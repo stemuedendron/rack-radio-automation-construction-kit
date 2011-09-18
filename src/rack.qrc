@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../images/top.png</file>
+	<file>../images/top-disabled.png</file>
+        <file>../images/left.png</file>
+	<file>../images/left-disabled.png</file>
+        <file>../images/right.png</file>
+	<file>../images/right-disabled.png</file>
+        <file>../images/bottom.png</file>
+	<file>../images/bottom-disabled.png</file>
+        <file>../images/ok.png</file>
+        <file>../images/close.png</file>
+	<file>../images/close-disabled.png</file>
+        <file>../images/move.png</file>
+        <file>../images/insert.png</file>
+        <file>../images/delete.png</file>
+        <file>../images/pfl.png</file>
+        <file>../images/pfl-small.png</file>
+        <file>../images/play-manual.png</file>
+        <file>../images/play.png</file>
+        <file>../qss/default.qss</file>
+        <file>../qss/default-old.qss</file>
+        <file>../qss/matrix.qss</file>
+    </qresource>
+</RCC>

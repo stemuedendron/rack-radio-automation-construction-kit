@@ -1,0 +1,13 @@
+bass errors mit qmap
+
+api mit static functions
+
+z.b. RackAPI Klasse mit static function gettime 
+
+
+clock pluginsd qtimer ersetzen durch basictimer oder qobject.starttimer
+
+
+device struct -> user comment field (main playout, pfl etc.)
+
+if a plugin can't init his device, show settings in widget to choose another one
