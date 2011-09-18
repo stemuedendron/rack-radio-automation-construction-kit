@@ -1,0 +1,18 @@
+splitter handle über qss stylen (rot)
+
+ 
+ QSplitter::handle {
+     image: url(images/splitter.png);
+ }
+
+ QSplitter::handle:horizontal {
+     width: 2px;
+ }
+
+ QSplitter::handle:vertical {
+     height: 2px;
+ }
+
+ QSplitter::handle:pressed {
+     url(images/splitter_pressed.png);
+ }
