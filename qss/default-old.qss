@@ -1,0 +1,382 @@
+/* R.A.C.K. default style sheet */
+
+
+/* All Buttons */
+
+
+
+#rackDialog {
+    border: 4px solid #FF0000;
+    background-color: #CBCDCE;
+    min-height: 400px;
+    max-height: 400px;
+    min-width: 300px;
+    max-width: 300px;
+}
+
+
+
+#rackDialog QLabel {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackDialog QLabel:disabled {
+    color: rgba(255,255,255,30%);
+}
+
+#rackTabWidget:pane {
+    background-color: #5F5F5F;
+}
+
+QLabel#rackErrorLabel {
+    color: #FF0000;
+}
+
+/*why this not work???*/
+* {
+    trash-icon: url(:/images/pfl-small.png)
+}
+
+QScrollBar:vertical {
+    border: none;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #717171, stop: 1 #B2B2B2);
+    width: 46px;
+    margin: 48px 0 48px 0;
+}
+
+QScrollBar::handle:vertical {
+    border: 4px solid #303030;
+    background-color: #5F5F5F;
+    min-height: 44px;
+}
+
+QScrollBar::handle:hover {
+    background-color: #6C6C6C;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    border: 2px solid #404040;
+    border-radius: 4px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #808080, stop: 0.49 #505050, stop: 0.5 #404040);
+    height: 44px;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #939393, stop: 0.49 #636363, stop: 0.5 #535353);
+}
+
+QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+    border-color: #FFFFFF;
+}
+
+QScrollBar::add-line:vertical {
+    subcontrol-position: bottom;
+}
+
+QScrollBar::sub-line:vertical {
+    subcontrol-position: top;
+}
+
+QScrollBar::up-arrow, QScrollBar::down-arrow {
+    border: none;
+}
+
+QScrollBar::up-arrow:vertical {
+    image: url(:/images/top.png);
+}
+
+QScrollBar::down-arrow:vertical {
+    image: url(:/images/bottom.png);
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+
+
+
+QWidget#rackWidget {
+    background-color: #000000;
+}
+
+/*ACHTUNG: gilt auch für hotkey-buttons usw.*/
+QPushButton {
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 4px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #4175FF, stop: 0.49 #2D58CB, stop: 0.5 #1D48BB);
+    border-color: #1D48BB;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QPushButton:disabled {
+    color: rgba(255,255,255,30%);
+}
+
+QPushButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #749AFF, stop: 0.49 #3266F1, stop: 0.5 #2256E1);
+}
+
+QPushButton:pressed {
+    border-color: #FFFFFF;
+}
+
+#rackOkButton {
+    min-width: 60px;
+    max-width: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #009900, stop: 0.49 #007000, stop: 0.5 #006600);
+    border-color: #006600;
+    image: url(:/images/ok.png);
+}
+
+#rackOkButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #0DAC13, stop: 0.49 #0D8313, stop: 0.5 #0D7913);
+}
+
+#rackOkButton:pressed {
+    border-color: #FFFFFF;
+}
+
+
+
+#rackCloseButton {
+    min-width: 60px;
+    max-width: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F00000, stop: 0.49 #C00000, stop: 0.5 #B00000);
+    border-color: #B00000;
+    image: url(:/images/close.png);
+}
+
+#rackCloseButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FD1313, stop: 0.49 #CD1313, stop: 0.5 #BD1313);
+}
+
+#rackCloseButton:pressed {
+    border-color: #FFFFFF;
+}
+
+
+#rackButton {
+    min-width: 96px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+[blinking="true"]#rackButton {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F00000, stop: 0.49 #C00000, stop: 0.5 #B00000);
+    border-color: #AAAAAA;
+}
+
+#rackLeftArrowButton {
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    image: url(:/images/left.png);
+}
+
+#rackRightArrowButton {
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    image: url(:/images/right.png);
+}
+
+#rackLeftArrowButton:disabled {
+    image: url(:/images/left-disabled.png);
+}
+
+#rackRightArrowButton:disabled {
+    image: url(:/images/right-disabled.png);
+}
+
+/*all widgets title headers*/
+
+#rackWidgetHeader {
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #686868, stop: 0.49 #383838 stop: 0.5 #282828);
+    min-height: 60px;
+    max-height: 60px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #686868;
+}
+
+#rackWidgetHeaderTitle {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#rackWidgetHeaderSubTitle {
+    color: #F8FE1E;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+/*Hotkeys Widget*/
+
+#rackHotkeyIndexButton {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000000;
+    border-radius: 6px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F3F3F3, stop: 1 #B6B6B6);
+    min-height: 44px;
+    max-height: 44px;
+}
+
+#rackHotkeyIndexButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FFFFFF, stop: 1 #C5C5C5);
+}
+
+#rackHotkeyIndexButton:pressed, #rackHotkeyIndexButton:checked {
+    border-color: #FFFFFF;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #4175FF, stop: 0.49 #2D58CB, stop: 0.5 #1D48BB);
+}
+
+#rackHotkeyIndexButtonTitleLabel {
+    color: #000000;
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 30px;
+}
+
+#rackHotkeyIndexButtonKeysLabel {
+    color: #B3B3B3;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackHotkeyIndexPage {
+    background-color: #000000;
+    border: none;
+}
+
+#rackHotkeyEditMode {
+    color: rgba(255,255,255,50%);
+    font-size: 12px;
+    background-color: rgba(0,0,255,30%);
+}
+
+[playingOrPaused="true"]#rackHotkeyButton {
+    border-color: #FFFFFF;
+}
+
+RButton {
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 6px;
+    qproperty-borderRadius: 6;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #606060, stop: 1 #000000);
+    border-color: #606060;
+
+
+   /* background-image: url(:/images/pfl-small.png);*/
+    background-repeat: no-repeat;
+
+
+    background-origin: content;
+    padding: 4px
+}
+
+RButton:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #737373, stop: 1 #131313);
+    border-color: #737373
+}
+
+RButton:pressed {
+    border-color: #FFFFFF;
+}
+
+
+
+/* Gradient Button */
+
+RButton[bk="0"] {
+    min-width: 40px;
+    min-height: 40px
+}
+
+
+/* On Air Button */
+
+RButton[bk="1"] {
+    min-width: 92px;
+    min-height: 92px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #009900, stop: 1 #006600);
+    border-color: #009900
+}
+
+RButton[bk="1"][position="0"] {
+    image: url(:/images/play.png)
+}
+
+RButton[bk="1"]:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #00B800, stop: 1 #007A00);
+    border-color: #00B800
+}
+
+RButton[bk="1"]:pressed {
+    border-color: white
+}
+
+
+/* Stack Button */
+
+RButton[bk="2"] {
+    min-width: 250px;
+    min-height: 100px
+}
+
+
+/* HotKey Button */
+
+RButton[bk="3"] {
+    min-width: 80px;
+    min-height: 60px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #4175FF, stop: 1 #1D48BB);
+    border-color: #4175FF
+}
+
+RButton[bk="3"]:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #749AFF, stop: 1 #2256E1);
+    border-color: #749AFF
+}
+
+RButton[bk="3"]:pressed {
+    border-color: white
+}
+
+
+/* Library Button */
+
+RButton[bk="4"] {
+    min-width: 200px;
+    min-height: 100px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #787878, stop: 1 #505050);
+    border-color: #787878
+}
+
+RButton[bk="4"]:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #909090, stop: 1 #606060);
+    border-color: #909090
+}
+
+RButton[bk="4"]:pressed {
+    border-color: white
+}
+
+

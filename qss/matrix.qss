@@ -1,0 +1,34 @@
+/* R.A.C.K. matrix style sheet */
+
+RButton {
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 2px;
+    qproperty-borderRadius: 2;
+    background-color: #000000;
+    border-color: #00FF00
+    }
+
+RButton:hover {
+    background-color: #303030
+}
+
+RButton:pressed {
+    border-color: white
+}
+
+RButton[bk="0"] {
+    min-width: 40px;
+    min-height: 40px
+}
+
+RButton[bk="1"] {
+    min-width: 100px;
+    min-height: 100px
+}
+
+RButton[bk="1"][position="0"] {
+    image: url(:/images/play.png)
+}
+
+
