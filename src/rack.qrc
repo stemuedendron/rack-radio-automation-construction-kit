@@ -1,16 +1,18 @@
 <RCC>
     <qresource prefix="/">
+        <file>../audio/main.ogg</file>
+        <file>../audio/mini.ogg</file>
         <file>../images/top.png</file>
-	<file>../images/top-disabled.png</file>
+        <file>../images/top-disabled.png</file>
         <file>../images/left.png</file>
-	<file>../images/left-disabled.png</file>
+        <file>../images/left-disabled.png</file>
         <file>../images/right.png</file>
-	<file>../images/right-disabled.png</file>
+        <file>../images/right-disabled.png</file>
         <file>../images/bottom.png</file>
-	<file>../images/bottom-disabled.png</file>
+        <file>../images/bottom-disabled.png</file>
         <file>../images/ok.png</file>
         <file>../images/close.png</file>
-	<file>../images/close-disabled.png</file>
+        <file>../images/close-disabled.png</file>
         <file>../images/move.png</file>
         <file>../images/insert.png</file>
         <file>../images/delete.png</file>
