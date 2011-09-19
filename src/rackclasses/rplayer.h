@@ -1,10 +1,8 @@
 #ifndef RPLAYER_H
 #define RPLAYER_H
-#include "bass.h"
 
 #include <QObject>
 #include <QBasicTimer>
-
 #include "bass.h"
 
 /**
