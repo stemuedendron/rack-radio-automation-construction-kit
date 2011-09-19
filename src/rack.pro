@@ -1,5 +1,3 @@
-TEMPLATE = subdirs
-
-SUBDIRS += \
-    rackcoreapp
-
+TEMPLATE    = subdirs
+SUBDIRS     = hotkeywidgettest \
+              rplayertest
