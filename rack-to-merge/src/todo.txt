@@ -1,0 +1,11 @@
+pluginmanager:
+
+neue button klasse mit member int pluginid für layout widget
+ebenso taskbar button
+
+
+rechten mausklick abschaffen (touch screen)
+->colordialog über settings erreichen
+
+
+
