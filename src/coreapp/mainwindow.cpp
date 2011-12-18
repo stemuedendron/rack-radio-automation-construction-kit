@@ -56,7 +56,7 @@ RMainWindow::RMainWindow(QWidget *parent) : QWidget(parent)
     QObject::connect(btQuit,SIGNAL(clicked()),SLOT(close()));
 
     m_btSavetest = new QPushButton("Save");
-    QObject::connect(m_btSavetest, SIGNAL(clicked()), m_desktop, SLOT(saveFSWidgets()));
+    QObject::connect(m_btSavetest, SIGNAL(clicked()), m_desktop, SLOT(saveRWidgets()));
 
 
     QHBoxLayout *barLayout = new QHBoxLayout;
