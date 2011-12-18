@@ -2,6 +2,11 @@
     <qresource prefix="/">
         <file>../audio/main.ogg</file>
         <file>../audio/mini.ogg</file>
+        <file>../qss/default.qss</file>
+        <file>../qss/default-old.qss</file>
+        <file>../qss/matrix.qss</file>
+        <file>../fonts/droid/DroidSans.ttf</file>
+        <file>../fonts/digital-7.ttf</file>
         <file>../images/top.png</file>
         <file>../images/top-disabled.png</file>
         <file>../images/left.png</file>
@@ -20,8 +25,5 @@
         <file>../images/pfl-small.png</file>
         <file>../images/play-manual.png</file>
         <file>../images/play.png</file>
-        <file>../qss/default.qss</file>
-        <file>../qss/default-old.qss</file>
-        <file>../qss/matrix.qss</file>
     </qresource>
 </RCC>

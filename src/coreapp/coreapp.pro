@@ -20,12 +20,43 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = coreapp \
-              plugins/digitalclock \
-              plugins/radioclock \
-              plugins/hotkeywidget \
-              tests/rplayertest \
-              tests/colordialog
+TARGET = rack
+
+SOURCES += main.cpp \
+    mainwindow.cpp \
+    ../rackclasses/rsplitter.cpp \
+    ../rackclasses/rdesktop.cpp \
+    ../rackclasses/rpluginhost.cpp
+
+HEADERS += mainwindow.h \
+    ../rackclasses/rinterface.h \
+    ../rackclasses/rsplitter.h \
+    ../rackclasses/rdesktop.h \
+    ../rackclasses/rpluginhost.h
+
+INCLUDEPATH += ../rackclasses
+
+RESOURCES += \
+    ../rack.qrc
+
+
+# bass library:
+unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
+LIBS += -L$$PWD/../../bass/ -lbass
+INCLUDEPATH += $$PWD/.././bass
+DEPENDPATH += $$PWD/../../bass
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

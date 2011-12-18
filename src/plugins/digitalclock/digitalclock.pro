@@ -20,12 +20,27 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = coreapp \
-              plugins/digitalclock \
-              plugins/radioclock \
-              plugins/hotkeywidget \
-              tests/rplayertest \
-              tests/colordialog
+TEMPLATE        = lib
+CONFIG         += plugin
+INCLUDEPATH += ../../rackclasses
+
+HEADERS         = \
+                ../../rackclasses/rinterface.h \
+                ../../rackclasses/rcolordialog.h \
+                rdigitalclockplugin.h \
+                rdigitalclock.h
+
+
+SOURCES         = \
+    ../../rackclasses/rcolordialog.cpp \
+    rdigitalclockplugin.cpp \
+    rdigitalclock.cpp
+
+
+TARGET          = $$qtLibraryTarget(digitalclockplugin)
+
+
+
+DESTDIR         = ../../coreapp/plugins
 
 

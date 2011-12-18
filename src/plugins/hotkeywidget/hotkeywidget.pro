@@ -20,12 +20,51 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = coreapp \
-              plugins/digitalclock \
-              plugins/radioclock \
-              plugins/hotkeywidget \
-              tests/rplayertest \
-              tests/colordialog
+TEMPLATE        = lib
+CONFIG         += plugin
+INCLUDEPATH += ../../rackclasses
+
+HEADERS         = \
+    ../../rackclasses/rplayer.h \
+    ../../rackclasses/rbutton.h \
+    ../../rackclasses/rblinkbutton.h \
+    ../../rackclasses/rinterface.h \
+    rpageedit.h \
+    rindexbutton.h \
+    rhotkeywidget.h \
+    rhotkeywidgetplugin.h
+
+
+SOURCES         = \
+    ../../rackclasses/rplayer.cpp \
+    ../../rackclasses/rbutton.cpp \
+    ../../rackclasses/rblinkbutton.cpp \
+    rpageedit.cpp \
+    rindexbutton.cpp \
+    rhotkeywidget.cpp \
+    rhotkeywidgetplugin.cpp
+
+
+TARGET          = $$qtLibraryTarget(rhotkeywidgetplugin)
+
+
+
+DESTDIR         = ../../coreapp/plugins
+
+
+# bass library:
+unix:!macx: LIBS += -L$$PWD/../../../bass/x64/ -lbass
+LIBS += -L$$PWD/../../../bass/ -lbass
+INCLUDEPATH += $$PWD/../../../bass
+DEPENDPATH += $$PWD/../../../bass
+
+
+
+
+
+
+
+
+
 
 

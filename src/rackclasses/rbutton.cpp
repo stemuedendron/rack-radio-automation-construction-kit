@@ -20,9 +20,10 @@
     Author: Steffen Müller
 */
 
-#include <QtGui>
-#include <qmath.h>
 #include "rbutton.h"
+#include <qmath.h>
+#include <QtGui>
+
 
 //methoden verdecken (z.B. settext wenn qpushbutton ?????
 
@@ -60,7 +61,12 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
                      << dev.driver;
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
-    QString file = qApp->applicationDirPath() + "/1.mp3";
+    //QString file = qApp->applicationDirPath() + "/1.mp3";
+
+   // QString file = ":/audio/main.ogg";
+
+    QTemporaryFile *tmpFile = QTemporaryFile::createLocalFile(":/audio/main.ogg");
+    QString file = tmpFile->fileName();
 
     m_player = new RPlayer(this, m_device);
 

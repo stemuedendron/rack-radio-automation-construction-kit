@@ -20,12 +20,17 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = coreapp \
-              plugins/digitalclock \
-              plugins/radioclock \
-              plugins/hotkeywidget \
-              tests/rplayertest \
-              tests/colordialog
+TARGET = colordialog
+
+INCLUDEPATH += ../../rackclasses
+
+
+HEADERS += mainwindow.h \ 
+    ../../rackclasses/rcolordialog.h
+SOURCES += main.cpp \ 
+    mainwindow.cpp \
+    ../../rackclasses/rcolordialog.cpp
+
+RESOURCES += ../../rack.qrc
 
 

@@ -23,8 +23,9 @@
 #ifndef RBUTTON_H
 #define RBUTTON_H
 
-#include <QPushButton>
 #include "rplayer.h"
+#include <QPushButton>
+
 
 class QColor;
 
