@@ -1,0 +1,30 @@
+button states:
+
+play auto
+play manuel
+
+insert
+move
+delete
+
+pfl
+
+
+
+stack-playbutton:
+-----------------
+delete
+move
+insert
+
+
+hotkey-button:
+--------------
+playing -> position clock, white border
+
+
+
+library-button:
+---------------
+selected -> color: blue
+
