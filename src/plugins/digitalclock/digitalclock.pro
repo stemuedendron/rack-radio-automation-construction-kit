@@ -22,13 +22,14 @@
 
 TEMPLATE        = lib
 CONFIG         += plugin
-INCLUDEPATH += ../../rackclasses
+INCLUDEPATH += ../../rackclasses \
+    ../../coreapp
 
 HEADERS         = \
-                ../../rackclasses/rinterface.h \
-                ../../rackclasses/rcolordialog.h \
-                rdigitalclockplugin.h \
-                rdigitalclock.h
+    ../../rackclasses/rinterface.h \
+    ../../rackclasses/rcolordialog.h \
+    rdigitalclockplugin.h \
+    rdigitalclock.h
 
 
 SOURCES         = \
@@ -42,5 +43,7 @@ TARGET          = $$qtLibraryTarget(digitalclockplugin)
 
 
 DESTDIR         = ../../coreapp/plugins
+
+
 
 

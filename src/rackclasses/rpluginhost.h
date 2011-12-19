@@ -66,10 +66,10 @@ private:
 
     //widgets for settings
     //FSLayoutWidget *m_layoutWidget;
-    QWidget *m_layoutWidget;
+    QWidget *m_wgSettings;
 
 
-    QVBoxLayout *m_middlelayout;
+    QVBoxLayout *m_vlMiddle;
     QPushButton *m_btLeft;
     QPushButton *m_btRight;
     QPushButton *m_btTop;
@@ -85,7 +85,7 @@ private:
     QWidgetList m_wlPluginWidgets;
 
     RInterface *m_rinterface;
-    QHBoxLayout *m_mainlayout;
+    QHBoxLayout *m_hlMain;
 
 };
 

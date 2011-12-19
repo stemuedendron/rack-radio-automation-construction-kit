@@ -39,15 +39,15 @@
  */
 RDesktop::RDesktop(QWidget *parent) : QWidget(parent)
 {
-    RPluginHost *rMain = new RPluginHost;
-    rMain->setLayoutVisible(false);
-    QObject::connect(this, SIGNAL(changeConfigModus(bool)), rMain, SLOT(setLayoutVisible(bool)));
-    QObject::connect(rMain, SIGNAL(btNewWidgetCLick(int)), SLOT(btNewRWidgetClick(int)));
-    QObject::connect(rMain, SIGNAL(btCloseWidgetClick()), SLOT(btCloseRWidgetClick()));
+    RPluginHost *mainPluginHost = new RPluginHost;
+    mainPluginHost->setLayoutVisible(false);
+    QObject::connect(this, SIGNAL(changeConfigModus(bool)), mainPluginHost, SLOT(setLayoutVisible(bool)));
+    QObject::connect(mainPluginHost, SIGNAL(btNewWidgetCLick(int)), SLOT(createPluginHost(int)));
+    QObject::connect(mainPluginHost, SIGNAL(btCloseWidgetClick()), SLOT(closePluginHost()));
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(rMain);
+    layout->addWidget(mainPluginHost);
     setLayout(layout);
 }
 
@@ -68,12 +68,13 @@ void RDesktop::setConfigModus(bool value)
  *
  * @param position
  */
-void RDesktop::btNewRWidgetClick(int position)
+void RDesktop::createPluginHost(int position)
 {
-    RPluginHost *newRWidget = new RPluginHost;
-    QObject::connect(this, SIGNAL(changeConfigModus(bool)), newRWidget, SLOT(setLayoutVisible(bool)));
-    QObject::connect(newRWidget, SIGNAL(btNewWidgetCLick(int)), SLOT(btNewRWidgetClick(int)));
-    QObject::connect(newRWidget, SIGNAL(btCloseWidgetClick()), SLOT(btCloseRWidgetClick()));
+    RPluginHost *pluginHost = new RPluginHost;
+    QObject::connect(this, SIGNAL(changeConfigModus(bool)), pluginHost, SLOT(setLayoutVisible(bool)));
+    QObject::connect(pluginHost, SIGNAL(btNewWidgetCLick(int)), SLOT(createPluginHost(int)));
+    QObject::connect(pluginHost, SIGNAL(btCloseWidgetClick()), SLOT(closePluginHost()));
+
     RPluginHost *senderWidget = qobject_cast<RPluginHost *>(sender());
     RSplitter *parentSplitter = qobject_cast<RSplitter *>(sender()->parent());
     if (!parentSplitter)
@@ -96,7 +97,7 @@ void RDesktop::btNewRWidgetClick(int position)
         widgetsizes = parentSplitter->sizes();
         widgetsizes.replace(senderpos, int(widgetsizes.at(senderpos)/2));
         widgetsizes.insert(senderpos + 1, widgetsizes.at(senderpos));
-        parentSplitter->insertWidget(newposition, newRWidget);
+        parentSplitter->insertWidget(newposition, pluginHost);
         parentSplitter->setSizes(widgetsizes);
         break;
     case  1:                                                        //left  vertical
@@ -108,7 +109,7 @@ void RDesktop::btNewRWidgetClick(int position)
             widgetsizes = parentSplitter->sizes();
             widgetsizes.replace(0, int(widgetsizes.at(0)/2));
             widgetsizes.append(widgetsizes.at(0));
-            parentSplitter->insertWidget(newposition, newRWidget);
+            parentSplitter->insertWidget(newposition, pluginHost);
             parentSplitter->setSizes(widgetsizes);
         }
         else if (parentSplitter->count() > 1)
@@ -123,8 +124,8 @@ void RDesktop::btNewRWidgetClick(int position)
             QList<int> newsizes = newSplitter->sizes();
             newsizes.replace(0, int(newsizes.at(0)/2));
             newsizes.append(newsizes.at(0));
-            if ((position == -1) or (position == -2)) newSplitter->insertWidget(0, newRWidget);
-            else newSplitter->addWidget(newRWidget);
+            if ((position == -1) or (position == -2)) newSplitter->insertWidget(0, pluginHost);
+            else newSplitter->addWidget(pluginHost);
             newSplitter->setSizes(newsizes);
             parentSplitter->setSizes(widgetsizes);
         }
@@ -137,7 +138,7 @@ void RDesktop::btNewRWidgetClick(int position)
  * @brief
  *
  */
-void RDesktop::btCloseRWidgetClick()
+void RDesktop::closePluginHost()
 {
     RPluginHost *senderWidget = qobject_cast<RPluginHost *>(sender());
     RSplitter *parentSplitter = qobject_cast<RSplitter *>(sender()->parent());
@@ -177,7 +178,7 @@ void RDesktop::btCloseRWidgetClick()
  * @brief
  *
  */
-void RDesktop::saveRWidgets()
+void RDesktop::savePluginHosts()
 {
     ////orientation unterscheiden
 

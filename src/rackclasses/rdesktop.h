@@ -46,15 +46,15 @@ private:
 
 private slots:
 
-    void btNewRWidgetClick(int);
-    void btCloseRWidgetClick();
+    void createPluginHost(int);
+    void closePluginHost();
 
 public slots:
 
     void setConfigModus(bool);
 
     //debug this
-    void saveRWidgets();
+    void savePluginHosts();
 
 signals:
 

@@ -20,25 +20,23 @@
     Author: Steffen Müller
 */
 
-#include "mainwindow.h"
+#include "rack.h"
 #include "rdesktop.h"
 
 #include <QtGui>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 
+static Rack *m_instance = 0;
 
-
-RMainWindow::RMainWindow(QWidget *parent) : QWidget(parent)
+Rack *Rack::instance()
 {
+    return m_instance;
+}
+
+Rack::Rack(QWidget *parent) : QWidget(parent)
+{
+    m_instance = this;
+
     setWindowTitle("R.A.C.K.");
-    //setPalette(QPalette(Qt::black));
-
-    //better:
-    //setStyleSheet("QWidget { background-color: black; }");
-
-    setPalette(Qt::black);
 
     QFile file(":/qss/default.qss");
     file.open(QFile::ReadOnly);
@@ -56,7 +54,7 @@ RMainWindow::RMainWindow(QWidget *parent) : QWidget(parent)
     QObject::connect(btQuit,SIGNAL(clicked()),SLOT(close()));
 
     m_btSavetest = new QPushButton("Save");
-    QObject::connect(m_btSavetest, SIGNAL(clicked()), m_desktop, SLOT(saveRWidgets()));
+    QObject::connect(m_btSavetest, SIGNAL(clicked()), m_desktop, SLOT(savePluginHosts()));
 
 
     QHBoxLayout *barLayout = new QHBoxLayout;
@@ -79,7 +77,7 @@ RMainWindow::RMainWindow(QWidget *parent) : QWidget(parent)
 
 }
 
-void RMainWindow::timerEvent(QTimerEvent *)
+void Rack::timerEvent(QTimerEvent *)
  {
      emit timeStrChanged(QTime::currentTime().toString(tr("hh:mm:ss")));
      emit dateStrChanged(QDate::currentDate().toString(tr("dd.MM.yy")));

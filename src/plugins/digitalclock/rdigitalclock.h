@@ -33,6 +33,11 @@ public:
 
     explicit RDigitalClock(QWidget *parent = 0);
 
+public slots:
+
+    void setDate(const QString &);
+    void setTime(const QString &);
+
 protected:
 
     void paintEvent(QPaintEvent *ev);
@@ -40,7 +45,9 @@ protected:
 
 private:
 
-    bool pushed;
+    bool m_pushed;
+    QString m_date;
+    QString m_time;
 
 };
 

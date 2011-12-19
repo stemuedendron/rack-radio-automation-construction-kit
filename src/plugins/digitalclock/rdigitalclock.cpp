@@ -25,16 +25,26 @@
 #include <QtGui>
 
 
- RDigitalClock::RDigitalClock(QWidget *parent) : QWidget(parent)
+ RDigitalClock::RDigitalClock(QWidget *parent)
+     : QWidget(parent),
+       m_pushed(false)
  {
-     QTimer *timer = new QTimer(this);
-     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-     timer->start(1000);
-
-     pushed = false;
 
      QFontDatabase fontDB;
      fontDB.addApplicationFont(":/fonts/digital-7.ttf");
+
+ }
+
+ void RDigitalClock::setDate(const QString &str)
+ {
+     m_date = str;
+     update();
+ }
+
+ void RDigitalClock::setTime(const QString &str)
+ {
+     m_time = str;
+     update();
  }
 
  void RDigitalClock::mouseReleaseEvent(QMouseEvent *ev)
@@ -44,7 +54,7 @@
      {
          if (ev->button() == Qt::LeftButton)
          {
-             pushed = !pushed;
+             m_pushed = !m_pushed;
              update();
          }
          else if (ev->button() == Qt::RightButton)
@@ -74,12 +84,12 @@
      painter.setFont(QFont("Digital-7", 16));
      QString label;
 
-     switch (pushed) {
+     switch (m_pushed) {
      case true:
-         label = QDate::currentDate().toString(tr("dd.MM.yy"));
+         label = m_date;
          break;
      case false:
-         label = QTime::currentTime().toString(tr("hh:mm:ss"));
+         label = m_time;
          break;
      }
 

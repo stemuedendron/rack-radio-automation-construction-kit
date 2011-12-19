@@ -23,28 +23,42 @@
 TARGET = rack
 
 SOURCES += main.cpp \
-    mainwindow.cpp \
     ../rackclasses/rsplitter.cpp \
     ../rackclasses/rdesktop.cpp \
-    ../rackclasses/rpluginhost.cpp
+    ../rackclasses/rpluginhost.cpp \
+    rack.cpp
 
-HEADERS += mainwindow.h \
+HEADERS += \
     ../rackclasses/rinterface.h \
     ../rackclasses/rsplitter.h \
     ../rackclasses/rdesktop.h \
-    ../rackclasses/rpluginhost.h
+    ../rackclasses/rpluginhost.h \
+    rack.h
 
 INCLUDEPATH += ../rackclasses
 
 RESOURCES += \
     ../rack.qrc
 
+OTHER_FILES += \
+    ../../qss/default.qss
 
 # bass library:
 unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
 LIBS += -L$$PWD/../../bass/ -lbass
 INCLUDEPATH += $$PWD/.././bass
 DEPENDPATH += $$PWD/../../bass
+
+
+
+
+
+
+
+
+
+
+
 
 
 

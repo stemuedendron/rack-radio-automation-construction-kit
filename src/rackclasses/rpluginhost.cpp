@@ -29,52 +29,43 @@ RPluginHost::RPluginHost(QWidget *parent) : QWidget(parent)
 {
     setMinimumSize(QSize(120,120));
 
-
-
     //widgets for settings
 
     QPalette pal;
     pal.setColor(QPalette::Window, QColor(0,0,0,160));
-    m_layoutWidget = new QWidget(this);
-    m_layoutWidget->setPalette(pal);
-    m_layoutWidget->setAutoFillBackground(true);
+    m_wgSettings = new QWidget(this);
+    m_wgSettings->setPalette(pal);
+    m_wgSettings->setAutoFillBackground(true);
 
-    //btLeft = new QPushButton(QPixmap(":/trolltech/styles/commonstyle/images/up-32.png"), "X");
     m_btLeft = new QPushButton;
-
-    m_btLeft->setFixedSize(40,40);
+    m_btLeft->setObjectName("rackSettingsLeftArrowButton");
 
     m_btRight = new QPushButton;
-
-    m_btRight->setFixedSize(40,40);
+    m_btRight->setObjectName("rackSettingsRightArrowButton");
 
     m_btTop = new QPushButton;
-
-    m_btTop->setFixedSize(40,40);
+    m_btTop->setObjectName("rackSettingsTopArrowButton");
 
     m_btBottom = new QPushButton;
-
-    m_btBottom->setFixedSize(40,40);
+    m_btBottom->setObjectName("rackSettingsBottomArrowButton");
 
     m_btClose = new QPushButton;
+    m_btClose->setObjectName("rackSettingsCloseButton");
 
-    m_btClose->setFixedSize(40,40);
 
     m_btMiddle = new QPushButton;
     m_btMiddle->setFixedHeight(40);
     m_btMiddle->resize(200,40);
 
-
     m_btMiddle->setText(QTime::currentTime().toString(tr("ss")));
 
-
-    m_middlelayout = new QVBoxLayout;
-    m_middlelayout->setSpacing(0);
-    m_middlelayout->setContentsMargins(0,0,0,0);
-    m_middlelayout->addWidget(m_btMiddle);
+    m_vlMiddle = new QVBoxLayout;
+    m_vlMiddle->setSpacing(0);
+    m_vlMiddle->setContentsMargins(0,0,0,0);
+    m_vlMiddle->addWidget(m_btMiddle);
 
     QWidget *middleWidget = new QWidget;
-    middleWidget->setLayout(m_middlelayout);
+    middleWidget->setLayout(m_vlMiddle);
 
     QGridLayout *layout = new QGridLayout;
     layout->setSpacing(0);
@@ -85,25 +76,25 @@ RPluginHost::RPluginHost(QWidget *parent) : QWidget(parent)
     layout->addWidget(m_btRight,1,2, Qt::AlignRight);
     layout->addWidget(m_btBottom,2,1, Qt::AlignBottom| Qt::AlignHCenter);
     layout->addWidget(middleWidget,1,1);
-    m_layoutWidget->setLayout(layout);
+    m_wgSettings->setLayout(layout);
 
     m_signalMapper = new QSignalMapper(this);
-    QObject::connect(m_btLeft, SIGNAL(pressed()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btRight, SIGNAL(pressed()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btTop, SIGNAL(pressed()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btBottom, SIGNAL(pressed()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_btLeft, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_btRight, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_btTop, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_btBottom, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
     m_signalMapper->setMapping(m_btLeft,  -1);
     m_signalMapper->setMapping(m_btRight,  1);
     m_signalMapper->setMapping(m_btTop,   -2);
     m_signalMapper->setMapping(m_btBottom, 2);
     QObject::connect(m_signalMapper, SIGNAL(mapped(int)), SIGNAL(btNewWidgetCLick(int)));
-    QObject::connect(m_btClose, SIGNAL(pressed()), SIGNAL(btCloseWidgetClick()));
-    QObject::connect(m_btMiddle, SIGNAL(pressed()), SLOT(newPlugin()));
+    QObject::connect(m_btClose, SIGNAL(clicked()), SIGNAL(btCloseWidgetClick()));
+    QObject::connect(m_btMiddle, SIGNAL(clicked()), SLOT(newPlugin()));
 
-    m_mainlayout = new QHBoxLayout;
-    m_mainlayout->setSpacing(0);
-    m_mainlayout->setContentsMargins(0,0,0,0);
-    setLayout(m_mainlayout);
+    m_hlMain = new QHBoxLayout;
+    m_hlMain->setSpacing(0);
+    m_hlMain->setContentsMargins(0,0,0,0);
+    setLayout(m_hlMain);
 
 }
 
@@ -150,12 +141,13 @@ void RPluginHost::newPlugin()
 
         QWidget *newplugin = m_rinterface->createRWidget(this);
 
+        //QObject::connect()
 
         QObject::connect(this, SIGNAL(setPluginsVisible(bool)), newplugin, SLOT(setVisible(bool)));
-        m_mainlayout->addWidget(newplugin);
+        m_hlMain->addWidget(newplugin);
 
 
-        m_layoutWidget->raise();
+        m_wgSettings->raise();
 
         //signal emit für taskbar und layoutwidget buttons
         m_wlPluginWidgets.append(newplugin);
@@ -166,7 +158,7 @@ void RPluginHost::newPlugin()
         QPushButton *newpluginbutton = new QPushButton;
 
         newpluginbutton->setFixedHeight(40);
-        m_middlelayout->insertWidget(0,newpluginbutton);
+        m_vlMiddle->insertWidget(0,newpluginbutton);
 
         ////QObject::connect(newpluginbutton,SIGNAL(pressed()),SLOT(removePluginButton(middlelayout->indexOf(newpluginbutton))));
 
@@ -191,11 +183,11 @@ void RPluginHost::removePlugin(int value)
 
 void RPluginHost::setLayoutVisible(bool value)
 {
-    m_layoutWidget->setVisible(value);
+    m_wgSettings->setVisible(value);
 }
 
 void RPluginHost::resizeEvent(QResizeEvent *ev)
 {
-    m_layoutWidget->resize(ev->size());
+    m_wgSettings->resize(ev->size());
     ev->accept();
 }

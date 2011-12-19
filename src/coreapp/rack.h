@@ -20,8 +20,8 @@
     Author: Steffen Müller
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef RACK_H
+#define RACK_H
 
 #include <QWidget>
 
@@ -30,12 +30,14 @@ class RDesktop;
 class QWidget;
 class QPushButton;
 
-class RMainWindow : public QWidget
+class Rack : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit RMainWindow(QWidget *parent = 0);
+
+    explicit Rack(QWidget *parent = 0);
+    static Rack *instance();
 
 signals:
 
@@ -43,6 +45,7 @@ signals:
     void dateStrChanged(QString);
 
 private:
+
     RDesktop *m_desktop;
 
     QWidget *m_taskbar;
@@ -50,8 +53,9 @@ private:
     QPushButton *m_btSavetest;
 
 protected:
+
      void timerEvent(QTimerEvent *);
 
 };
 
-#endif // MAINWINDOW_H
+#endif // RACK_H
