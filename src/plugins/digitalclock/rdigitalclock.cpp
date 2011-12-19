@@ -56,6 +56,15 @@
          {
              m_pushed = !m_pushed;
              update();
+
+
+
+
+             emit sayHello("Hello from digital clock!");
+
+
+
+
          }
          else if (ev->button() == Qt::RightButton)
          {

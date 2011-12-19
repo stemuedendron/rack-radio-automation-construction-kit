@@ -20,6 +20,7 @@
     Author: Steffen Müller
 */
 
+#include "rack.h"
 #include "rpluginhost.h"
 
 #include <QtGui>
@@ -141,7 +142,16 @@ void RPluginHost::newPlugin()
 
         QWidget *newplugin = m_rinterface->createRWidget(this);
 
-        //QObject::connect()
+
+
+
+        QObject::connect(Rack::instance(), SIGNAL(dateStrChanged(QString)), newplugin, SLOT(setDate(QString)));
+        QObject::connect(Rack::instance(), SIGNAL(timeStrChanged(QString)), newplugin, SLOT(setTime(QString)));
+        QObject::connect(newplugin, SIGNAL(sayHello(QString)), Rack::instance(), SLOT(setWindowTitle(QString)));
+
+
+
+
 
         QObject::connect(this, SIGNAL(setPluginsVisible(bool)), newplugin, SLOT(setVisible(bool)));
         m_hlMain->addWidget(newplugin);

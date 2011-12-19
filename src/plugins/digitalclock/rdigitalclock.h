@@ -38,6 +38,10 @@ public slots:
     void setDate(const QString &);
     void setTime(const QString &);
 
+signals:
+
+    void sayHello(const QString &);
+
 protected:
 
     void paintEvent(QPaintEvent *ev);
