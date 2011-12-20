@@ -36,7 +36,7 @@ class RackImpl : public Rack
 
 public:
 
-    explicit RackImpl(QWidget *parent = 0);
+    explicit RackImpl();
 
     //this is only for for member classes to access the main rack api
     //plugins get on load a pointer to the api object
