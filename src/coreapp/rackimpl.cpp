@@ -33,7 +33,7 @@ RackImpl *RackImpl::instance()
     return m_instance;
 }
 
-RackImpl::RackImpl(QWidget *)
+RackImpl::RackImpl()
 {
 
     m_instance = this;

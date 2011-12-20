@@ -33,6 +33,7 @@ public:
 
     virtual QWidget *createRWidget(QWidget *parent, Rack *api) = 0;
 
+//in this way we can plugins force to implement api methods:
 //public slots:
 
 //    virtual void setDate(const QString &) = 0;
