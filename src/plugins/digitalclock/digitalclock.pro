@@ -23,10 +23,11 @@
 TEMPLATE        = lib
 CONFIG         += plugin
 INCLUDEPATH += ../../rackclasses \
-    ../../coreapp
+
 
 HEADERS         = \
     ../../rackclasses/rinterface.h \
+    ../../rackclasses/rack.h \
     ../../rackclasses/rcolordialog.h \
     rdigitalclockplugin.h \
     rdigitalclock.h

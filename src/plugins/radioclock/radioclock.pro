@@ -25,8 +25,9 @@ CONFIG         += plugin
 INCLUDEPATH += ../../rackclasses
 
 HEADERS         = rradioclockplugin.h \
-                  ../../rackclasses/rinterface.h \
-                  rradioclock.h \
+    rradioclock.h \
+    ../../rackclasses/rinterface.h \
+    ../../rackclasses/rack.h \
     ../../rackclasses/rcolordialog.h
 
 

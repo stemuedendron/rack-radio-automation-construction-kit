@@ -20,7 +20,7 @@
     Author: Steffen Müller
 */
 
-
+#include "rack.h"
 #include "rhotkeywidget.h"
 #include "rbutton.h"
 #include "rpageedit.h"
@@ -34,7 +34,9 @@
 
 //TODO: show number of currently played hotkeys on index button
 
-RHotKeyWidget::RHotKeyWidget(QWidget *parent) : QWidget(parent)
+RHotKeyWidget::RHotKeyWidget(QWidget *parent, Rack *api)
+    : QWidget(parent),
+      m_rack(api)
 {
 
     //create header widget:

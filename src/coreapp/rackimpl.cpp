@@ -20,20 +20,22 @@
     Author: Steffen Müller
 */
 
-#include "rack.h"
+#include "rackimpl.h"
 #include "rdesktop.h"
 
 #include <QtGui>
 
-static Rack *m_instance = 0;
 
-Rack *Rack::instance()
+static RackImpl *m_instance = 0;
+
+RackImpl *RackImpl::instance()
 {
     return m_instance;
 }
 
-Rack::Rack(QWidget *parent) : QWidget(parent)
+RackImpl::RackImpl(QWidget *)
 {
+
     m_instance = this;
 
     setWindowTitle("R.A.C.K.");
@@ -77,8 +79,19 @@ Rack::Rack(QWidget *parent) : QWidget(parent)
 
 }
 
-void Rack::timerEvent(QTimerEvent *)
- {
-     emit timeStrChanged(QTime::currentTime().toString(tr("hh:mm:ss")));
-     emit dateStrChanged(QDate::currentDate().toString(tr("dd.MM.yy")));
- }
+void RackImpl::timerEvent(QTimerEvent *)
+{
+    emit timeStrChanged(QTime::currentTime().toString(tr("hh:mm:ss")));
+    emit dateStrChanged(QDate::currentDate().toString(tr("dd.MM.yy")));
+}
+
+//api
+void RackImpl::getHello(const QString &str)
+{
+    setWindowTitle(str);
+}
+
+
+
+
+

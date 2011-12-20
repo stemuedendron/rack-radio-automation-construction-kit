@@ -20,7 +20,7 @@
     Author: Steffen Müller
 */
 
-#include "rack.h"
+#include "rackimpl.h"
 #include <QtGui>
 
 int main(int argc, char *argv[])
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     QApplication::setGraphicsSystem("raster");
     QApplication app(argc, argv);
 
-    Rack mainWindow;
+    RackImpl mainWindow;
     mainWindow.resize(800, 600);
     mainWindow.setWindowState(Qt::WindowMaximized);
 

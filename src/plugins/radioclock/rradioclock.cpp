@@ -20,6 +20,7 @@
     Author: Steffen Müller
 */
 
+#include "rack.h"
 #include "rradioclock.h"
 #include "rcolordialog.h"
 #include <QtGui>
@@ -30,15 +31,29 @@
 //showdate ?
 //show secondsleft ?
 
-RRadioClock::RRadioClock(QWidget *parent) : QWidget(parent)
+RRadioClock::RRadioClock(QWidget *parent, Rack *api)
+    : QWidget(parent),
+      m_rack(api),
+      m_pushed(false)
 {
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(200);
-
     setMinimumSize(QSize(130,130));
-    pushed = false;
 
+    //connect to api
+    QObject::connect(m_rack, SIGNAL(dateStrChanged(QString)), this, SLOT(setDate(QString)));
+    QObject::connect(m_rack, SIGNAL(timeStrChanged(QString)), this, SLOT(setTime(QString)));
+    QObject::connect(this, SIGNAL(sayHello(QString)), m_rack, SLOT(getHello(QString)));
+}
+
+void RRadioClock::setDate(const QString &str)
+{
+    m_date = str;
+    update();
+}
+
+void RRadioClock::setTime(const QString &str)
+{
+    m_time = str;
+    update();
 }
 
 void RRadioClock::mouseReleaseEvent(QMouseEvent *ev)
@@ -48,8 +63,13 @@ void RRadioClock::mouseReleaseEvent(QMouseEvent *ev)
     {
         if (ev->button() == Qt::LeftButton)
         {
-            pushed = !pushed;
+            m_pushed = !m_pushed;
             update();
+
+
+            emit sayHello("Hello from radio clock!");
+
+
         }
         else if (ev->button() == Qt::RightButton)
         {
@@ -78,8 +98,10 @@ void RRadioClock::paintEvent(QPaintEvent *)
     painter.setBrush(color);
     painter.setPen(color);
     painter.setFont(QFont("Sans Serif", 18, QFont::Bold));
-    QTime time = QTime::currentTime();
-    painter.drawText(-100,-100,200,200, Qt::AlignCenter, time.toString("hh:mm:ss"));
+
+    QTime time = QTime::fromString(m_time);
+
+    painter.drawText(-100,-100,200,200, Qt::AlignCenter, m_time);
     for (int i = 0; i < 12; ++i) {
         painter.drawLine(88, 0, 91, 0);
         painter.rotate(30.0);
@@ -89,7 +111,7 @@ void RRadioClock::paintEvent(QPaintEvent *)
     if (time.second() == 0) j=60;
     else j=time.second();
 
-    switch (pushed) {
+    switch (m_pushed) {
     case true:
         for (k = 1; k <= 60 ; ++k) {
             painter.rotate(6.0);

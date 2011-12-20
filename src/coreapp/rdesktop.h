@@ -20,42 +20,52 @@
     Author: Steffen Müller
 */
 
-#ifndef RRADIOCLOCK_H
-#define RRADIOCLOCK_H
-
+#ifndef RDESKTOP_H
+#define RDESKTOP_H
 #include <QWidget>
 
-class Rack;
+class RSplitter;
+class QXmlStreamWriter;
 
-class RRadioClock : public QWidget
-{
+
+class RDesktop : public QWidget
+ {
     Q_OBJECT
 
 public:
 
-    explicit RRadioClock(QWidget *parent = 0, Rack *api = 0);
-
-public slots:
-
-    void setDate(const QString &);
-    void setTime(const QString &);
-
-signals:
-
-    void sayHello(const QString &);
-
-protected:
-
-    void paintEvent(QPaintEvent *ev);
-    void mouseReleaseEvent(QMouseEvent *ev);
+    explicit RDesktop(QWidget *parent = 0);
 
 private:
 
-    Rack* m_rack;
-    bool m_pushed;
-    QString m_date;
-    QString m_time;
+    void saveSplitter(RSplitter *splitter);
+    void saveSplitterItem(QObject *obj, QXmlStreamWriter *xml);
+
+    void saveSplittertoXML(RSplitter *splitter);
+    void saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml);
+
+private slots:
+
+    void createPluginHost(int);
+    void closePluginHost();
+
+public slots:
+
+    void setConfigModus(bool);
+
+    //debug this
+    void savePluginHosts();
+
+signals:
+
+    void changeConfigModus(bool);
 
 };
 
-#endif // RRADIOCLOCK_H
+#endif // RDESKTOP_H
+
+
+
+
+
+

@@ -23,7 +23,9 @@
 #ifndef RDIGITALCLOCK_H
 #define RDIGITALCLOCK_H
 
-#include <QPushButton>
+#include <QWidget>
+
+class Rack;
 
 class RDigitalClock : public QWidget
 {
@@ -31,7 +33,7 @@ class RDigitalClock : public QWidget
 
 public:
 
-    explicit RDigitalClock(QWidget *parent = 0);
+    explicit RDigitalClock(QWidget *parent = 0, Rack *api = 0);
 
 public slots:
 
@@ -49,6 +51,7 @@ protected:
 
 private:
 
+    Rack* m_rack;
     bool m_pushed;
     QString m_date;
     QString m_time;

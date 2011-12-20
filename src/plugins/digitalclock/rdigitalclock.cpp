@@ -20,18 +20,25 @@
     Author: Steffen Müller
 */
 
+#include "rack.h"
 #include "rdigitalclock.h"
 #include "rcolordialog.h"
 #include <QtGui>
 
 
- RDigitalClock::RDigitalClock(QWidget *parent)
+RDigitalClock::RDigitalClock(QWidget *parent, Rack *api)
      : QWidget(parent),
+       m_rack(api),
        m_pushed(false)
  {
 
      QFontDatabase fontDB;
      fontDB.addApplicationFont(":/fonts/digital-7.ttf");
+
+     //connect to api
+     QObject::connect(m_rack, SIGNAL(dateStrChanged(QString)), this, SLOT(setDate(QString)));
+     QObject::connect(m_rack, SIGNAL(timeStrChanged(QString)), this, SLOT(setTime(QString)));
+     QObject::connect(this, SIGNAL(sayHello(QString)), m_rack, SLOT(getHello(QString)));
 
  }
 

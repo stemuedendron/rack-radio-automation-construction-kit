@@ -23,6 +23,7 @@
 #ifndef RINTERFACE_H
 #define RINTERFACE_H
 
+#include "rack.h"
 #include <QWidget>
 
 class RInterface
@@ -30,7 +31,16 @@ class RInterface
 public:
     virtual ~RInterface() {}
 
-    virtual QWidget *createRWidget(QWidget *parent) = 0;
+    virtual QWidget *createRWidget(QWidget *parent, Rack *api) = 0;
+
+//public slots:
+
+//    virtual void setDate(const QString &) = 0;
+//    virtual void setTime(const QString &) = 0;
+
+//signals:
+
+//    virtual void sayHello(const QString &) = 0;
 
 };
 

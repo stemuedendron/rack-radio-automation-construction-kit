@@ -24,10 +24,10 @@
 #include "rradioclock.h"
 #include <QtGui>
 
-QWidget *RRadioClockPlugin::createRWidget(QWidget *parent)
+QWidget *RRadioClockPlugin::createRWidget(QWidget *parent, Rack *api)
  {
 
-    return new RRadioClock(parent);
+    return new RRadioClock(parent, api);
 
  }
 

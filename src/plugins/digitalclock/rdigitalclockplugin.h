@@ -34,8 +34,7 @@ class RDigitalClockPlugin : public QObject, RInterface
 
 public:
 
-    QWidget *createRWidget(QWidget *parent);
-
+    QWidget *createRWidget(QWidget *parent, Rack *api);
 
 };
 

@@ -25,10 +25,10 @@
 
 #include <QtGui>
 
-QWidget *RHotKeyWidgetPlugin::createRWidget(QWidget *parent)
+QWidget *RHotKeyWidgetPlugin::createRWidget(QWidget *parent, Rack *api)
  {
 
-    return new RHotKeyWidget(parent);
+    return new RHotKeyWidget(parent, api);
  }
 
 

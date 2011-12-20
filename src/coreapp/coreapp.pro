@@ -23,17 +23,17 @@
 TARGET = rack
 
 SOURCES += main.cpp \
-    ../rackclasses/rsplitter.cpp \
-    ../rackclasses/rdesktop.cpp \
-    ../rackclasses/rpluginhost.cpp \
-    rack.cpp
+    rackimpl.cpp \
+    rdesktop.cpp \
+    rpluginhost.cpp \
+    ../rackclasses/rsplitter.cpp
 
-HEADERS += \
+HEADERS += rackimpl.h \
+    rdesktop.h \
+    rpluginhost.h \
+    ../rackclasses/rack.h \
     ../rackclasses/rinterface.h \
-    ../rackclasses/rsplitter.h \
-    ../rackclasses/rdesktop.h \
-    ../rackclasses/rpluginhost.h \
-    rack.h
+    ../rackclasses/rsplitter.h
 
 INCLUDEPATH += ../rackclasses
 
@@ -48,6 +48,8 @@ unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
 LIBS += -L$$PWD/../../bass/ -lbass
 INCLUDEPATH += $$PWD/.././bass
 DEPENDPATH += $$PWD/../../bass
+
+
 
 
 

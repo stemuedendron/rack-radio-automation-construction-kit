@@ -20,42 +20,44 @@
     Author: Steffen Müller
 */
 
-#ifndef RRADIOCLOCK_H
-#define RRADIOCLOCK_H
+#ifndef RACKIMPL_H
+#define RACKIMPL_H
 
-#include <QWidget>
+#include "rack.h"
 
-class Rack;
+//forward deklarationen:
+class RDesktop;
+class QWidget;
+class QPushButton;
 
-class RRadioClock : public QWidget
+class RackImpl : public Rack
 {
     Q_OBJECT
 
 public:
 
-    explicit RRadioClock(QWidget *parent = 0, Rack *api = 0);
+    explicit RackImpl(QWidget *parent = 0);
+
+    //this is only for for member classes to access the main rack api
+    //plugins get on load a pointer to the api object
+    static RackImpl *instance();
 
 public slots:
 
-    void setDate(const QString &);
-    void setTime(const QString &);
-
-signals:
-
-    void sayHello(const QString &);
-
-protected:
-
-    void paintEvent(QPaintEvent *ev);
-    void mouseReleaseEvent(QMouseEvent *ev);
+    void getHello(const QString &);
 
 private:
 
-    Rack* m_rack;
-    bool m_pushed;
-    QString m_date;
-    QString m_time;
+    RDesktop *m_desktop;
+
+    QWidget *m_taskbar;
+    QPushButton *m_btSettings;
+    QPushButton *m_btSavetest;
+
+protected:
+
+     void timerEvent(QTimerEvent *);
 
 };
 
-#endif // RRADIOCLOCK_H
+#endif // RACKIMPL_H

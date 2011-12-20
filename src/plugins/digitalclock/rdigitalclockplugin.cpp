@@ -25,9 +25,11 @@
 #include <QtGui>
 
 
-QWidget *RDigitalClockPlugin::createRWidget(QWidget *parent)
+QWidget *RDigitalClockPlugin::createRWidget(QWidget *parent, Rack *api)
  {
-    return new RDigitalClock(parent);
+
+    return new RDigitalClock(parent, api);
+
  }
 
 

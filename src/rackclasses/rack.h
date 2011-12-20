@@ -20,42 +20,26 @@
     Author: Steffen Müller
 */
 
-#ifndef RRADIOCLOCK_H
-#define RRADIOCLOCK_H
+#ifndef RACK_H
+#define RACK_H
 
 #include <QWidget>
 
-class Rack;
 
-class RRadioClock : public QWidget
+//this is the rack API
+class Rack : public QWidget
 {
     Q_OBJECT
 
-public:
-
-    explicit RRadioClock(QWidget *parent = 0, Rack *api = 0);
-
 public slots:
 
-    void setDate(const QString &);
-    void setTime(const QString &);
+    virtual void getHello(const QString &) = 0;
 
 signals:
 
-    void sayHello(const QString &);
-
-protected:
-
-    void paintEvent(QPaintEvent *ev);
-    void mouseReleaseEvent(QMouseEvent *ev);
-
-private:
-
-    Rack* m_rack;
-    bool m_pushed;
-    QString m_date;
-    QString m_time;
+    void timeStrChanged(QString);
+    void dateStrChanged(QString);
 
 };
 
-#endif // RRADIOCLOCK_H
+#endif // RACK_H
