@@ -120,8 +120,8 @@ bool RPluginHost::loadPlugin()
          QObject *plugin = pluginLoader.instance();
 
          if (plugin) {
-             m_rinterface = qobject_cast<RInterface *>(plugin);
-             if (m_rinterface)
+             m_rwidgetInterface = qobject_cast<RWidgetInterface *>(plugin);
+             if (m_rwidgetInterface)
                  return true;
          }
      }
@@ -140,7 +140,7 @@ void RPluginHost::newPlugin()
 
         emit setPluginsVisible(false);
 
-        QWidget *newplugin = m_rinterface->createRWidget(this, RackImpl::instance());
+        QWidget *newplugin = m_rwidgetInterface->createRWidget(this, RackImpl::instance());
 
 
 

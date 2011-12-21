@@ -23,7 +23,7 @@
 #ifndef RPLUGINHOST_H
 #define RPLUGINHOST_H
 
-#include "rinterface.h"
+#include "rwidgetinterface.h"
 #include <QWidget>
 
 class QHBoxLayout;
@@ -84,7 +84,7 @@ private:
 
     QWidgetList m_wlPluginWidgets;
 
-    RInterface *m_rinterface;
+    RWidgetInterface *m_rwidgetInterface;
     QHBoxLayout *m_hlMain;
 
 };

@@ -20,16 +20,16 @@
     Author: Steffen Müller
 */
 
-#ifndef RINTERFACE_H
-#define RINTERFACE_H
+#ifndef RWIDGETINTERFACE_H
+#define RWIDGETINTERFACE_H
 
 #include "rack.h"
 #include <QWidget>
 
-class RInterface
+class RWidgetInterface
 {
 public:
-    virtual ~RInterface() {}
+    virtual ~RWidgetInterface() {}
 
     virtual QWidget *createRWidget(QWidget *parent, Rack *api) = 0;
 
@@ -47,8 +47,8 @@ public:
 
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE(RInterface, "org.rack.Rack.RInterface/1.0")
+Q_DECLARE_INTERFACE(RWidgetInterface, "org.rack.RWidgetInterface/1.0")
 QT_END_NAMESPACE
 
 
-#endif
+#endif //RWIDGETINTERFACE_H

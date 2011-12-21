@@ -28,7 +28,7 @@ HEADERS         = \
     ../../rackclasses/rplayer.h \
     ../../rackclasses/rbutton.h \
     ../../rackclasses/rblinkbutton.h \
-    ../../rackclasses/rinterface.h \
+    ../../rackclasses/rwidgetinterface.h \
     ../../rackclasses/rack.h \
     rpageedit.h \
     rindexbutton.h \

@@ -26,7 +26,7 @@ INCLUDEPATH += ../../rackclasses
 
 HEADERS         = rradioclockplugin.h \
     rradioclock.h \
-    ../../rackclasses/rinterface.h \
+    ../../rackclasses/rwidgetinterface.h \
     ../../rackclasses/rack.h \
     ../../rackclasses/rcolordialog.h
 

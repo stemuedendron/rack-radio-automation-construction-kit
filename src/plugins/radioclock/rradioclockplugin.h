@@ -21,16 +21,16 @@
 */
 
 #ifndef RRADIOCLOCKPLUGIN_H
-#define RRADIOCLOCKLUGIN_H
+#define RRADIOCLOCKPLUGIN_H
 
-#include "rinterface.h"
+#include "rwidgetinterface.h"
 #include <QObject>
 
 
-class RRadioClockPlugin : public QObject, RInterface
+class RRadioClockPlugin : public QObject, RWidgetInterface
 {
     Q_OBJECT
-    Q_INTERFACES(RInterface)
+    Q_INTERFACES(RWidgetInterface)
 
 public:
 
@@ -40,4 +40,4 @@ public:
 };
 
 
-#endif
+#endif // RRADIOCLOCKPLUGIN_H

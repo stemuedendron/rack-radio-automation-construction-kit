@@ -23,14 +23,14 @@
 #ifndef RHOTKEYWIDGETPLUGIN_H
 #define RHOTKEYWIDGETPLUGIN_H
 
-#include "rinterface.h"
+#include "rwidgetinterface.h"
 #include <QObject>
 
 
-class RHotKeyWidgetPlugin : public QObject, RInterface
+class RHotKeyWidgetPlugin : public QObject, RWidgetInterface
 {
     Q_OBJECT
-    Q_INTERFACES(RInterface)
+    Q_INTERFACES(RWidgetInterface)
 
 public:
 
@@ -40,4 +40,4 @@ public:
 };
 
 
-#endif
+#endif //RHOTKEYWIDGETPLUGIN_H
