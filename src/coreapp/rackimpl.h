@@ -38,8 +38,8 @@ public:
 
     explicit RackImpl();
 
-    //this is only for for member classes to access the main rack api
-    //plugins get on load a pointer to the api object
+    //this is only for core classes to access the main rack api
+    //plugins get a pointer to the api object on loading
     static RackImpl *instance();
 
 public slots:
