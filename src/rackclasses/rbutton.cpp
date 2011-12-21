@@ -195,6 +195,8 @@ void RButton::setLength(const qint64 &length)
     refreshImage();
 }
 
+// wrong!! Frees all resources used by the output device, including all its samples, streams and MOD musics.
+// so others too!
 RButton::~RButton()
 {
     if (RPlayer::free(m_device)) qDebug("free device with engine index: %d", m_device);
