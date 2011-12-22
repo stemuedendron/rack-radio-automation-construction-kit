@@ -26,14 +26,18 @@ SOURCES += main.cpp \
     rackimpl.cpp \
     rdesktop.cpp \
     rpluginhost.cpp \
-    ../rackclasses/rsplitter.cpp
+    ../rackclasses/rsplitter.cpp \
+    mainwindow.cpp \
+    coreplugin.cpp
 
 HEADERS += rackimpl.h \
     rdesktop.h \
     rpluginhost.h \
     ../rackclasses/rack.h \
     ../rackclasses/rsplitter.h \
-    ../rackclasses/rwidgetinterface.h
+    ../rackclasses/rwidgetinterface.h \
+    mainwindow.h \
+    coreplugin.h
 
 INCLUDEPATH += ../rackclasses
 
@@ -48,6 +52,10 @@ unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
 LIBS += -L$$PWD/../../bass/ -lbass
 INCLUDEPATH += $$PWD/.././bass
 DEPENDPATH += $$PWD/../../bass
+
+
+
+
 
 
 
