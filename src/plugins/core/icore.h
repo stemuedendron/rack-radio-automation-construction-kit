@@ -20,14 +20,14 @@
     Author: Steffen Müller
 */
 
-#ifndef RACK_H
-#define RACK_H
+#ifndef ICORE_H
+#define ICORE_H
 
 #include <QWidget>
 
 
-//this is the rack API
-class Rack : public QWidget
+//this is the rack core plugin interface
+class ICore : public QWidget
 {
     Q_OBJECT
 
@@ -42,4 +42,4 @@ signals:
 
 };
 
-#endif // RACK_H
+#endif // ICORE_H

@@ -31,7 +31,7 @@
 //showdate ?
 //show secondsleft ?
 
-RRadioClock::RRadioClock(QWidget *parent, Rack *api)
+RRadioClock::RRadioClock(QWidget *parent, ICore *api)
     : QWidget(parent),
       m_rack(api),
       m_pushed(false)

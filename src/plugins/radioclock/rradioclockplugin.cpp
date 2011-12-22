@@ -24,7 +24,7 @@
 #include "rradioclock.h"
 #include <QtGui>
 
-QWidget *RRadioClockPlugin::createRWidget(QWidget *parent, Rack *api)
+QWidget *RRadioClockPlugin::createRWidget(QWidget *parent, ICore *api)
  {
 
     return new RRadioClock(parent, api);

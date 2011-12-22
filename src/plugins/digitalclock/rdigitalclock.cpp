@@ -26,7 +26,7 @@
 #include <QtGui>
 
 
-RDigitalClock::RDigitalClock(QWidget *parent, Rack *api)
+RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
      : QWidget(parent),
        m_rack(api),
        m_pushed(false)

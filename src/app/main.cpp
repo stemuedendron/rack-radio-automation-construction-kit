@@ -28,10 +28,11 @@ int main(int argc, char *argv[])
     QApplication::setGraphicsSystem("raster");
     QApplication app(argc, argv);
 
-    RackImpl rackWindow;
-    rackWindow.resize(800, 600);
-    rackWindow.setWindowState(Qt::WindowMaximized);
+//    RackImpl rackWindow;
+//    rackWindow.resize(800, 600);
+//    rackWindow.setWindowState(Qt::WindowMaximized);
 
-    rackWindow.show();
+//    rackWindow.show();
+
     return app.exec();
 }

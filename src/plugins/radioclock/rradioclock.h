@@ -25,7 +25,7 @@
 
 #include <QWidget>
 
-class Rack;
+class ICore;
 
 class RRadioClock : public QWidget
 {
@@ -33,7 +33,7 @@ class RRadioClock : public QWidget
 
 public:
 
-    explicit RRadioClock(QWidget *parent = 0, Rack *api = 0);
+    explicit RRadioClock(QWidget *parent = 0, ICore *api = 0);
 
 public slots:
 
@@ -51,7 +51,7 @@ protected:
 
 private:
 
-    Rack* m_rack;
+    ICore* m_rack;
     bool m_pushed;
     QString m_date;
     QString m_time;

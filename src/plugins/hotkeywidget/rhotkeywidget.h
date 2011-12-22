@@ -27,7 +27,7 @@
 
 #include <QWidget>
 
-class Rack;
+class ICore;
 class QStringList;
 class QStackedWidget;
 class QLabel;
@@ -40,7 +40,7 @@ class RHotKeyWidget : public QWidget
 
 public:
 
-    explicit RHotKeyWidget(QWidget *parent = 0, Rack *api = 0);
+    explicit RHotKeyWidget(QWidget *parent = 0, ICore *api = 0);
 
 signals:
 
@@ -61,7 +61,7 @@ private slots:
 
 private:
 
-    Rack* m_rack;
+    ICore* m_rack;
     int sortedInsert(const QString &title);
     void createHotKeys(const int &index, const int &rows, const int &cols);
     void createIndexButton(const int &index, const QString &title, const int &keys);

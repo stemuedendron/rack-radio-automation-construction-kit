@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/audio/main.ogg</file>
+        <file>resources/audio/mini.ogg</file>
+        <file>resources/stylesheets/default.qss</file>
+        <file>resources/stylesheets/default-old.qss</file>
+        <file>resources/stylesheets/matrix.qss</file>
+        <file>resources/fonts/DroidSans.ttf</file>
+        <file>resources/fonts/digital-7.ttf</file>
+        <file>resources/images/top.png</file>
+        <file>resources/images/top-disabled.png</file>
+        <file>resources/images/left.png</file>
+        <file>resources/images/left-disabled.png</file>
+        <file>resources/images/right.png</file>
+        <file>resources/images/right-disabled.png</file>
+        <file>resources/images/bottom.png</file>
+        <file>resources/images/bottom-disabled.png</file>
+        <file>resources/images/ok.png</file>
+        <file>resources/images/close.png</file>
+        <file>resources/images/close-disabled.png</file>
+        <file>resources/images/move.png</file>
+        <file>resources/images/insert.png</file>
+        <file>resources/images/delete.png</file>
+        <file>resources/images/pfl.png</file>
+        <file>resources/images/pfl-small.png</file>
+        <file>resources/images/play-manual.png</file>
+        <file>resources/images/play.png</file>
+    </qresource>
+</RCC>

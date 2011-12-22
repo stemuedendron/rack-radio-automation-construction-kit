@@ -25,7 +25,7 @@
 
 #include <QtGui>
 
-QWidget *RHotKeyWidgetPlugin::createRWidget(QWidget *parent, Rack *api)
+QWidget *RHotKeyWidgetPlugin::createRWidget(QWidget *parent, ICore *api)
  {
 
     return new RHotKeyWidget(parent, api);
