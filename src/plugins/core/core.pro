@@ -20,10 +20,13 @@
 #    Author: Steffen Müller
 #
 
-TARGET = rack
+TEMPLATE        = lib
+CONFIG         += plugin
 
-SOURCES += main.cpp \
-    rdesktop.cpp \
+TARGET          = $$qtLibraryTarget(coreplugin)
+
+
+SOURCES += rdesktop.cpp \
     rpluginhost.cpp \
     ../rackclasses/rsplitter.cpp \
     mainwindow.cpp \
@@ -44,7 +47,7 @@ HEADERS += \
 INCLUDEPATH += ../rackclasses
 
 RESOURCES += \
-    ../rack.qrc
+    ../../resources/rack.qrc
 
 OTHER_FILES += \
     ../../qss/default.qss
@@ -54,6 +57,7 @@ unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
 LIBS += -L$$PWD/../../bass/ -lbass
 INCLUDEPATH += $$PWD/.././bass
 DEPENDPATH += $$PWD/../../bass
+
 
 
 
