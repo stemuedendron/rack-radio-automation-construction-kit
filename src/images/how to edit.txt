@@ -1,0 +1,11 @@
+for disabled icons:
+
+gimp:
+
+1. Ebenen -> Deckkraft: 50%
+2. neue ebene aus sichtbarem, alte ebene entfernen
+3. filter -> gausches weichzeichnen: 4px
+
+
+gimp-dbp installieren (batch processing plugin)
+http://members.ozemail.com.au/~hodsond/dbp.html
