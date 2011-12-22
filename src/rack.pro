@@ -21,7 +21,8 @@
 #
 
 TEMPLATE    = subdirs
-SUBDIRS     = coreapp \
+SUBDIRS     = app \
+              plugins/core \
               plugins/digitalclock \
               plugins/radioclock \
               plugins/hotkeywidget \
