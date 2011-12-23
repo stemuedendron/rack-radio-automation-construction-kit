@@ -22,11 +22,13 @@
 
 TARGET = rack
 
-SOURCES += main.cpp \
+SOURCES += \
+    main.cpp \
     mainwindow.cpp \
     coreimpl.cpp \
     rdesktop.cpp \
-    rpluginhost.cpp
+    rpluginhost.cpp \
+    ../shared/rsplitter.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -34,16 +36,20 @@ HEADERS += \
     icore.h \
     rdesktop.h \
     rpluginhost.h \
-    ../libs/extensionsystem/rwidgetinterface.h
+    ../libs/extensionsystem/rwidgetinterface.h \
+    ../shared/rsplitter.h
 
-##brauchen wir das???
-INCLUDEPATH += ../libs/extensionsystem
+INCLUDEPATH += \
+    ../libs/extensionsystem \
+    ../shared/
 
 RESOURCES += \
     ../resources/rack.qrc
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 

@@ -23,13 +23,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QWidget>
+
 //forward deklarationen:
 
 //the api:
 class CoreImpl;
 
 class RDesktop;
-class QWidget;
 class QPushButton;
 
 class MainWindow : public QWidget

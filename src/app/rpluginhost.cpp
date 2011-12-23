@@ -140,7 +140,7 @@ void RPluginHost::newPlugin()
 
         emit setPluginsVisible(false);
 
-        QWidget *newplugin = m_rwidgetInterface->createRWidget(this, RackImpl::instance());
+        QWidget *newplugin = m_rwidgetInterface->createRWidget(this, CoreImpl::instance());
 
 
 

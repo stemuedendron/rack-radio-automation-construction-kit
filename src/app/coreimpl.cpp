@@ -23,6 +23,7 @@
 #include "coreimpl.h"
 #include "mainwindow.h"
 
+#include <QTime>
 
 // The Core Singleton
 static CoreImpl *m_instance = 0;
@@ -30,13 +31,14 @@ static CoreImpl *m_instance = 0;
 ICore *ICore::instance()
 {
     return m_instance;
-    startTimer(1000);
 }
+
 
 CoreImpl::CoreImpl(MainWindow *mainwindow)
 {
     m_instance = this;
     m_mainwindow = mainwindow;
+    startTimer(1000);
 }
 
 CoreImpl::~CoreImpl()
