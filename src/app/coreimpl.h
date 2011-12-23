@@ -20,24 +20,37 @@
     Author: Steffen Müller
 */
 
-#include "mainwindow.h"
-#include <QtGui>
+#ifndef COREIMPL_H
+#define COREIMPL_H
 
-int main(int argc, char *argv[])
+#include "icore.h"
+
+class MainWindow;
+
+class CoreImpl : public ICore
 {
+    Q_OBJECT
 
-#ifdef Q_WS_X11
-    // gui is slow with the xlib backend
-    QApplication::setGraphicsSystem("raster");
-#endif
+public:
 
-    QApplication app(argc, argv);
+    CoreImpl(MainWindow *mainwindow);
+    ~CoreImpl();
 
-    MainWindow mainWindow;
-    mainWindow.resize(800, 600);
-    mainWindow.setWindowState(Qt::WindowMaximized);
 
-    mainWindow.show();
+public slots:
 
-    return app.exec();
-}
+    void getHello(const QString &);
+
+private:
+
+    MainWindow *m_mainwindow;
+    friend class MainWindow;
+
+
+protected:
+
+     void timerEvent(QTimerEvent *);
+
+};
+
+#endif // COREIMPL_H

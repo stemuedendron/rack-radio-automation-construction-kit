@@ -20,24 +20,33 @@
     Author: Steffen Müller
 */
 
-#include "mainwindow.h"
-#include <QtGui>
+#ifndef ICORE_H
+#define ICORE_H
 
-int main(int argc, char *argv[])
+#include <QObject>
+
+
+//this is the rack core api interface
+class ICore : public QObject
 {
+    Q_OBJECT
 
-#ifdef Q_WS_X11
-    // gui is slow with the xlib backend
-    QApplication::setGraphicsSystem("raster");
-#endif
+public:
 
-    QApplication app(argc, argv);
+    ICore() {}
+    virtual ~ICore() {}
 
-    MainWindow mainWindow;
-    mainWindow.resize(800, 600);
-    mainWindow.setWindowState(Qt::WindowMaximized);
+    static ICore *instance();
 
-    mainWindow.show();
+public slots:
 
-    return app.exec();
-}
+    virtual void getHello(const QString &) = 0;
+
+signals:
+
+    void timeStrChanged(QString);
+    void dateStrChanged(QString);
+
+};
+
+#endif // ICORE_H

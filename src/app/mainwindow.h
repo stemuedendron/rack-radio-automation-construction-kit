@@ -20,24 +20,46 @@
     Author: Steffen Müller
 */
 
-#include "mainwindow.h"
-#include <QtGui>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-int main(int argc, char *argv[])
+//forward deklarationen:
+
+//the api:
+class CoreImpl;
+
+class RDesktop;
+class QWidget;
+class QPushButton;
+
+class MainWindow : public QWidget
 {
+    Q_OBJECT
 
-#ifdef Q_WS_X11
-    // gui is slow with the xlib backend
-    QApplication::setGraphicsSystem("raster");
-#endif
+public:
 
-    QApplication app(argc, argv);
+    MainWindow();
+    ~MainWindow();
 
-    MainWindow mainWindow;
-    mainWindow.resize(800, 600);
-    mainWindow.setWindowState(Qt::WindowMaximized);
 
-    mainWindow.show();
+public slots:
 
-    return app.exec();
-}
+
+
+private:
+
+    CoreImpl *m_coreImpl;
+
+    RDesktop *m_rdesktop;
+
+    QWidget *m_rtaskbar;
+
+    QPushButton *m_btSettings;
+    QPushButton *m_btSavetest;
+
+protected:
+
+
+};
+
+#endif // MAINWINDOW_H

@@ -22,10 +22,28 @@
 
 TARGET = rack
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    mainwindow.cpp \
+    coreimpl.cpp
 
 HEADERS += \
-    ../plugins/core/icore.h
+    mainwindow.h \
+    coreimpl.h \
+    icore.h
+
+RESOURCES += \
+    ../resources/rack.qrc
+
+OTHER_FILES += \
+    ../resources/stylesheets/default.qss
+
+
+
+
+
+
+
+
 
 
 

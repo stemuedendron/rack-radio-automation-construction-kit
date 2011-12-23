@@ -20,26 +20,40 @@
     Author: Steffen Müller
 */
 
-#ifndef ICORE_H
-#define ICORE_H
-
-#include <QWidget>
+#include "coreimpl.h"
+#include "mainwindow.h"
 
 
-//this is the rack core plugin interface
-class ICore : public QWidget
+// The Core Singleton
+static CoreImpl *m_instance = 0;
+
+ICore *ICore::instance()
 {
-    Q_OBJECT
+    return m_instance;
+    startTimer(1000);
+}
 
-public slots:
+CoreImpl::CoreImpl(MainWindow *mainwindow)
+{
+    m_instance = this;
+    m_mainwindow = mainwindow;
+}
 
-    virtual void getHello(const QString &) = 0;
+CoreImpl::~CoreImpl()
+{
+    m_instance = 0;
+}
 
-signals:
 
-    void timeStrChanged(QString);
-    void dateStrChanged(QString);
 
-};
+void CoreImpl::timerEvent(QTimerEvent *)
+{
+    emit timeStrChanged(QTime::currentTime().toString(tr("hh:mm:ss")));
+    emit dateStrChanged(QDate::currentDate().toString(tr("dd.MM.yy")));
+}
 
-#endif // ICORE_H
+void CoreImpl::getHello(const QString &str)
+{
+    //m_mainwindow->
+    //setWindowTitle(str);
+}
