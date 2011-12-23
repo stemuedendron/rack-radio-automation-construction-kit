@@ -26,28 +26,18 @@ CONFIG         += plugin
 TARGET          = $$qtLibraryTarget(coreplugin)
 
 
-SOURCES += rdesktop.cpp \
-    rpluginhost.cpp \
-    ../rackclasses/rsplitter.cpp \
-    mainwindow.cpp \
-    coreplugin.cpp \
-    coreimpl.cpp
+SOURCES += \
+    ../rackclasses/rsplitter.cpp
 
 HEADERS += \
-    rdesktop.h \
-    rpluginhost.h \
     ../rackclasses/rack.h \
     ../rackclasses/rsplitter.h \
     ../rackclasses/rwidgetinterface.h \
-    mainwindow.h \
-    coreplugin.h \
-    coreimpl.h \
     icore.h
 
 INCLUDEPATH += ../rackclasses
 
-RESOURCES += \
-    ../../resources/rack.qrc
+RESOURCES +=
 
 OTHER_FILES += \
     ../../qss/default.qss
@@ -57,6 +47,20 @@ unix:!macx: LIBS += -L$$PWD/../../bass/x64/ -lbass
 LIBS += -L$$PWD/../../bass/ -lbass
 INCLUDEPATH += $$PWD/.././bass
 DEPENDPATH += $$PWD/../../bass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

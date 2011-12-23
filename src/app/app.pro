@@ -24,18 +24,31 @@ TARGET = rack
 
 SOURCES += main.cpp \
     mainwindow.cpp \
-    coreimpl.cpp
+    coreimpl.cpp \
+    rdesktop.cpp \
+    rpluginhost.cpp
 
 HEADERS += \
     mainwindow.h \
     coreimpl.h \
-    icore.h
+    icore.h \
+    rdesktop.h \
+    rpluginhost.h \
+    ../libs/extensionsystem/rwidgetinterface.h
+
+##brauchen wir das???
+INCLUDEPATH += ../libs/extensionsystem
 
 RESOURCES += \
     ../resources/rack.qrc
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
+
+
+
 
 
 

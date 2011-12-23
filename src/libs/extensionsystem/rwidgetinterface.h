@@ -23,7 +23,7 @@
 #ifndef RWIDGETINTERFACE_H
 #define RWIDGETINTERFACE_H
 
-#include "rack.h"
+#include "icore.h"
 #include <QWidget>
 
 class RWidgetInterface
@@ -31,7 +31,7 @@ class RWidgetInterface
 public:
     virtual ~RWidgetInterface() {}
 
-    virtual QWidget *createRWidget(QWidget *parent, Rack *api) = 0;
+    virtual QWidget *createRWidget(QWidget *parent, ICore *api) = 0;
 
 //in this way we can plugins force to implement api methods:
 //public slots:
