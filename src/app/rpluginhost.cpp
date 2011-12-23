@@ -20,7 +20,7 @@
     Author: Steffen Müller
 */
 
-#include "rackimpl.h"
+#include "coreimpl.h"
 #include "rpluginhost.h"
 
 #include <QtGui>

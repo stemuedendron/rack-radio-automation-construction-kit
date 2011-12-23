@@ -22,6 +22,7 @@
 
 #ifndef RDESKTOP_H
 #define RDESKTOP_H
+
 #include <QWidget>
 
 class RSplitter;
@@ -63,9 +64,3 @@ signals:
 };
 
 #endif // RDESKTOP_H
-
-
-
-
-
-
