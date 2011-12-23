@@ -29,6 +29,7 @@
 
 
 MainWindow::MainWindow() :
+    //create the rack api object:
     m_coreImpl(new CoreImpl(this)),
     m_rdesktop(0),
     m_rtaskbar(0)
