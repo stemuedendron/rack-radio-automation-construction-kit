@@ -20,7 +20,7 @@
     Author: Steffen Müller
 */
 
-#include "rack.h"
+#include "icore.h"
 #include "rdigitalclock.h"
 #include "rcolordialog.h"
 #include <QtGui>
@@ -28,7 +28,7 @@
 
 RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
      : QWidget(parent),
-       m_rack(api),
+       m_core(api),
        m_pushed(false)
  {
 
@@ -36,9 +36,9 @@ RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
      fontDB.addApplicationFont(":/fonts/digital-7.ttf");
 
      //connect to api
-     QObject::connect(m_rack, SIGNAL(dateStrChanged(QString)), this, SLOT(setDate(QString)));
-     QObject::connect(m_rack, SIGNAL(timeStrChanged(QString)), this, SLOT(setTime(QString)));
-     QObject::connect(this, SIGNAL(sayHello(QString)), m_rack, SLOT(getHello(QString)));
+     QObject::connect(m_core, SIGNAL(dateStrChanged(QString)), this, SLOT(setDate(QString)));
+     QObject::connect(m_core, SIGNAL(timeStrChanged(QString)), this, SLOT(setTime(QString)));
+     QObject::connect(this, SIGNAL(sayHello(QString)), m_core, SLOT(getHello(QString)));
 
  }
 
