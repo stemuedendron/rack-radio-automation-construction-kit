@@ -20,32 +20,22 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE        = lib
-CONFIG         += plugin
-INCLUDEPATH += ../../rackclasses
+include(../../libs/extensionsystem/plugins.pri)
 
-HEADERS         = rradioclockplugin.h \
+TEMPLATE = lib
+CONFIG += plugin
+
+INCLUDEPATH += ../../shared
+
+HEADERS = \
+    rradioclockplugin.h \
     rradioclock.h \
-    ../../rackclasses/rwidgetinterface.h \
-    ../../rackclasses/rack.h \
-    ../../rackclasses/rcolordialog.h
+    ../../shared/rcolordialog.h
 
+SOURCES = \
+    rradioclockplugin.cpp \
+    rradioclock.cpp \
+    ../../shared/rcolordialog.cpp
 
-SOURCES         = rradioclockplugin.cpp \
-                  rradioclock.cpp \ 
-    ../../rackclasses/rcolordialog.cpp
-
-
-TARGET          = $$qtLibraryTarget(radioclockplugin)
-
-
-
-DESTDIR         = ../../coreapp/plugins
-
-# bass library:
-unix:!macx: LIBS += -L$$PWD/../../../bass/x64/ -lbass
-LIBS += -L$$PWD/../../../bass/ -lbass
-INCLUDEPATH += $$PWD/../../../bass
-DEPENDPATH += $$PWD/../../../bass
-
+TARGET = $$qtLibraryTarget(radioclockplugin)
 

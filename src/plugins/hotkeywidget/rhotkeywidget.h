@@ -61,7 +61,7 @@ private slots:
 
 private:
 
-    ICore* m_rack;
+    ICore* m_core;
     int sortedInsert(const QString &title);
     void createHotKeys(const int &index, const int &rows, const int &cols);
     void createIndexButton(const int &index, const QString &title, const int &keys);

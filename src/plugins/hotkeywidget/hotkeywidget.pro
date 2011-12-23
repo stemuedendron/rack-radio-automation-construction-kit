@@ -20,44 +20,38 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE        = lib
-CONFIG         += plugin
-INCLUDEPATH += ../../rackclasses
+include(../../libs/extensionsystem/plugins.pri)
 
-HEADERS         = \
-    ../../rackclasses/rplayer.h \
-    ../../rackclasses/rbutton.h \
-    ../../rackclasses/rblinkbutton.h \
-    ../../rackclasses/rwidgetinterface.h \
-    ../../rackclasses/rack.h \
+TEMPLATE = lib
+CONFIG += plugin
+
+INCLUDEPATH += ../../shared
+
+HEADERS = \
+    ../../shared/rplayer.h \
+    ../../shared/rbutton.h \
+    ../../shared/rblinkbutton.h \
     rpageedit.h \
     rindexbutton.h \
     rhotkeywidget.h \
     rhotkeywidgetplugin.h
 
-
-SOURCES         = \
-    ../../rackclasses/rplayer.cpp \
-    ../../rackclasses/rbutton.cpp \
-    ../../rackclasses/rblinkbutton.cpp \
+SOURCES = \
+    ../../shared/rplayer.cpp \
+    ../../shared/rbutton.cpp \
+    ../../shared/rblinkbutton.cpp \
     rpageedit.cpp \
     rindexbutton.cpp \
     rhotkeywidget.cpp \
     rhotkeywidgetplugin.cpp
 
-
 TARGET          = $$qtLibraryTarget(rhotkeywidgetplugin)
 
-
-
-DESTDIR         = ../../coreapp/plugins
-
-
 # bass library:
-unix:!macx: LIBS += -L$$PWD/../../../bass/x64/ -lbass
-LIBS += -L$$PWD/../../../bass/ -lbass
-INCLUDEPATH += $$PWD/../../../bass
-DEPENDPATH += $$PWD/../../../bass
+unix:!macx: LIBS += -L$$PWD/../../libs/3rdparty/bass/x64/ -lbass
+LIBS += -L$$PWD/../../libs/3rdparty/bass/ -lbass
+INCLUDEPATH += $$PWD/../../libs/3rdparty/bass
+DEPENDPATH += $$PWD/../../libs/3rdparty/bass
 
 
 

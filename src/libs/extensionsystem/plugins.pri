@@ -21,22 +21,13 @@
 #
 
 
-TEMPLATE = app
-TARGET = rplayertest
+INCLUDEPATH += \
+    ../../libs/extensionsystem \
+    ../../app \
+    ../../shared/
 
-DEPENDPATH += .
+HEADERS += \
+    ../../app/icore.h \
+    ../../libs/extensionsystem/rwidgetinterface.h
 
-INCLUDEPATH += ../../shared
-
-HEADERS += mainwindow.h \ 
-    ../../shared/rplayer.h
-
-SOURCES += main.cpp \ 
-    mainwindow.cpp \
-    ../../shared/rplayer.cpp
-
-# bass library:
-unix:!macx: LIBS += -L$$PWD/../../libs/3rdparty/bass/x64/ -lbass
-LIBS += -L$$PWD/../../libs/3rdparty/bass/ -lbass
-INCLUDEPATH += $$PWD/../../libs/3rdparty/bass
-DEPENDPATH += $$PWD/../../libs/3rdparty/bass
+DESTDIR  = ../../app/plugins

@@ -22,15 +22,17 @@
 
 TARGET = colordialog
 
-INCLUDEPATH += ../../rackclasses
+INCLUDEPATH += \
+    ../../shared
 
+HEADERS +=\
+     mainwindow.h \
+    ../../shared/rcolordialog.h
 
-HEADERS += mainwindow.h \ 
-    ../../rackclasses/rcolordialog.h
-SOURCES += main.cpp \ 
+SOURCES += \
+    main.cpp \
     mainwindow.cpp \
-    ../../rackclasses/rcolordialog.cpp
+    ../../shared/rcolordialog.cpp
 
-RESOURCES += ../../rack.qrc
 
 

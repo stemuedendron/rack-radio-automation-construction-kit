@@ -20,32 +20,24 @@
 #    Author: Steffen Müller
 #
 
+
+include(../../libs/extensionsystem/plugins.pri)
+
 TEMPLATE = lib
 CONFIG += plugin
-
-INCLUDEPATH += \
-    ../../libs/extensionsystem \
-    ../../app \
-    ../../shared/
 
 HEADERS = \
     rdigitalclockplugin.h \
     rdigitalclock.h \
-    ../../app/icore.h \
-    ../../libs/extensionsystem/rwidgetinterface.h \
     ../../shared/rcolordialog.h
-
 
 SOURCES = \
     rdigitalclockplugin.cpp \
     rdigitalclock.cpp \
     ../../shared/rcolordialog.cpp
 
-
 TARGET = $$qtLibraryTarget(digitalclockplugin)
 
-
-DESTDIR  = ../../app/plugins
 
 
 

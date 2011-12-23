@@ -25,7 +25,8 @@
 
 #include <QTime>
 
-// The Core Singleton
+// The Core Singleton, access only from app classes
+// plugins get a pointer to core api
 static CoreImpl *m_instance = 0;
 
 ICore *ICore::instance()
@@ -56,6 +57,5 @@ void CoreImpl::timerEvent(QTimerEvent *)
 
 void CoreImpl::getHello(const QString &str)
 {
-    //m_mainwindow->
-    //setWindowTitle(str);
+    m_mainwindow->setWindowTitle(str);
 }

@@ -20,7 +20,7 @@
     Author: Steffen Müller
 */
 
-#include "rack.h"
+#include "icore.h"
 #include "rhotkeywidget.h"
 #include "rbutton.h"
 #include "rpageedit.h"
@@ -36,7 +36,7 @@
 
 RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     : QWidget(parent),
-      m_rack(api)
+      m_core(api)
 {
 
     //create header widget:

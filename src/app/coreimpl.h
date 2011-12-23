@@ -44,7 +44,9 @@ public slots:
 private:
 
     MainWindow *m_mainwindow;
-    friend class MainWindow;
+
+    //maybe we need this?
+    //friend class MainWindow;
 
 
 protected:

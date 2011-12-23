@@ -34,7 +34,7 @@ class RRadioClockPlugin : public QObject, RWidgetInterface
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, Rack *api);
+    QWidget *createRWidget(QWidget *parent, ICore *api);
 
 
 };

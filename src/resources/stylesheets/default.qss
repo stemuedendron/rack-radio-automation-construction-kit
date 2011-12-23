@@ -137,7 +137,7 @@
 
 
 
-Rack {
+MainWindow {
     background-color: #000000;
 }
 
