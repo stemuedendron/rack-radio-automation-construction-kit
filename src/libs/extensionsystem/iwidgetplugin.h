@@ -20,16 +20,16 @@
     Author: Steffen Müller
 */
 
-#ifndef RWIDGETINTERFACE_H
-#define RWIDGETINTERFACE_H
+#ifndef IWIDGETPLUGIN_H
+#define IWIDGETPLUGIN_H
 
 #include "icore.h"
 #include <QWidget>
 
-class RWidgetInterface
+class IWidgetPlugin
 {
 public:
-    virtual ~RWidgetInterface() {}
+    virtual ~IWidgetPlugin() {}
 
     virtual QWidget *createRWidget(QWidget *parent, ICore *api) = 0;
 
@@ -47,8 +47,8 @@ public:
 
 
 QT_BEGIN_NAMESPACE
-Q_DECLARE_INTERFACE(RWidgetInterface, "org.rack.RWidgetInterface/1.0")
+Q_DECLARE_INTERFACE(IWidgetPlugin, "org.rack.IWidgetPlugin/1.0")
 QT_END_NAMESPACE
 
 
-#endif //RWIDGETINTERFACE_H
+#endif //IWIDGETPLUGIN_H

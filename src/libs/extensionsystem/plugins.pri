@@ -28,6 +28,6 @@ INCLUDEPATH += \
 
 HEADERS += \
     ../../app/icore.h \
-    ../../libs/extensionsystem/rwidgetinterface.h
+    ../../libs/extensionsystem/iwidgetplugin.h
 
 DESTDIR  = ../../app/plugins
