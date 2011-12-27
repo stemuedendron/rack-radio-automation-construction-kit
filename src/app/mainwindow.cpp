@@ -27,12 +27,11 @@
 #include <QtGui>
 
 
-
 MainWindow::MainWindow() :
     //create the rack api object:
     m_coreImpl(new CoreImpl(this)),
-    m_rdesktop(0),
-    m_rtaskbar(0)
+    m_desktop(0),
+    m_taskbar(0)
 {
 
     setWindowTitle("R.A.C.K.");
@@ -42,34 +41,34 @@ MainWindow::MainWindow() :
     QString styleSheet = QLatin1String(file.readAll());
     setStyleSheet(styleSheet);
 
-    m_rdesktop = new RDesktop();
-    m_rtaskbar = new QWidget();
+    m_desktop = new RDesktop();
+    m_taskbar = new QWidget();
 
-    m_btSettings = new QPushButton("Settings");
-    m_btSettings->setCheckable(true);
-    QObject::connect(m_btSettings, SIGNAL(toggled(bool)), m_rdesktop, SLOT(setConfigModus(bool)));
+    m_settingsButton = new QPushButton("Settings");
+    m_settingsButton->setCheckable(true);
+    QObject::connect(m_settingsButton, SIGNAL(toggled(bool)), m_desktop, SLOT(setConfigModus(bool)));
 
     QPushButton *btQuit = new QPushButton("Quit");
     QObject::connect(btQuit,SIGNAL(clicked()),SLOT(close()));
 
-    m_btSavetest = new QPushButton("Save");
-    QObject::connect(m_btSavetest, SIGNAL(clicked()), m_rdesktop, SLOT(savePluginHosts()));
+    m_saveButton = new QPushButton("Save");
+    QObject::connect(m_saveButton, SIGNAL(clicked()), m_desktop, SLOT(savePluginHosts()));
 
 
     QHBoxLayout *barLayout = new QHBoxLayout();
-    barLayout->addWidget(m_btSettings);
+    barLayout->addWidget(m_settingsButton);
     barLayout->addWidget(btQuit);
 
-    barLayout->addWidget(m_btSavetest);
+    barLayout->addWidget(m_saveButton);
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(m_rdesktop);
+    layout->addWidget(m_desktop);
 
     layout->addLayout(barLayout);
 
-    layout->addWidget(m_rtaskbar);
+    layout->addWidget(m_taskbar);
 
     setLayout(layout);
 

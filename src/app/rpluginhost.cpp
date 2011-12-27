@@ -34,68 +34,68 @@ RPluginHost::RPluginHost(QWidget *parent) : QWidget(parent)
 
     QPalette pal;
     pal.setColor(QPalette::Window, QColor(0,0,0,160));
-    m_wgSettings = new QWidget(this);
-    m_wgSettings->setPalette(pal);
-    m_wgSettings->setAutoFillBackground(true);
+    m_settingsWidget = new QWidget(this);
+    m_settingsWidget->setPalette(pal);
+    m_settingsWidget->setAutoFillBackground(true);
 
-    m_btLeft = new QPushButton;
-    m_btLeft->setObjectName("rackSettingsLeftArrowButton");
+    m_leftButton = new QPushButton;
+    m_leftButton->setObjectName("rackSettingsLeftArrowButton");
 
-    m_btRight = new QPushButton;
-    m_btRight->setObjectName("rackSettingsRightArrowButton");
+    m_rightButton = new QPushButton;
+    m_rightButton->setObjectName("rackSettingsRightArrowButton");
 
-    m_btTop = new QPushButton;
-    m_btTop->setObjectName("rackSettingsTopArrowButton");
+    m_topButton = new QPushButton;
+    m_topButton->setObjectName("rackSettingsTopArrowButton");
 
-    m_btBottom = new QPushButton;
-    m_btBottom->setObjectName("rackSettingsBottomArrowButton");
+    m_bottomButtom = new QPushButton;
+    m_bottomButtom->setObjectName("rackSettingsBottomArrowButton");
 
-    m_btClose = new QPushButton;
-    m_btClose->setObjectName("rackSettingsCloseButton");
+    m_closeButton = new QPushButton;
+    m_closeButton->setObjectName("rackSettingsCloseButton");
 
 
-    m_btMiddle = new QPushButton;
-    m_btMiddle->setFixedHeight(40);
-    m_btMiddle->resize(200,40);
+    m_newWidgetButton = new QPushButton;
+    m_newWidgetButton->setFixedHeight(40);
+    m_newWidgetButton->resize(200,40);
 
-    m_btMiddle->setText(QTime::currentTime().toString(tr("ss")));
+    m_newWidgetButton->setText(QTime::currentTime().toString(tr("ss")));
 
-    m_vlMiddle = new QVBoxLayout;
-    m_vlMiddle->setSpacing(0);
-    m_vlMiddle->setContentsMargins(0,0,0,0);
-    m_vlMiddle->addWidget(m_btMiddle);
+    m_middleLayout = new QVBoxLayout;
+    m_middleLayout->setSpacing(0);
+    m_middleLayout->setContentsMargins(0,0,0,0);
+    m_middleLayout->addWidget(m_newWidgetButton);
 
     QWidget *middleWidget = new QWidget;
-    middleWidget->setLayout(m_vlMiddle);
+    middleWidget->setLayout(m_middleLayout);
 
     QGridLayout *layout = new QGridLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(m_btTop,0,1, Qt::AlignTop | Qt::AlignHCenter);
-    layout->addWidget(m_btClose,0,2, Qt::AlignTop | Qt::AlignRight);
-    layout->addWidget(m_btLeft,1,0, Qt::AlignLeft);
-    layout->addWidget(m_btRight,1,2, Qt::AlignRight);
-    layout->addWidget(m_btBottom,2,1, Qt::AlignBottom| Qt::AlignHCenter);
+    layout->addWidget(m_topButton,0,1, Qt::AlignTop | Qt::AlignHCenter);
+    layout->addWidget(m_closeButton,0,2, Qt::AlignTop | Qt::AlignRight);
+    layout->addWidget(m_leftButton,1,0, Qt::AlignLeft);
+    layout->addWidget(m_rightButton,1,2, Qt::AlignRight);
+    layout->addWidget(m_bottomButtom,2,1, Qt::AlignBottom| Qt::AlignHCenter);
     layout->addWidget(middleWidget,1,1);
-    m_wgSettings->setLayout(layout);
+    m_settingsWidget->setLayout(layout);
 
     m_signalMapper = new QSignalMapper(this);
-    QObject::connect(m_btLeft, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btRight, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btTop, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
-    QObject::connect(m_btBottom, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
-    m_signalMapper->setMapping(m_btLeft,  -1);
-    m_signalMapper->setMapping(m_btRight,  1);
-    m_signalMapper->setMapping(m_btTop,   -2);
-    m_signalMapper->setMapping(m_btBottom, 2);
+    QObject::connect(m_leftButton, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_rightButton, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_topButton, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    QObject::connect(m_bottomButtom, SIGNAL(clicked()), m_signalMapper, SLOT(map()));
+    m_signalMapper->setMapping(m_leftButton,  -1);
+    m_signalMapper->setMapping(m_rightButton,  1);
+    m_signalMapper->setMapping(m_topButton,   -2);
+    m_signalMapper->setMapping(m_bottomButtom, 2);
     QObject::connect(m_signalMapper, SIGNAL(mapped(int)), SIGNAL(btNewWidgetCLick(int)));
-    QObject::connect(m_btClose, SIGNAL(clicked()), SIGNAL(btCloseWidgetClick()));
-    QObject::connect(m_btMiddle, SIGNAL(clicked()), SLOT(newPlugin()));
+    QObject::connect(m_closeButton, SIGNAL(clicked()), SIGNAL(btCloseWidgetClick()));
+    QObject::connect(m_newWidgetButton, SIGNAL(clicked()), SLOT(newPlugin()));
 
-    m_hlMain = new QHBoxLayout;
-    m_hlMain->setSpacing(0);
-    m_hlMain->setContentsMargins(0,0,0,0);
-    setLayout(m_hlMain);
+    m_mainLayout = new QHBoxLayout;
+    m_mainLayout->setSpacing(0);
+    m_mainLayout->setContentsMargins(0,0,0,0);
+    setLayout(m_mainLayout);
 
 }
 
@@ -120,8 +120,8 @@ bool RPluginHost::loadPlugin()
          QObject *plugin = pluginLoader.instance();
 
          if (plugin) {
-             m_rwidgetInterface = qobject_cast<RWidgetInterface *>(plugin);
-             if (m_rwidgetInterface)
+             m_widgetInterface = qobject_cast<RWidgetInterface *>(plugin);
+             if (m_widgetInterface)
                  return true;
          }
      }
@@ -140,7 +140,7 @@ void RPluginHost::newPlugin()
 
         emit setPluginsVisible(false);
 
-        QWidget *newplugin = m_rwidgetInterface->createRWidget(this, CoreImpl::instance());
+        QWidget *newplugin = m_widgetInterface->createRWidget(this, CoreImpl::instance());
 
 
 
@@ -154,13 +154,13 @@ void RPluginHost::newPlugin()
 
 
         QObject::connect(this, SIGNAL(setPluginsVisible(bool)), newplugin, SLOT(setVisible(bool)));
-        m_hlMain->addWidget(newplugin);
+        m_mainLayout->addWidget(newplugin);
 
 
-        m_wgSettings->raise();
+        m_settingsWidget->raise();
 
         //signal emit für taskbar und layoutwidget buttons
-        m_wlPluginWidgets.append(newplugin);
+        m_pluginWidgetList.append(newplugin);
         emit pluginAdded();
 
 
@@ -168,7 +168,7 @@ void RPluginHost::newPlugin()
         QPushButton *newpluginbutton = new QPushButton;
 
         newpluginbutton->setFixedHeight(40);
-        m_vlMiddle->insertWidget(0,newpluginbutton);
+        m_middleLayout->insertWidget(0,newpluginbutton);
 
         ////QObject::connect(newpluginbutton,SIGNAL(pressed()),SLOT(removePluginButton(middlelayout->indexOf(newpluginbutton))));
 
@@ -180,24 +180,24 @@ void RPluginHost::newPlugin()
 void RPluginHost::showPlugin(int value)
 {
     emit setPluginsVisible(false);
-    m_wlPluginWidgets.at(value)->setVisible(true);
+    m_pluginWidgetList.at(value)->setVisible(true);
 }
 
 void RPluginHost::removePlugin(int value)
 {
 
     //wlPluginWidgets.takeAt(value)->deleteLater();
-    delete m_wlPluginWidgets.takeAt(value);
+    delete m_pluginWidgetList.takeAt(value);
 }
 
 
 void RPluginHost::setLayoutVisible(bool value)
 {
-    m_wgSettings->setVisible(value);
+    m_settingsWidget->setVisible(value);
 }
 
 void RPluginHost::resizeEvent(QResizeEvent *ev)
 {
-    m_wgSettings->resize(ev->size());
+    m_settingsWidget->resize(ev->size());
     ev->accept();
 }

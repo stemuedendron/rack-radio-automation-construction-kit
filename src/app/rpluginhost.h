@@ -66,26 +66,26 @@ private:
 
     //widgets for settings
     //FSLayoutWidget *m_layoutWidget;
-    QWidget *m_wgSettings;
+    QWidget *m_settingsWidget;
 
 
-    QVBoxLayout *m_vlMiddle;
-    QPushButton *m_btLeft;
-    QPushButton *m_btRight;
-    QPushButton *m_btTop;
-    QPushButton *m_btBottom;
-    QPushButton *m_btClose;
+    QVBoxLayout *m_middleLayout;
+    QPushButton *m_leftButton;
+    QPushButton *m_rightButton;
+    QPushButton *m_topButton;
+    QPushButton *m_bottomButtom;
+    QPushButton *m_closeButton;
 
-    QPushButton *m_btMiddle;
+    QPushButton *m_newWidgetButton;
     QSignalMapper *m_signalMapper;
 
 
     bool loadPlugin();
 
-    QWidgetList m_wlPluginWidgets;
+    QWidgetList m_pluginWidgetList;
 
-    RWidgetInterface *m_rwidgetInterface;
-    QHBoxLayout *m_hlMain;
+    RWidgetInterface *m_widgetInterface;
+    QHBoxLayout *m_mainLayout;
 
 };
 

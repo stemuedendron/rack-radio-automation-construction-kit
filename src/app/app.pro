@@ -36,8 +36,8 @@ HEADERS += \
     icore.h \
     rdesktop.h \
     rpluginhost.h \
-    ../libs/extensionsystem/rwidgetinterface.h \
-    ../shared/rsplitter.h
+    ../shared/rsplitter.h \
+    ../libs/extensionsystem/iwidgetplugin.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -48,6 +48,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 

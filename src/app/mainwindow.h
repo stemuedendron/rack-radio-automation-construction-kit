@@ -25,7 +25,6 @@
 
 #include <QWidget>
 
-//forward deklarationen:
 
 //the api:
 class CoreImpl;
@@ -46,17 +45,16 @@ public:
 public slots:
 
 
-
 private:
 
     CoreImpl *m_coreImpl;
 
-    RDesktop *m_rdesktop;
+    RDesktop *m_desktop;
 
-    QWidget *m_rtaskbar;
+    QWidget *m_taskbar;
 
-    QPushButton *m_btSettings;
-    QPushButton *m_btSavetest;
+    QPushButton *m_settingsButton;
+    QPushButton *m_saveButton;
 
 protected:
 
