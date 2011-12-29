@@ -28,7 +28,8 @@ SOURCES += \
     coreimpl.cpp \
     rdesktop.cpp \
     rpluginhost.cpp \
-    ../shared/rsplitter.cpp
+    ../shared/rsplitter.cpp \
+ #   rackwindow.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS += \
     rdesktop.h \
     rpluginhost.h \
     ../shared/rsplitter.h \
-    ../libs/extensionsystem/iwidgetplugin.h
+    ../libs/extensionsystem/iwidgetplugin.h \
+ #   rackwindow.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -48,6 +50,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 

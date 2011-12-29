@@ -34,7 +34,7 @@ MainWindow::MainWindow() :
     m_taskbar(0)
 {
 
-    setWindowTitle("R.A.C.K.");
+    setWindowTitle(tr("R.A.C.K."));
 
     QFile file(":/stylesheets/default.qss");
     file.open(QFile::ReadOnly);

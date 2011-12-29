@@ -23,12 +23,11 @@
 #include "rdesktop.h"
 #include "rpluginhost.h"
 #include "rsplitter.h"
+
 #include <QSettings>
 #include <QVBoxLayout>
-
 #include <QDir>
 #include <QXmlStreamWriter>
-
 #include <QDebug>
 
 

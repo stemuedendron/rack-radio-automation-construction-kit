@@ -27,6 +27,11 @@
 #include "rindexbutton.h"
 #include <QtGui>
 
+//switch to model view?
+
+//review to use qlistwidget instead of qvboxlayout (and qstringlist?) for index page to enable an easy drag and drop implementation
+
+//disable next and preview buttons while play
 
 //how to save? after create page or befor remove?
 

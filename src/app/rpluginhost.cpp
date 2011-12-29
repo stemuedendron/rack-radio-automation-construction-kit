@@ -56,14 +56,14 @@ RPluginHost::RPluginHost(QWidget *parent) : QWidget(parent)
 
     m_newWidgetButton = new QPushButton;
     m_newWidgetButton->setFixedHeight(40);
-    m_newWidgetButton->resize(200,40);
+    m_newWidgetButton->resize(100,40);
 
-    m_newWidgetButton->setText(QTime::currentTime().toString(tr("ss")));
+    m_newWidgetButton->setText(tr("new Widget ..."));
 
     m_middleLayout = new QVBoxLayout;
     m_middleLayout->setSpacing(0);
     m_middleLayout->setContentsMargins(0,0,0,0);
-    m_middleLayout->addWidget(m_newWidgetButton);
+    m_middleLayout->addWidget(m_newWidgetButton, 0, Qt::AlignHCenter);
 
     QWidget *middleWidget = new QWidget;
     middleWidget->setLayout(m_middleLayout);
@@ -140,8 +140,10 @@ void RPluginHost::newPlugin()
 
         emit setPluginsVisible(false);
 
-        QWidget *newplugin = m_widgetPlugin->createRWidget(this, CoreImpl::instance());
+        QWidget *newWidget = m_widgetPlugin->createRWidget(this, CoreImpl::instance());
 
+
+        newWidget->setWindowTitle("testen");
 
 
 
@@ -153,22 +155,27 @@ void RPluginHost::newPlugin()
 
 
 
-        QObject::connect(this, SIGNAL(setPluginsVisible(bool)), newplugin, SLOT(setVisible(bool)));
-        m_mainLayout->addWidget(newplugin);
+        QObject::connect(this, SIGNAL(setPluginsVisible(bool)), newWidget, SLOT(setVisible(bool)));
+        m_mainLayout->addWidget(newWidget);
 
 
         m_settingsWidget->raise();
 
         //signal emit für taskbar und layoutwidget buttons
-        m_pluginWidgetList.append(newplugin);
+        m_pluginWidgetList.append(newWidget);
         emit pluginAdded();
 
 
+        static int dummy;
+        dummy++;
 
-        QPushButton *newpluginbutton = new QPushButton;
+
+
+        QPushButton *newpluginbutton = new QPushButton(QString::number(dummy));
 
         newpluginbutton->setFixedHeight(40);
-        m_middleLayout->insertWidget(0,newpluginbutton);
+        m_middleLayout->insertWidget(m_middleLayout->count() - 1, newpluginbutton);
+
 
         ////QObject::connect(newpluginbutton,SIGNAL(pressed()),SLOT(removePluginButton(middlelayout->indexOf(newpluginbutton))));
 
