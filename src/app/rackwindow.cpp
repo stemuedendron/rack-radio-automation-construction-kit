@@ -22,6 +22,7 @@
 
 #include "rackwindow.h"
 #include "coreimpl.h"
+#include "rsplitter.h"
 
 #include <QtGui>
 
@@ -31,7 +32,7 @@ RackWindow::RackWindow(QWidget *parent) :
 //    m_coreImpl(new CoreImpl(this)),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
     m_mapperclosePluginHost(new QSignalMapper(this)),
-    m_mainSplitter(new QSplitter(Qt::Horizontal))
+    m_mainSplitter(new RSplitter(Qt::Horizontal))
 {
 
     setWindowTitle(tr("R.A.C.K."));
@@ -157,7 +158,7 @@ void RackWindow::createPluginHost(int position)
     }
     QSignalMapper *sm = qobject_cast<QSignalMapper *>(sender());
     QWidget *senderPluginHost = qobject_cast<QWidget *>(sm->mapping(position)->parent()->parent());
-    QSplitter *parentSplitter = qobject_cast<QSplitter *>(senderPluginHost->parent());
+    RSplitter *parentSplitter = qobject_cast<RSplitter *>(senderPluginHost->parent());
     QList<int> widgetsizes;
     int senderpos = parentSplitter->indexOf(senderPluginHost);
     int newposition;
@@ -187,7 +188,7 @@ void RackWindow::createPluginHost(int position)
         }
         else if (parentSplitter->count() > 1)
         {
-            QSplitter *newSplitter = new QSplitter(Qt::Orientation(abs(position)));
+            RSplitter *newSplitter = new RSplitter(Qt::Orientation(abs(position)));
             newSplitter->setChildrenCollapsible(false);
 
             //QObject::connect(this, SIGNAL(changeConfigModus(bool)), newSplitter, SLOT(setConfigModus(bool)));
@@ -226,8 +227,8 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 //needs handling if we should delete the plugins or not and save there content
 void RackWindow::closePluginHost(QWidget *pluginHost)
 {
-    QSplitter *splitter = qobject_cast<QSplitter *>(pluginHost->parent());
-    QSplitter *parentSplitter = qobject_cast<QSplitter *>(splitter->parent());
+    RSplitter *splitter = qobject_cast<RSplitter *>(pluginHost->parent());
+    RSplitter *parentSplitter = qobject_cast<RSplitter *>(splitter->parent());
     if (!parentSplitter && splitter->count() == 1) return;
     if (splitter->count() > 2)
     {
@@ -251,7 +252,7 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
         parentSplitter->insertWidget(parentSplitter->indexOf(splitter), splitter->widget(0));
         delete splitter;
     }
-//    QList<QSplitter *> splitters = qFindChildren<QSplitter *>(this);
+//    QList<RSplitter *> splitters = qFindChildren<RSplitter *>(this);
 //    qDebug("splitter count: %d", splitters.size());
 }
 

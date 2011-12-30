@@ -28,7 +28,7 @@
 //the api:
 class CoreImpl;
 class QSignalMapper;
-class QSplitter;
+class RSplitter;
 
 class RackWindow : public QWidget
 {
@@ -65,7 +65,7 @@ private:
     CoreImpl *m_coreImpl;
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperclosePluginHost;
-    QSplitter *m_mainSplitter;
+    RSplitter *m_mainSplitter;
 
 };
 
