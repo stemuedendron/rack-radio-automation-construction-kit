@@ -171,10 +171,10 @@ void RPluginHost::newPlugin()
 
 
 
-        QPushButton *newpluginbutton = new QPushButton(QString::number(dummy));
+        QPushButton *pluginButton = new QPushButton(QString::number(dummy));
 
-        newpluginbutton->setFixedHeight(40);
-        m_middleLayout->insertWidget(m_middleLayout->count() - 1, newpluginbutton);
+        pluginButton->setFixedHeight(40);
+        m_middleLayout->insertWidget(m_middleLayout->count() - 1, pluginButton);
 
 
         ////QObject::connect(newpluginbutton,SIGNAL(pressed()),SLOT(removePluginButton(middlelayout->indexOf(newpluginbutton))));

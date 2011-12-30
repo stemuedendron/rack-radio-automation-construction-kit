@@ -29,7 +29,7 @@ SOURCES += \
     rdesktop.cpp \
     rpluginhost.cpp \
     ../shared/rsplitter.cpp \
- #   rackwindow.cpp
+    rackwindow.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -39,7 +39,7 @@ HEADERS += \
     rpluginhost.h \
     ../shared/rsplitter.h \
     ../libs/extensionsystem/iwidgetplugin.h \
- #   rackwindow.h
+    rackwindow.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

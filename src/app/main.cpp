@@ -21,6 +21,9 @@
 */
 
 #include "mainwindow.h"
+
+#include "rackwindow.h"
+
 #include <QtGui>
 
 int main(int argc, char *argv[])
@@ -33,7 +36,10 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    MainWindow mainWindow;
+    //MainWindow mainWindow;
+
+    RackWindow mainWindow;
+
     mainWindow.resize(800, 600);
     mainWindow.setWindowState(Qt::WindowMaximized);
 
