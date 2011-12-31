@@ -22,6 +22,7 @@
 
 #include "rackwindow.h"
 #include "coreimpl.h"
+#include "iwidgetplugin.h"
 #include "rsplitter.h"
 
 #include <QtGui>
@@ -29,7 +30,7 @@
 RackWindow::RackWindow(QWidget *parent) :
     QWidget(parent),
     //create the rack api object:
-//    m_coreImpl(new CoreImpl(this)),
+    m_coreImpl(new CoreImpl(this)),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
     m_mapperclosePluginHost(new QSignalMapper(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal))
@@ -132,14 +133,14 @@ void RackWindow::createPluginHost(int position)
     QObject::connect(this, SIGNAL(setSettingsMode(int)), overlayLayout, SLOT(setCurrentIndex(int)));
 
     //create new plugin host widget signals:
-    QSignalMapper *mapperCreatePluginHost = new QSignalMapper(this);
+    QSignalMapper *mapperCreatePluginHost = new QSignalMapper(pluginHost);
     QObject::connect(leftButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
     QObject::connect(rightButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
     QObject::connect(topButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
     QObject::connect(bottomButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
-    mapperCreatePluginHost->setMapping(leftButton,  NewSplitterLeft);
-    mapperCreatePluginHost->setMapping(rightButton,  NewSplitterRight);
-    mapperCreatePluginHost->setMapping(topButton,   NewSplitterTop);
+    mapperCreatePluginHost->setMapping(leftButton, NewSplitterLeft);
+    mapperCreatePluginHost->setMapping(rightButton, NewSplitterRight);
+    mapperCreatePluginHost->setMapping(topButton, NewSplitterTop);
     mapperCreatePluginHost->setMapping(bottomButton, NewSplitterBottom);
     QObject::connect(mapperCreatePluginHost, SIGNAL(mapped(int)), SLOT(createPluginHost(int)));
 
@@ -150,6 +151,11 @@ void RackWindow::createPluginHost(int position)
     //close plugin host signals:
     QObject::connect(closeButton, SIGNAL(clicked()), m_mapperclosePluginHost, SLOT(map()));
     m_mapperclosePluginHost->setMapping(closeButton, pluginHost);
+
+    //create plugin switch signalmapper
+    QSignalMapper *mapperSwitchPlugin = new QSignalMapper(pluginHost);
+    mapperSwitchPlugin->setObjectName("rackPluginSwitchMapper");
+    QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(int)), pluginStack, SLOT(setCurrentIndex(int)));
 
     //insert new pluginhost widget in splitter, create new splitter if necessary
     if (position == 0) {
@@ -210,18 +216,43 @@ void RackWindow::createPluginHost(int position)
 
 void RackWindow::loadPlugin(QWidget *pluginHost)
 {
-    QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
+    QDir pluginsDir(qApp->applicationDirPath());
+#if defined(Q_OS_WIN)
+    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+    }
+#endif
+    pluginsDir.cd("plugins");
 
-    pluginStack->addWidget(new QPushButton("Hello!"));
+    QString fileName = pluginsDir.entryList(QDir::Files).first();
+    QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+    QObject *plugin = pluginLoader.instance();
 
-    QVBoxLayout *pluginSettingsLayout = qFindChild<QVBoxLayout *>(pluginHost, "rackPluginSettingsLayout");
+    if (plugin) {
+        IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
+        if (widgetPlugin) {
+            QWidget *newWidget = widgetPlugin->createRWidget(this, CoreImpl::instance());
+            QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
+            int index = pluginStack->addWidget(newWidget);
+            pluginStack->setCurrentIndex(index);
 
-    static int dummy;
-    dummy++;
+            QVBoxLayout *pluginSettingsLayout = qFindChild<QVBoxLayout *>(pluginHost, "rackPluginSettingsLayout");
+            QPushButton *pluginButton = new QPushButton(QString::number(index));
+            pluginButton->setFixedHeight(40);
+            pluginSettingsLayout->insertWidget(pluginSettingsLayout->count() - 1, pluginButton);
 
-    QPushButton *pluginButton = new QPushButton(QString::number(dummy));
-    pluginButton->setFixedHeight(40);
-    pluginSettingsLayout->insertWidget(pluginSettingsLayout->count() - 1, pluginButton);
+            QSignalMapper *sm = qFindChild<QSignalMapper *>(pluginHost, "rackPluginSwitchMapper");
+            QObject::connect(pluginButton, SIGNAL(clicked()), sm, SLOT(map()));
+            sm->setMapping(pluginButton, index);
+
+        }
+    }
+    else QMessageBox::information(this, "Error", "Could not load the plugin");
 }
 
 //needs handling if we should delete the plugins or not and save there content
@@ -331,7 +362,7 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
 
 RackWindow::~RackWindow()
 {
-//    delete m_coreImpl;
-//    m_coreImpl = 0;
+    delete m_coreImpl;
+    m_coreImpl = 0;
 }
 

@@ -135,7 +135,7 @@
 }
 
 
-
+#rackPluginStack,
 RackWindow {
     background-color: #000000;
 }

@@ -29,7 +29,7 @@
 
 MainWindow::MainWindow() :
     //create the rack api object:
-    m_coreImpl(new CoreImpl(this)),
+//    m_coreImpl(new CoreImpl(this)),
     m_desktop(0),
     m_taskbar(0)
 {
@@ -76,7 +76,7 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-    delete m_coreImpl;
-    m_coreImpl = 0;
+//    delete m_coreImpl;
+//    m_coreImpl = 0;
 }
 

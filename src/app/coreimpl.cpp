@@ -21,7 +21,7 @@
 */
 
 #include "coreimpl.h"
-#include "mainwindow.h"
+#include "rackwindow.h"
 
 #include <QTime>
 
@@ -35,7 +35,7 @@ ICore *ICore::instance()
 }
 
 
-CoreImpl::CoreImpl(MainWindow *mainwindow)
+CoreImpl::CoreImpl(RackWindow *mainwindow)
 {
     m_instance = this;
     m_mainwindow = mainwindow;

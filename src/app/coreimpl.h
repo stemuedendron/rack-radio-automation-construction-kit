@@ -25,7 +25,7 @@
 
 #include "icore.h"
 
-class MainWindow;
+class RackWindow;
 
 class CoreImpl : public ICore
 {
@@ -33,7 +33,7 @@ class CoreImpl : public ICore
 
 public:
 
-    CoreImpl(MainWindow *mainwindow);
+    CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
 
@@ -43,10 +43,10 @@ public slots:
 
 private:
 
-    MainWindow *m_mainwindow;
+    RackWindow *m_mainwindow;
 
     //maybe we need this?
-    //friend class MainWindow;
+    //friend class RackWindow;
 
 
 protected:

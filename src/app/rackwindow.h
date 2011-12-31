@@ -63,9 +63,11 @@ private:
     };
 
     CoreImpl *m_coreImpl;
+    RSplitter *m_mainSplitter;
+
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperclosePluginHost;
-    RSplitter *m_mainSplitter;
+
 
 };
 

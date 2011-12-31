@@ -20,8 +20,6 @@
     Author: Steffen Müller
 */
 
-#include "mainwindow.h"
-
 #include "rackwindow.h"
 
 #include <QtGui>
