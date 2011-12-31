@@ -24,22 +24,16 @@ TARGET = rack
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
     coreimpl.cpp \
-    rdesktop.cpp \
-    rpluginhost.cpp \
-    ../shared/rsplitter.cpp \
-    rackwindow.cpp
+    rackwindow.cpp \
+    ../shared/rsplitter.cpp
 
 HEADERS += \
-    mainwindow.h \
     coreimpl.h \
     icore.h \
-    rdesktop.h \
-    rpluginhost.h \
+    rackwindow.h \
     ../shared/rsplitter.h \
-    ../libs/extensionsystem/iwidgetplugin.h \
-    rackwindow.h
+    ../libs/extensionsystem/iwidgetplugin.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -50,6 +44,12 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
+
+
+
+
 
 
 
