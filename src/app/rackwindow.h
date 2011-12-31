@@ -29,6 +29,7 @@
 class CoreImpl;
 class QSignalMapper;
 class RSplitter;
+class QXmlStreamWriter;
 
 class RackWindow : public QWidget
 {
@@ -42,6 +43,11 @@ public:
 signals:
 
 public slots:
+
+    //old save stuff
+    //debug this
+    void savePluginHosts();
+    /////////////////////////
 
 private slots:
 
@@ -68,6 +74,14 @@ private:
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperclosePluginHost;
 
+
+    //old save stuff
+    void saveSplitter(RSplitter *splitter);
+    void saveSplitterItem(QObject *obj, QXmlStreamWriter *xml);
+
+    void saveSplittertoXML(RSplitter *splitter);
+    void saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml);
+    /////////////////////////////
 
 };
 

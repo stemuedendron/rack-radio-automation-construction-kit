@@ -31,9 +31,9 @@ RackWindow::RackWindow(QWidget *parent) :
     QWidget(parent),
     //create the rack api object:
     m_coreImpl(new CoreImpl(this)),
+    m_mainSplitter(new RSplitter(Qt::Horizontal)),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
-    m_mapperclosePluginHost(new QSignalMapper(this)),
-    m_mainSplitter(new RSplitter(Qt::Horizontal))
+    m_mapperclosePluginHost(new QSignalMapper(this))
 {
 
     setWindowTitle(tr("R.A.C.K."));
@@ -56,9 +56,15 @@ RackWindow::RackWindow(QWidget *parent) :
     //replace with 'real' menu
     QPushButton *showSettingsButton = new QPushButton("Settings");
     QPushButton *hideSettingsButton = new QPushButton("OK");
+
+    QPushButton *saveButton = new QPushButton("Save");
+    QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(savePluginHosts()));
+
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addWidget(showSettingsButton);
     hl->addWidget(hideSettingsButton);
+    hl->addWidget(saveButton);
+    ////////////////////////////////////
 
     QVBoxLayout *vl = new QVBoxLayout;
     vl->setSpacing(0);
@@ -357,6 +363,173 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
 //    }
 //    else QMessageBox::information(this, "Error", "Could not load the plugin");
 //}
+
+
+void RackWindow::savePluginHosts()
+{
+    ////orientation unterscheiden
+
+    QSettings settings("RadioFrei", "Layouts");
+    settings.clear();
+
+    QObjectList allObj = children();
+
+    QList<RSplitter*> allsplitters;
+
+    for (int i = 0; i < children().count(); ++i)
+    {
+       settings.setValue(children().at(i)->metaObject()->className(), "nix");
+      //  if (qobject_cast<RSplitter *>(children().at(i))) allsplitters << qobject_cast<RSplitter *>(children().at(i));
+    }
+
+    settings.setValue("AlleSplitter",allsplitters.count());
+    settings.setValue("Alle", allObj.count());
+
+    QList<QWidget *> allWidgets = qFindChildren<QWidget *>(this);
+
+    for (int i = 0; i < allWidgets.count(); ++i)
+    {
+        settings.setValue(allWidgets.at(i)->metaObject()->className(), i);
+    }
+
+    settings.beginWriteArray("widgets");
+
+    for (int i = 0; i < allObj.count(); ++i)
+    {
+      settings.setArrayIndex(i);
+      settings.setValue(allObj.at(i)->metaObject()->className(), "nix");
+    }
+     settings.endArray();
+
+     settings.beginGroup("splitters/test");
+
+     // foreach (QObject* child, children()) settings.setValue(child->metaObject()->className(), child->parent()->metaObject()->className());
+
+     settings.setValue("rwigetcount",allObj.count());
+     settings.endGroup();
+
+     //nothing to save here but the plugins inside the rMain RWidget
+     //    if (count() == 1)
+     //    {
+
+     //    }
+     //    //we have at least 2 Rwidgets
+     //    else
+     //    {
+
+     //    }
+     //get the root widget if we have more than one rwidget (if it is rsplitter):
+     RSplitter *root = qobject_cast<RSplitter *>(layout()->itemAt(0)->widget());
+     if (root)
+     {
+
+         settings.setValue("splitterSizes", root->saveState());
+
+         saveSplittertoXML(root);
+         saveSplitter(root);
+     }
+
+}
+
+//Variante 1: XML mit QSettings schreiben und splitter.state sichern:
+/**
+ * @brief
+ *
+ * @param splitter
+ */
+void RackWindow::saveSplitter(RSplitter *splitter)
+{
+    QString setting;
+    QXmlStreamWriter xml(&setting);
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE xml>");
+    xml.writeStartElement("racklayout");
+    xml.writeAttribute("version", "1.0");
+    saveSplitterItem(splitter, &xml);
+    xml.writeEndDocument();
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "RadioFrei", "Layout");
+    settings.clear();
+    settings.setValue("layout", setting);
+}
+
+/**
+ * @brief
+ *
+ * @param obj
+ * @param xml
+ */
+void RackWindow::saveSplitterItem(QObject *obj, QXmlStreamWriter *xml)
+{
+    QString className = obj->metaObject()->className();
+    xml->writeStartElement("object");
+    xml->writeAttribute("class", className);
+    if (qobject_cast<RSplitter *>(obj))
+    {
+        RSplitter *splitter = qobject_cast<RSplitter *>(obj);
+        xml->writeAttribute("state", QString::fromLatin1(splitter->saveState().constData(), splitter->saveState().size()));
+        for (int i = 0; i < splitter->count(); ++i)
+        {
+            saveSplitterItem(splitter->widget(i),xml);
+        }
+    }
+    xml->writeEndElement();
+}
+
+
+//Variante 2: XML in eigene Datei schreiben und orientation und sizes extra sichern:
+
+/**
+ * @brief
+ *
+ * @param splitter
+ */
+void RackWindow::saveSplittertoXML(RSplitter *splitter)
+{
+    QXmlStreamWriter xml;
+    xml.setAutoFormatting(true);
+    //needs change!!!!!! for cross platform
+    QFile file("/home/rf/rack.xml");
+    if (!file.open(QFile::WriteOnly | QFile::Text))
+    {
+        qDebug() << "Error xml";
+        return;
+    }
+    xml.setDevice(&file);
+    xml.writeStartDocument();
+    xml.writeDTD("<!DOCTYPE xml>");
+    xml.writeStartElement("racklayout");
+    xml.writeAttribute("version", "1.0");
+    saveSplitterItemtoXML(splitter, &xml);
+    xml.writeEndDocument();
+}
+
+
+/**
+ * @brief
+ *
+ * @param obj
+ * @param xml
+ */
+void RackWindow::saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml)
+{
+    QString className = obj->metaObject()->className();
+    xml->writeStartElement("object");
+    xml->writeAttribute("class", className);
+    if (qobject_cast<RSplitter *>(obj))
+    {
+        RSplitter *splitter = qobject_cast<RSplitter *>(obj);
+        xml->writeAttribute("orientation", QString::number(splitter->orientation()));
+        QList<int> sizes = splitter->sizes();
+        QStringList tmp;
+        foreach (int size, sizes) tmp << QString::number(size);
+        xml->writeAttribute("sizes", tmp.join("|"));
+        for (int i = 0; i < splitter->count(); ++i)
+        {
+            saveSplitterItemtoXML(splitter->widget(i),xml);
+        }
+    }
+    xml->writeEndElement();
+}
 
 
 
