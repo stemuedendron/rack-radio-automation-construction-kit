@@ -23,6 +23,34 @@
 /* R.A.C.K. default style sheet */
 
 
+/*Toolbar*/
+QToolBar {
+    spacing: 3px; /* spacing between items in the tool bar */
+
+background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #717171, stop: 1 #B2B2B2);
+}
+
+
+#rackMenuButton {
+    height: 70px;
+    width: 60px;
+    image: url(:/images/menu.png);
+    background:none;
+    border:none;
+    image-position: top;
+    text-align: bottom center;
+}
+#rackMenuButton:open {
+    background-color: black;
+}
+#rackMenuButton::menu-indicator {
+     image: none;
+     width: 0px;
+     height: 0px;
+}
+
+/*Menu*/
+
 
 /*40 x 40 Buttons*/
 #rackSettingsCloseButton,
@@ -47,23 +75,23 @@
     border-width: 2px;
     border-style: solid;
     border-radius: 4px;
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #606060, stop: 1 #000000);
-    border-color: #606060;
+    border-color: #737373;
+    background: transparent;
 }
 #rackSettingsCloseButton:hover,
 #rackSettingsLeftArrowButton:hover,
 #rackSettingsRightArrowButton:hover,
 #rackSettingsTopArrowButton:hover,
 #rackSettingsBottomArrowButton:hover {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #737373, stop: 1 #131313);
-    border-color: #737373
+
+    border-color: #FFFFFF
 }
 #rackSettingsCloseButton:pressed,
 #rackSettingsLeftArrowButton:pressed,
 #rackSettingsRightArrowButton:pressed,
 #rackSettingsTopArrowButton:pressed,
 #rackSettingsBottomArrowButton:pressed {
-    border-color: #FFFFFF
+    border-color: red
 }
 
 

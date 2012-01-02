@@ -21,11 +21,14 @@
 */
 
 #include "rsplitter.h"
+#include "icore.h"
 #include <QtGui>
 
 RSplitterHandle::RSplitterHandle(Qt::Orientation orientation, RSplitter *parent) : QSplitterHandle(orientation, parent)
 {
     m_handleColor=Qt::white;
+    QObject::connect(ICore::instance(), SIGNAL(enterSettingsMode()), this, SLOT(enterSettingsMode()));
+    QObject::connect(ICore::instance(), SIGNAL(leaveSettingsMode()), this, SLOT(leaveSettingsMode()));
 }
 
 void RSplitterHandle::paintEvent(QPaintEvent *event)
@@ -49,7 +52,15 @@ void RSplitterHandle::mouseReleaseEvent(QMouseEvent *)
     update();
 }
 
+void RSplitterHandle::enterSettingsMode()
+{
+    setEnabled(true);
+}
 
+void RSplitterHandle::leaveSettingsMode()
+{
+    setDisabled(true);
+}
 
 
 RSplitter::RSplitter(Qt::Orientation orientation, QWidget *parent) : QSplitter(orientation, parent)
@@ -61,11 +72,7 @@ RSplitter::RSplitter(Qt::Orientation orientation, QWidget *parent) : QSplitter(o
 QSplitterHandle *RSplitter::createHandle()
 {
     RSplitterHandle *myhandle = new RSplitterHandle(orientation(), this);
-    QObject::connect(this, SIGNAL(changeConfigModus(bool)), myhandle, SLOT(setEnabled(bool)));
     return myhandle;
 }
 
-void RSplitter::setConfigModus(bool value)
-{
-    emit changeConfigModus(value);
-}
+

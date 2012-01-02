@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication::setStyle(new QWindowsStyle);
     QApplication app(argc, argv);
-
-    //MainWindow mainWindow;
+    app.setOrganizationName("Radio F.R.E.I.");
+    app.setApplicationName("r.a.c.k. - Radio Automation Construction Kit");
 
     RackWindow mainWindow;
 

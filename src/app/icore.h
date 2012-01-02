@@ -47,6 +47,9 @@ signals:
     void timeStrChanged(QString);
     void dateStrChanged(QString);
 
+    void enterSettingsMode();
+    void leaveSettingsMode();
+
 };
 
 #endif // ICORE_H
