@@ -23,7 +23,7 @@
 #include "rindexbutton.h"
 #include <QtGui>
 
-RIndexButton::RIndexButton(const QString &title, const int &keys, QWidget *parent) : QPushButton(parent)
+RIndexButton::RIndexButton(const QString &title, const int &keys, QWidget *parent) : RPushButton(parent)
 {
     setObjectName("rackHotkeyIndexButton");
     m_title = new QLabel;

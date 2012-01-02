@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
-
+    QApplication::setStyle(new QWindowsStyle);
     //MainWindow mainWindow;
 
     RackWindow mainWindow;

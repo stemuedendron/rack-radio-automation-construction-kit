@@ -21,6 +21,7 @@
 */
 
 #include "rpageedit.h"
+#include "rpushbutton.h"
 #include <QtGui>
 
 RPageEdit::RPageEdit(QWidget *parent) : QDialog(parent)
@@ -81,10 +82,10 @@ RPageEdit::RPageEdit(QWidget *parent) : QDialog(parent)
     tabWidget->addTab(wgDelete, tr("Delete"));
 
     //dialog buttons:
-    QPushButton *btOK = new QPushButton;
+    RPushButton *btOK = new RPushButton;
     btOK->setObjectName("rackOkButton");
     btOK->setDefault(true);
-    QPushButton *btClose = new QPushButton;
+    RPushButton *btClose = new RPushButton;
     btClose->setObjectName("rackCloseButton");
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addStretch();

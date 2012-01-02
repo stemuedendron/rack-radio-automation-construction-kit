@@ -24,6 +24,7 @@
 #include "coreimpl.h"
 #include "iwidgetplugin.h"
 #include "rsplitter.h"
+#include "rpushbutton.h"
 
 #include <QtGui>
 
@@ -54,10 +55,10 @@ RackWindow::RackWindow(QWidget *parent) :
     emit setSettingsMode(0);
 
     //replace with 'real' menu
-    QPushButton *showSettingsButton = new QPushButton("Settings");
-    QPushButton *hideSettingsButton = new QPushButton("OK");
+    RPushButton *showSettingsButton = new RPushButton("Settings");
+    RPushButton *hideSettingsButton = new RPushButton("OK");
 
-    QPushButton *saveButton = new QPushButton("Save");
+    RPushButton *saveButton = new RPushButton("Save");
     QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(savePluginHosts()));
 
     QHBoxLayout *hl = new QHBoxLayout;
@@ -95,17 +96,17 @@ void RackWindow::createPluginHost(int position)
     settingsWidget->setPalette(pal);
     settingsWidget->setAutoFillBackground(true);
 
-    QPushButton *leftButton = new QPushButton;
+    RPushButton *leftButton = new RPushButton;
     leftButton->setObjectName("rackSettingsLeftArrowButton");
-    QPushButton *rightButton = new QPushButton;
+    RPushButton *rightButton = new RPushButton;
     rightButton->setObjectName("rackSettingsRightArrowButton");
-    QPushButton *topButton = new QPushButton;
+    RPushButton *topButton = new RPushButton;
     topButton->setObjectName("rackSettingsTopArrowButton");
-    QPushButton *bottomButton = new QPushButton;
+    RPushButton *bottomButton = new RPushButton;
     bottomButton->setObjectName("rackSettingsBottomArrowButton");
-    QPushButton *closeButton = new QPushButton;
+    RPushButton *closeButton = new RPushButton;
     closeButton->setObjectName("rackSettingsCloseButton");
-    QPushButton *newWidgetButton = new QPushButton(tr("new Widget ..."));
+    RPushButton *newWidgetButton = new RPushButton(tr("new Widget ..."));
     newWidgetButton->setFixedHeight(40);
 
     QWidget *middleWidget = new QWidget;
@@ -248,7 +249,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             pluginStack->setCurrentIndex(index);
 
             QVBoxLayout *pluginSettingsLayout = qFindChild<QVBoxLayout *>(pluginHost, "rackPluginSettingsLayout");
-            QPushButton *pluginButton = new QPushButton(QString::number(index));
+            RPushButton *pluginButton = new RPushButton(QString::number(index));
             pluginButton->setFixedHeight(40);
             pluginSettingsLayout->insertWidget(pluginSettingsLayout->count() - 1, pluginButton);
 
@@ -351,7 +352,7 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
 //        static int dummy;
 //        dummy++;
 
-//        QPushButton *newpluginbutton = new QPushButton(QString::number(dummy));
+//        RPushButton *newpluginbutton = new RPushButton(QString::number(dummy));
 
 //        newpluginbutton->setFixedHeight(40);
 //        m_middleLayout->insertWidget(m_middleLayout->count() - 1, newpluginbutton);

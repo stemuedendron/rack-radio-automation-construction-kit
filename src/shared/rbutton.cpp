@@ -29,7 +29,7 @@
 
 
 RButton::RButton(ButtonKind bk, QWidget *parent)
-    : QPushButton(parent),
+    : RPushButton(parent),
     m_bk(bk),
     m_position(0),
     m_positionClockColor(QColor(255,255,255,100)),
@@ -38,7 +38,6 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
     m_drawPosition(0)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     ////////////////////////////////////////////////////////////////
     QList<audiodevice> devices = RPlayer::getDevices();
     foreach (const audiodevice &dev, devices)
@@ -83,7 +82,7 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
 
 void RButton::paintEvent(QPaintEvent *e)
 {
-    QPushButton::paintEvent(e);
+    RPushButton::paintEvent(e);
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     if (!m_drawPosition == 0) drawClock(&painter);

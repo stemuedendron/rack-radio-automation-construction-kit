@@ -21,11 +21,13 @@
 */
 
 #include "rcolordialog.h"
+#include "rpushbutton.h"
 
 #include <QtGui>
 
 
-RColorDialog::RColorDialog(QWidget *parent) : QDialog(parent, Qt::FramelessWindowHint)
+RColorDialog::RColorDialog(QWidget *parent) :
+    QDialog(parent, Qt::FramelessWindowHint)
 {
     setPalette(QPalette(Qt::lightGray));
     setFixedSize(220,300);
@@ -36,13 +38,13 @@ RColorDialog::RColorDialog(QWidget *parent) : QDialog(parent, Qt::FramelessWindo
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
         {
-            QPushButton *bt = new QPushButton;
+            RPushButton *bt = new RPushButton;
             bt->setFixedSize(60,60);
 
             connect(bt, SIGNAL(pressed()),SLOT(setColor()));
             l->addWidget(bt, i, j);
         }
-    QPushButton *closebt = new QPushButton;
+    RPushButton *closebt = new RPushButton;
 
     closebt->setFixedSize(60,60);
 
@@ -62,7 +64,7 @@ void RColorDialog::paintEvent(QPaintEvent *)
 
 void RColorDialog::setColor()
 {
-    QPushButton *senderButton = qobject_cast<QPushButton *>(sender());
+    RPushButton *senderButton = qobject_cast<RPushButton *>(sender());
     //colorValue = senderButton->getColor();
     done(true);
 }

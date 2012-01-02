@@ -31,6 +31,7 @@ HEADERS = \
     ../../shared/rplayer.h \
     ../../shared/rbutton.h \
     ../../shared/rblinkbutton.h \
+    ../../shared/rpushbutton.h \
     rpageedit.h \
     rindexbutton.h \
     rhotkeywidget.h \
@@ -40,6 +41,7 @@ SOURCES = \
     ../../shared/rplayer.cpp \
     ../../shared/rbutton.cpp \
     ../../shared/rblinkbutton.cpp \
+    ../../shared/rpushbutton.cpp \
     rpageedit.cpp \
     rindexbutton.cpp \
     rhotkeywidget.cpp \
@@ -52,6 +54,8 @@ unix:!macx: LIBS += -L$$PWD/../../libs/3rdparty/bass/x64/ -lbass
 LIBS += -L$$PWD/../../libs/3rdparty/bass/ -lbass
 INCLUDEPATH += $$PWD/../../libs/3rdparty/bass
 DEPENDPATH += $$PWD/../../libs/3rdparty/bass
+
+
 
 
 

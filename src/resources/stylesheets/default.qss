@@ -259,7 +259,6 @@ QPushButton:pressed {
     border-color: #FFFFFF;
 }
 
-
 #rackOkButton {
     min-width: 60px;
     max-width: 60px;

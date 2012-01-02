@@ -27,12 +27,16 @@ INCLUDEPATH += \
 
 HEADERS +=\
      mainwindow.h \
-    ../../shared/rcolordialog.h
+    ../../shared/rcolordialog.h \
+    ../../shared/rpushbutton.h
 
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    ../../shared/rcolordialog.cpp
+    ../../shared/rcolordialog.cpp \
+    ../../shared/rpushbutton.cpp
+
+
 
 
 

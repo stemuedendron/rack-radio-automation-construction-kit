@@ -30,12 +30,16 @@ INCLUDEPATH += ../../shared
 HEADERS = \
     rradioclockplugin.h \
     rradioclock.h \
-    ../../shared/rcolordialog.h
+    ../../shared/rcolordialog.h \
+    ../../shared/rpushbutton.h
 
 SOURCES = \
     rradioclockplugin.cpp \
     rradioclock.cpp \
-    ../../shared/rcolordialog.cpp
+    ../../shared/rcolordialog.cpp \
+    ../../shared/rpushbutton.cpp
 
 TARGET = $$qtLibraryTarget(radioclockplugin)
+
+
 

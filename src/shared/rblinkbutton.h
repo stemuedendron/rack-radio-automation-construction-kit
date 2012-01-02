@@ -23,10 +23,10 @@
 #ifndef RBLINKBUTTON_H
 #define RBLINKBUTTON_H
 
-#include <QPushButton>
+#include "rpushbutton.h"
 #include <QTimer>
 
-class RBlinkButton : public QPushButton
+class RBlinkButton : public RPushButton
 {
     Q_OBJECT
     Q_PROPERTY(bool blinking READ blinking)

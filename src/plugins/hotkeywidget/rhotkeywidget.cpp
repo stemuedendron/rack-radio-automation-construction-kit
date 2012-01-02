@@ -25,6 +25,7 @@
 #include "rbutton.h"
 #include "rpageedit.h"
 #include "rindexbutton.h"
+#include "rpushbutton.h"
 #include <QtGui>
 
 //switch to model view?
@@ -58,21 +59,21 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     connect(m_btEdit, SIGNAL(toggled(bool)), this, SIGNAL(editMode(bool)));
 
 
-    QPushButton *btIndex = new QPushButton(tr("Index"));
+    RPushButton *btIndex = new RPushButton(tr("Index"));
     btIndex->setObjectName("rackButton");
     btIndex->setDisabled(true);
     btIndex->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     connect(btIndex,SIGNAL(clicked()),this,SLOT(showIndexPage()));
     connect(this, SIGNAL(enableIndexButton(bool)), btIndex, SLOT(setEnabled(bool)));
 
-    QPushButton *btPrevious = new QPushButton;
+    RPushButton *btPrevious = new RPushButton;
     btPrevious->setObjectName("rackLeftArrowButton");
     btPrevious->setDisabled(true);
     btPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     connect(btPrevious,SIGNAL(clicked()),this,SLOT(showPreviousPage()));
     connect(this, SIGNAL(enableNPButtons(bool)), btPrevious, SLOT(setEnabled(bool)));
 
-    QPushButton *btNext = new QPushButton;
+    RPushButton *btNext = new RPushButton;
     btNext->setObjectName("rackRightArrowButton");
     btNext->setDisabled(true);
     btNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);

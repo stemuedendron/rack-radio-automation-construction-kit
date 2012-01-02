@@ -24,12 +24,12 @@
 #define RBUTTON_H
 
 #include "rplayer.h"
-#include <QPushButton>
+#include "rpushbutton.h"
 
 
 class QColor;
 
-class RButton : public QPushButton
+class RButton : public RPushButton
 {
     Q_OBJECT
     Q_ENUMS(ButtonKind)

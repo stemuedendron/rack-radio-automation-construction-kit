@@ -40,8 +40,6 @@ public:
     explicit RackWindow(QWidget *parent = 0);
     ~RackWindow();
 
-signals:
-
 public slots:
 
     //old save stuff

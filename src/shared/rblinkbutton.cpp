@@ -26,7 +26,8 @@
 #include <QStyle>
 
 
-RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) : QPushButton(text, parent)
+RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) :
+    RPushButton(text, parent)
 {
     setCheckable(true);
     m_blinking = false;

@@ -29,14 +29,18 @@ CONFIG += plugin
 HEADERS = \
     rdigitalclockplugin.h \
     rdigitalclock.h \
-    ../../shared/rcolordialog.h
+    ../../shared/rcolordialog.h \
+    ../../shared/rpushbutton.h
 
 SOURCES = \
     rdigitalclockplugin.cpp \
     rdigitalclock.cpp \
-    ../../shared/rcolordialog.cpp
+    ../../shared/rcolordialog.cpp \
+    ../../shared/rpushbutton.cpp
 
 TARGET = $$qtLibraryTarget(digitalclockplugin)
+
+
 
 
 

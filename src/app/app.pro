@@ -26,14 +26,16 @@ SOURCES += \
     main.cpp \
     coreimpl.cpp \
     rackwindow.cpp \
-    ../shared/rsplitter.cpp
+    ../shared/rsplitter.cpp \
+    ../shared/rpushbutton.cpp
 
 HEADERS += \
     coreimpl.h \
     icore.h \
     rackwindow.h \
     ../shared/rsplitter.h \
-    ../libs/extensionsystem/iwidgetplugin.h
+    ../libs/extensionsystem/iwidgetplugin.h \
+    ../shared/rpushbutton.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -44,6 +46,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 

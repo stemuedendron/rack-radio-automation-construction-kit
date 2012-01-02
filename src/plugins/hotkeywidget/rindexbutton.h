@@ -23,11 +23,11 @@
 #ifndef RINDEXBUTTON_H
 #define RINDEXBUTTON_H
 
-#include <QPushButton>
+#include "rpushbutton.h"
 
 class QLabel;
 
-class RIndexButton : public QPushButton
+class RIndexButton : public RPushButton
 {
     Q_OBJECT
 
