@@ -23,21 +23,24 @@
 #ifndef RACKWINDOW_H
 #define RACKWINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
 
-//the api:
+class RSplitter;
+class QMenu;
+class QToolBar;
+
 class CoreImpl;
 class QSignalMapper;
-class RSplitter;
+class QAction;
 class QXmlStreamWriter;
 
-class RackWindow : public QWidget
+class RackWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
 
-    explicit RackWindow(QWidget *parent = 0);
+    RackWindow();
     ~RackWindow();
 
 public slots:
@@ -53,10 +56,6 @@ private slots:
     void closePluginHost(QWidget *pluginHost);
     void loadPlugin(QWidget *pluginHost);
 
-signals:
-
-    void setSettingsMode(int);
-
 private:
 
     enum NewSplitterLocation {
@@ -66,12 +65,9 @@ private:
         NewSplitterBottom = 2
     };
 
-    CoreImpl *m_coreImpl;
-    RSplitter *m_mainSplitter;
-
-    QSignalMapper *m_mapperLoadNewPlugin;
-    QSignalMapper *m_mapperclosePluginHost;
-
+    void createActions();
+    void createMenus();
+    void createToolBars();
 
     //old save stuff
     void saveSplitter(RSplitter *splitter);
@@ -80,6 +76,21 @@ private:
     void saveSplittertoXML(RSplitter *splitter);
     void saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml);
     /////////////////////////////
+
+    CoreImpl *m_coreImpl;
+
+    RSplitter *m_mainSplitter;
+    QMenu *m_mainMenu;
+    QToolBar *m_mainToolBar;
+
+    QSignalMapper *m_mapperLoadNewPlugin;
+    QSignalMapper *m_mapperclosePluginHost;
+
+    QAction *m_showSettingsAct;
+    QAction *m_hideSettingsAct;
+    QAction *m_pflAct;
+
+
 
 };
 

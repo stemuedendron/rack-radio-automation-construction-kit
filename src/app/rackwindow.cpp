@@ -28,9 +28,7 @@
 
 #include <QtGui>
 
-RackWindow::RackWindow(QWidget *parent) :
-    QWidget(parent),
-    //create the rack api object:
+RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal)),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
@@ -44,56 +42,83 @@ RackWindow::RackWindow(QWidget *parent) :
     QString styleSheet = QLatin1String(file.readAll());
     setStyleSheet(styleSheet);
 
+    setCentralWidget(m_mainSplitter);
 
-    m_mainSplitter->setChildrenCollapsible(false);
-
-
-    //QObject::connect(this, SIGNAL(changeConfigModus(bool)), m_mainSplitter, SLOT(setConfigModus(bool)));
-
+    createActions();
+    createMenus();
+    createToolBars();
 
     createPluginHost(0);
-    emit setSettingsMode(0);
+    m_hideSettingsAct->activate(QAction::Trigger);
 
     //replace with 'real' menu
-    RPushButton *showSettingsButton = new RPushButton("Settings");
-    RPushButton *hideSettingsButton = new RPushButton("OK");
+//    RPushButton *showSettingsButton = new RPushButton("Settings");
+//    RPushButton *hideSettingsButton = new RPushButton("OK");
 
-    RPushButton *saveButton = new RPushButton("Save");
-    QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(savePluginHosts()));
+//    RPushButton *saveButton = new RPushButton("Save");
+//    QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(savePluginHosts()));
 
-    QHBoxLayout *hl = new QHBoxLayout;
-    hl->addWidget(showSettingsButton);
-    hl->addWidget(hideSettingsButton);
-    hl->addWidget(saveButton);
+//    QHBoxLayout *hl = new QHBoxLayout;
+//    hl->addWidget(showSettingsButton);
+//    hl->addWidget(hideSettingsButton);
+//    hl->addWidget(saveButton);
     ////////////////////////////////////
 
-    QVBoxLayout *vl = new QVBoxLayout;
-    vl->setSpacing(0);
-    vl->setContentsMargins(0,0,0,0);
-    vl->addWidget(m_mainSplitter);
-    vl->addLayout(hl);
-    setLayout(vl);
 
-    QSignalMapper *mapperSetSettingsMode = new QSignalMapper(this);
+//    QVBoxLayout *vl = new QVBoxLayout;
+//    vl->setSpacing(0);
+//    vl->setContentsMargins(0,0,0,0);
+//    vl->addWidget(m_mainSplitter);
+//    //vl->addLayout(hl);
+//    vl->addWidget(m_toolBarWidget);
+//    setLayout(vl);
 
-    QObject::connect(showSettingsButton, SIGNAL(clicked()),mapperSetSettingsMode,SLOT(map()));
-    QObject::connect(hideSettingsButton, SIGNAL(clicked()),mapperSetSettingsMode,SLOT(map()));
-    mapperSetSettingsMode->setMapping(showSettingsButton, 1);
-    mapperSetSettingsMode->setMapping(hideSettingsButton, 0);
-    QObject::connect(mapperSetSettingsMode, SIGNAL(mapped(int)), this, SIGNAL(setSettingsMode(int)));
+//    QObject::connect(showSettingsButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(enterSettingsMode()));
+//    QObject::connect(hideSettingsButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(leaveSettingsMode()));
+//    hideSettingsButton->click();
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperclosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
 
 }
 
+void RackWindow::createActions()
+{
+    m_showSettingsAct = new QAction(tr("Show Settings"), this);
+    QObject::connect(m_showSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
+
+    m_hideSettingsAct = new QAction(tr("Hide Settings"), this);
+    QObject::connect(m_hideSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(leaveSettingsMode()));
+
+    m_pflAct = new QAction(tr("PFL"), this);
+}
+
+void RackWindow::createMenus()
+{
+    m_mainMenu = new QMenu;
+    m_mainMenu->addAction(m_showSettingsAct);
+    m_mainMenu->addAction(m_hideSettingsAct);
+}
+
+void RackWindow::createToolBars()
+{
+    m_mainToolBar = new QToolBar;
+    addToolBar(Qt::BottomToolBarArea, m_mainToolBar);
+    RPushButton *tb = new RPushButton(tr("Menu"));
+    tb->setObjectName("rackMenuButton");
+    tb->setMenu(m_mainMenu);
+    m_mainToolBar->addWidget(tb);
+
+    m_mainToolBar->addAction(m_pflAct);
+
+
+}
+
 void RackWindow::createPluginHost(int position)
 {
     //create new pluginhost widget
-    QPalette pal;
-    pal.setColor(QPalette::Window, QColor(0,0,0,160));
     QWidget *settingsWidget = new QWidget;
-    settingsWidget->setPalette(pal);
+    settingsWidget->setPalette(QPalette(QColor(0,0,0,160)));
     settingsWidget->setAutoFillBackground(true);
 
     RPushButton *leftButton = new RPushButton;
@@ -137,8 +162,15 @@ void RackWindow::createPluginHost(int position)
     overlayLayout->addWidget(settingsWidget);
     overlayLayout->setCurrentIndex(1);
 
-    //show settings signal:
-    QObject::connect(this, SIGNAL(setSettingsMode(int)), overlayLayout, SLOT(setCurrentIndex(int)));
+    //enter/leave settings signals:
+    QSignalMapper *mapperShowSettingsMode = new QSignalMapper(pluginHost);
+    QObject::connect(m_showSettingsAct, SIGNAL(triggered()), mapperShowSettingsMode, SLOT(map()));
+    mapperShowSettingsMode->setMapping(m_showSettingsAct, 1);
+    QSignalMapper *mapperHideSettingsMode = new QSignalMapper(pluginHost);
+    QObject::connect(m_hideSettingsAct, SIGNAL(triggered()), mapperHideSettingsMode, SLOT(map()));
+    mapperHideSettingsMode->setMapping(m_hideSettingsAct, 0);
+    QObject::connect(mapperShowSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
+    QObject::connect(mapperHideSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
 
     //create new plugin host widget signals:
     QSignalMapper *mapperCreatePluginHost = new QSignalMapper(pluginHost);
@@ -203,10 +235,6 @@ void RackWindow::createPluginHost(int position)
         else if (parentSplitter->count() > 1)
         {
             RSplitter *newSplitter = new RSplitter(Qt::Orientation(abs(position)));
-            newSplitter->setChildrenCollapsible(false);
-
-            //QObject::connect(this, SIGNAL(changeConfigModus(bool)), newSplitter, SLOT(setConfigModus(bool)));
-
             widgetsizes = parentSplitter->sizes();
             parentSplitter->insertWidget(parentSplitter->indexOf(senderPluginHost), newSplitter);
             newSplitter->addWidget(senderPluginHost);
