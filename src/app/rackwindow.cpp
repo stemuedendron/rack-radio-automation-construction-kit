@@ -130,6 +130,7 @@ void RackWindow::createPluginHost(int position)
     pluginStack->setObjectName("rackPluginStack");
     pluginStack->setAutoFillBackground(true);
     QWidget *pluginHost = new QWidget;
+    //pluginHost->setMinimumSize(80,80);
     QStackedLayout *overlayLayout = new QStackedLayout(pluginHost);
     overlayLayout->setStackingMode(QStackedLayout::StackAll);
     overlayLayout->addWidget(pluginStack);

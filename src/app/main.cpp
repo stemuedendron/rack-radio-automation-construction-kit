@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
     // gui is slow with the xlib backend
     QApplication::setGraphicsSystem("raster");
 #endif
-
-    QApplication app(argc, argv);
     QApplication::setStyle(new QWindowsStyle);
+    QApplication app(argc, argv);
+
     //MainWindow mainWindow;
 
     RackWindow mainWindow;
