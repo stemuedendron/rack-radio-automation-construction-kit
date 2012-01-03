@@ -95,7 +95,9 @@ void RackWindow::createActions()
 
 void RackWindow::createMenus()
 {
-    m_mainMenu = new QMenu;
+    m_mainMenu = new QMenu(this);
+    //m_mainMenu->setStyleSheet("background-color: red;");
+    m_mainMenu->setObjectName("rackMainMenu");
     m_mainMenu->addAction(m_showSettingsAct);
     m_mainMenu->addAction(m_hideSettingsAct);
 }

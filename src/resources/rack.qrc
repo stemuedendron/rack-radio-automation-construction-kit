@@ -26,5 +26,6 @@
         <file>images/play-manual.png</file>
         <file>images/play.png</file>
         <file>images/menu-main.png</file>
+        <file>images/menu-main-hover.png</file>
     </qresource>
 </RCC>

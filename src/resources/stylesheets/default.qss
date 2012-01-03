@@ -23,12 +23,10 @@
 /* R.A.C.K. default style sheet */
 
 
-/*Toolbar*/
+/*Main Toolbar*/
 #rackMainToolbar {
-    spacing: 3px; /* spacing between items in the tool bar */
+    spacing: 30px;
     background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B2B2B2, stop: 1 #717171);
-
-
 }
 
 #rackMainToolbar > RPushButton {
@@ -38,23 +36,48 @@
     border:none;
     image-position: top;
     text-align: bottom;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     padding: 5px;
 }
 #rackMainMenuButton {
     image: url(:/images/menu-main.png);
 }
+#rackMainMenuButton:hover {
+    image: url(:/images/menu-main-hover.png);
+}
 #rackMainMenuButton:open {
-    background-color: black;
+    background-color: #9BBBF5;
+    color: #000000;
 }
 #rackMainMenuButton::menu-indicator {
-     image: none;
-     width: 0px;
-     height: 0px;
+    image: none;
+    width: 0px;
+    height: 0px;
 }
 
-/*Menu*/
+/*Main Menu*/
+#rackMainMenu {
+    background-color: #5F5F5F;
+    font-size: 16px;
+    font-weight: bold;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 16px;
+}
+#rackMainMenu::item {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #404040, stop: 1 #000000);
+    color: #FFFFFF;
+    margin: 5px;
+    padding: 10px 20px 10px 20px ;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 6px;
+    border-color: #404040;
+}
+#rackMainMenu::item:selected {
+    border-color: #FFFFFF;
+}
 
 
 /*40 x 40 Buttons*/
