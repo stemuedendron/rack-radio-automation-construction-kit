@@ -25,6 +25,6 @@
         <file>images/pfl-small.png</file>
         <file>images/play-manual.png</file>
         <file>images/play.png</file>
-        <file>images/menu.png</file>
+        <file>images/menu-main.png</file>
     </qresource>
 </RCC>

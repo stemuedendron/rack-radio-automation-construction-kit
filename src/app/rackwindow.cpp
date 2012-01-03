@@ -103,9 +103,10 @@ void RackWindow::createMenus()
 void RackWindow::createToolBars()
 {
     m_mainToolBar = new QToolBar;
+    m_mainToolBar->setObjectName("rackMainToolbar");
     addToolBar(Qt::BottomToolBarArea, m_mainToolBar);
     RPushButton *tb = new RPushButton(tr("Menu"));
-    tb->setObjectName("rackMenuButton");
+    tb->setObjectName("rackMainMenuButton");
     tb->setMenu(m_mainMenu);
     m_mainToolBar->addWidget(tb);
 
