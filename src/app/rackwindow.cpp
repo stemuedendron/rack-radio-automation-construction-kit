@@ -96,24 +96,29 @@ void RackWindow::createActions()
 void RackWindow::createMenus()
 {
     m_mainMenu = new QMenu(this);
-    //m_mainMenu->setStyleSheet("background-color: red;");
     m_mainMenu->setObjectName("rackMainMenu");
+    QAction *titleAct = new QAction(tr("R.A.C.K."),this);
+    titleAct->setDisabled(true);
+    m_mainMenu->addAction(titleAct);
+    m_mainMenu->setDefaultAction(titleAct);
+
     m_mainMenu->addAction(m_showSettingsAct);
     m_mainMenu->addAction(m_hideSettingsAct);
+
+
 }
 
 void RackWindow::createToolBars()
 {
     m_mainToolBar = new QToolBar;
     m_mainToolBar->setObjectName("rackMainToolbar");
+    m_mainToolBar->setMovable(false);
     addToolBar(Qt::BottomToolBarArea, m_mainToolBar);
     RPushButton *tb = new RPushButton(tr("Menu"));
     tb->setObjectName("rackMainMenuButton");
     tb->setMenu(m_mainMenu);
     m_mainToolBar->addWidget(tb);
-
     m_mainToolBar->addAction(m_pflAct);
-
 
 }
 
