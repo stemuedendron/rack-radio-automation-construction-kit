@@ -56,7 +56,10 @@ RackWindow::RackWindow() :
 void RackWindow::createToolBars()
 {
     //main toolbar actions:
+    QAction *fullscreenAct = new QAction(tr("Fullscreen"), this);
+    fullscreenAct->setCheckable(true);
     QAction *enterSettingsAct = new QAction(tr("Change Widget Layout"), this);
+    QAction *quitAct = new QAction(tr("Quit"), this);
 
     //main toolbar menus:
     QMenu *mainMenu = new QMenu(this);
@@ -65,7 +68,9 @@ void RackWindow::createToolBars()
     titleAct->setDisabled(true);
     mainMenu->addAction(titleAct);
     mainMenu->setDefaultAction(titleAct);
+    mainMenu->addAction(fullscreenAct);
     mainMenu->addAction(enterSettingsAct);
+    mainMenu->addAction(quitAct);
 
     //main toolbar buttons:
     RPushButton *settingsButton = new RPushButton(tr("Menu"));
@@ -91,7 +96,9 @@ void RackWindow::createToolBars()
     QObject::connect(previewButton, SIGNAL(clicked()), deleteButton, SLOT(setUnchecked()));
 
     //main toolbar signals & slots:
+    QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen(bool)));
     QObject::connect(enterSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
+    QObject::connect(quitAct, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mainToolBar, SLOT(hide()));
     QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), mainToolBar, SLOT(show()));
 
@@ -577,7 +584,11 @@ void RackWindow::saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml)
     xml->writeEndElement();
 }
 
-
+void RackWindow::toggleFullscreen(bool fs)
+{
+    if (fs) showFullScreen();
+    else showNormal();
+}
 
 RackWindow::~RackWindow()
 {

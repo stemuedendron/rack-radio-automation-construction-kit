@@ -52,6 +52,8 @@ private slots:
     void closePluginHost(QWidget *pluginHost);
     void loadPlugin(QWidget *pluginHost);
 
+    void toggleFullscreen(bool);
+
 private:
 
     enum NewSplitterLocation {
