@@ -39,3 +39,8 @@ RPushButton::RPushButton(const QIcon &icon, const QString &text, QWidget *parent
 {
     setFocusPolicy(Qt::NoFocus);
 }
+
+void RPushButton::setUnchecked()
+{
+    if (isCheckable()) setChecked(false);
+}

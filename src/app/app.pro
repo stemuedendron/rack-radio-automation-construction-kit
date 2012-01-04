@@ -27,7 +27,8 @@ SOURCES += \
     coreimpl.cpp \
     rackwindow.cpp \
     rsplitter.cpp \
-    ../shared/rpushbutton.cpp
+    ../shared/rpushbutton.cpp \
+    ../shared/rblinkbutton.cpp
 
 HEADERS += \
     coreimpl.h \
@@ -35,7 +36,8 @@ HEADERS += \
     rackwindow.h \
     rsplitter.h \
     ../libs/extensionsystem/iwidgetplugin.h \
-    ../shared/rpushbutton.h
+    ../shared/rpushbutton.h \
+    ../shared/rblinkbutton.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -46,6 +48,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 

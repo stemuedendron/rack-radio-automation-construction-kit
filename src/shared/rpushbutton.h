@@ -35,6 +35,10 @@ public:
     explicit RPushButton(const QString &text, QWidget *parent=0);
     RPushButton(const QIcon& icon, const QString &text, QWidget *parent=0);
 
+public slots:
+
+    void setUnchecked();
+
 };
 
 #endif // RPUSHBUTTON_H

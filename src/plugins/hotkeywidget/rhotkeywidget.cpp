@@ -83,7 +83,7 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     QGridLayout *hl = new QGridLayout;
     hl->addWidget(title,        0, 0);
     hl->addWidget(m_pageTitle,  1, 0);
-    hl->addWidget(m_btEdit,       0, 1, 2, 1);
+    hl->addWidget(m_btEdit,     0, 1, 2, 1);
     hl->addWidget(btIndex,      0, 2, 2, 1);
     hl->addWidget(btPrevious,   0, 3, 2, 1);
     hl->addWidget(btNext,       0, 4, 2, 1);

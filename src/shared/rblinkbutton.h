@@ -30,17 +30,20 @@ class RBlinkButton : public RPushButton
 {
     Q_OBJECT
     Q_PROPERTY(bool blinking READ blinking)
+    Q_PROPERTY(int interval READ interval WRITE setInterval)
 
 public:
 
     explicit RBlinkButton(const QString &text, QWidget *parent = 0);
     int blinking() const {return m_blinking;}
+    int interval() const {return m_timer->interval();}
+    void setInterval(int interval) {m_timer->setInterval(interval);}
 
 signals:
 
 private slots:
 
-    void startTimer(const bool &);
+    void startTimer(bool);
     void setBlinking();
 
 private:

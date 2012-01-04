@@ -26,12 +26,8 @@
 #include <QMainWindow>
 
 class RSplitter;
-class QMenu;
-class QToolBar;
-
 class CoreImpl;
 class QSignalMapper;
-class QAction;
 class QXmlStreamWriter;
 
 class RackWindow : public QMainWindow
@@ -65,8 +61,6 @@ private:
         NewSplitterBottom = 2
     };
 
-    void createActions();
-    void createMenus();
     void createToolBars();
 
     //old save stuff
@@ -78,19 +72,9 @@ private:
     /////////////////////////////
 
     CoreImpl *m_coreImpl;
-
     RSplitter *m_mainSplitter;
-    QMenu *m_mainMenu;
-    QToolBar *m_mainToolBar;
-
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperclosePluginHost;
-
-    QAction *m_showSettingsAct;
-    QAction *m_hideSettingsAct;
-    QAction *m_pflAct;
-
-
 
 };
 

@@ -25,6 +25,7 @@
 #include "iwidgetplugin.h"
 #include "rsplitter.h"
 #include "rpushbutton.h"
+#include "rblinkbutton.h"
 
 #include <QtGui>
 
@@ -44,82 +45,85 @@ RackWindow::RackWindow() :
 
     setCentralWidget(m_mainSplitter);
 
-    createActions();
-    createMenus();
-    createToolBars();
-
     createPluginHost(0);
-    m_hideSettingsAct->activate(QAction::Trigger);
-
-    //replace with 'real' menu
-//    RPushButton *showSettingsButton = new RPushButton("Settings");
-//    RPushButton *hideSettingsButton = new RPushButton("OK");
-
-//    RPushButton *saveButton = new RPushButton("Save");
-//    QObject::connect(saveButton, SIGNAL(clicked()), this, SLOT(savePluginHosts()));
-
-//    QHBoxLayout *hl = new QHBoxLayout;
-//    hl->addWidget(showSettingsButton);
-//    hl->addWidget(hideSettingsButton);
-//    hl->addWidget(saveButton);
-    ////////////////////////////////////
-
-
-//    QVBoxLayout *vl = new QVBoxLayout;
-//    vl->setSpacing(0);
-//    vl->setContentsMargins(0,0,0,0);
-//    vl->addWidget(m_mainSplitter);
-//    //vl->addLayout(hl);
-//    vl->addWidget(m_toolBarWidget);
-//    setLayout(vl);
-
-//    QObject::connect(showSettingsButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(enterSettingsMode()));
-//    QObject::connect(hideSettingsButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(leaveSettingsMode()));
-//    hideSettingsButton->click();
+    createToolBars();
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperclosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
 
 }
 
-void RackWindow::createActions()
-{
-    m_showSettingsAct = new QAction(tr("Show Settings"), this);
-    QObject::connect(m_showSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
-
-    m_hideSettingsAct = new QAction(tr("Hide Settings"), this);
-    QObject::connect(m_hideSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(leaveSettingsMode()));
-
-    m_pflAct = new QAction(tr("PFL"), this);
-}
-
-void RackWindow::createMenus()
-{
-    m_mainMenu = new QMenu(this);
-    m_mainMenu->setObjectName("rackMainMenu");
-    QAction *titleAct = new QAction(tr("R.A.C.K."),this);
-    titleAct->setDisabled(true);
-    m_mainMenu->addAction(titleAct);
-    m_mainMenu->setDefaultAction(titleAct);
-
-    m_mainMenu->addAction(m_showSettingsAct);
-    m_mainMenu->addAction(m_hideSettingsAct);
-
-
-}
-
 void RackWindow::createToolBars()
 {
-    m_mainToolBar = new QToolBar;
-    m_mainToolBar->setObjectName("rackMainToolbar");
-    m_mainToolBar->setMovable(false);
-    addToolBar(Qt::BottomToolBarArea, m_mainToolBar);
-    RPushButton *tb = new RPushButton(tr("Menu"));
-    tb->setObjectName("rackMainMenuButton");
-    tb->setMenu(m_mainMenu);
-    m_mainToolBar->addWidget(tb);
-    m_mainToolBar->addAction(m_pflAct);
+    //main toolbar actions:
+    QAction *enterSettingsAct = new QAction(tr("Change Widget Layout"), this);
 
+    //main toolbar menus:
+    QMenu *mainMenu = new QMenu(this);
+    mainMenu->setObjectName("rackMainMenu");
+    QAction *titleAct = new QAction(tr("R.A.C.K."),this);
+    titleAct->setDisabled(true);
+    mainMenu->addAction(titleAct);
+    mainMenu->setDefaultAction(titleAct);
+    mainMenu->addAction(enterSettingsAct);
+
+    //main toolbar buttons:
+    RPushButton *settingsButton = new RPushButton(tr("Menu"));
+    settingsButton->setObjectName("rackSettingsButton");
+    settingsButton->setMenu(mainMenu);
+    RBlinkButton *deleteButton = new RBlinkButton(tr("Delete"));
+    deleteButton->setObjectName("rackDeleteButton");
+    RBlinkButton *previewButton = new RBlinkButton(tr("Preview"));
+    previewButton->setObjectName("rackPreviewButton");
+
+    //main toolbar:
+    QToolBar *mainToolBar = new QToolBar;
+    mainToolBar->setObjectName("rackMainToolBar");
+    mainToolBar->setMovable(false);
+    mainToolBar->addWidget(settingsButton);
+    mainToolBar->addWidget(deleteButton);
+    mainToolBar->addWidget(previewButton);
+
+    //make own exclusiv handling in which all buttons can be unchecked:
+    QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
+    QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
+    QObject::connect(deleteButton, SIGNAL(clicked()), previewButton, SLOT(setUnchecked()));
+    QObject::connect(previewButton, SIGNAL(clicked()), deleteButton, SLOT(setUnchecked()));
+
+    //main toolbar signals & slots:
+    QObject::connect(enterSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
+    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mainToolBar, SLOT(hide()));
+    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), mainToolBar, SLOT(show()));
+
+
+    //settings toolbar buttons:
+    RPushButton *settingsOKButton = new RPushButton(tr("OK"));
+    settingsOKButton->setObjectName("rackSettingsOKButton");
+
+    //settings toolbar:
+    QToolBar *settingsToolBar = new QToolBar;
+    settingsToolBar->setObjectName("rackSettingsToolBar");
+    settingsToolBar->setMovable(false);
+    settingsToolBar->addWidget(settingsOKButton);
+
+    //settings toolbar signals & slots:
+    QObject::connect(settingsOKButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(leaveSettingsMode()));
+    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), settingsToolBar, SLOT(show()));
+    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), settingsToolBar, SLOT(hide()));
+
+
+    //plugin bar:
+    QToolBar *pluginToolBar = new QToolBar;
+    pluginToolBar->setObjectName("rackPluginToolBar");
+    pluginToolBar->setMovable(false);
+
+
+    //add toolbars to mainwindow:
+    addToolBar(Qt::BottomToolBarArea, mainToolBar);
+    addToolBar(Qt::BottomToolBarArea, settingsToolBar);
+    addToolBar(Qt::BottomToolBarArea, pluginToolBar);
+
+    settingsOKButton->click();
 }
 
 void RackWindow::createPluginHost(int position)
@@ -172,11 +176,11 @@ void RackWindow::createPluginHost(int position)
 
     //enter/leave settings signals:
     QSignalMapper *mapperShowSettingsMode = new QSignalMapper(pluginHost);
-    QObject::connect(m_showSettingsAct, SIGNAL(triggered()), mapperShowSettingsMode, SLOT(map()));
-    mapperShowSettingsMode->setMapping(m_showSettingsAct, 1);
+    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mapperShowSettingsMode, SLOT(map()));
+    mapperShowSettingsMode->setMapping(m_coreImpl, 1);
     QSignalMapper *mapperHideSettingsMode = new QSignalMapper(pluginHost);
-    QObject::connect(m_hideSettingsAct, SIGNAL(triggered()), mapperHideSettingsMode, SLOT(map()));
-    mapperHideSettingsMode->setMapping(m_hideSettingsAct, 0);
+    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), mapperHideSettingsMode, SLOT(map()));
+    mapperHideSettingsMode->setMapping(m_coreImpl, 0);
     QObject::connect(mapperShowSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
     QObject::connect(mapperHideSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
 

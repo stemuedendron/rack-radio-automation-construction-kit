@@ -23,13 +23,30 @@
 /* R.A.C.K. default style sheet */
 
 
-/*Main Toolbar*/
-#rackMainToolbar {
-    spacing: 30px;
-    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B2B2B2, stop: 1 #717171);
+/* todo: use variables and implement own stylesheet loader to parse the sheet*/
+
+/*ToolBars*/
+#rackMainToolBar,
+#rackSettingsToolBar,
+#rackPluginToolBar {
+    border: none;
+    border-top: 1px solid #1541AC;
 }
 
-#rackMainToolbar > RPushButton {
+/*Main ToolBar*/
+#rackMainToolBar {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B2B2B2, stop: 1 #717171);
+}
+
+/*Settings ToolBar*/
+#rackSettingsToolBar,
+#rackPluginToolBar {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #202020, stop: 1 #000000);
+}
+
+
+#rackSettingsToolBar > RPushButton,
+#rackMainToolBar > RPushButton {
     height: 70px;
     width: 70px;
     background:none;
@@ -40,20 +57,56 @@
     font-weight: bold;
     padding: 5px;
 }
-#rackMainMenuButton {
+
+#rackSettingsButton {
     image: url(:/images/menu-main.png);
 }
-#rackMainMenuButton:hover {
+
+#rackSettingsButton:hover {
     image: url(:/images/menu-main-hover.png);
 }
-#rackMainMenuButton:open {
+
+#rackSettingsButton:open {
     background-color: #9BBBF5;
     color: #000000;
 }
-#rackMainMenuButton::menu-indicator {
+
+#rackSettingsButton::menu-indicator {
     image: none;
     width: 0px;
     height: 0px;
+}
+
+#rackDeleteButton {
+    image: url(:/images/menu-main.png);
+}
+
+#rackDeleteButton:hover {
+    image: url(:/images/menu-main-hover.png);
+}
+
+#rackPreviewButton {
+    image: url(:/images/menu-main.png);
+}
+
+#rackPreviewButton:hover {
+    image: url(:/images/menu-main-hover.png);
+}
+
+[blinking="true"]#rackDeleteButton,
+[blinking="true"]#rackPreviewButton {
+    background-color: #9BBBF5;
+    color: #000000;
+    qproperty-interval: 500;
+}
+
+
+#rackSettingsOKButton {
+    image: url(:/images/menu-main.png);
+}
+
+#rackSettingsOKButton:hover {
+    image: url(:/images/menu-main-hover.png);
 }
 
 /*Main Menu*/
@@ -63,8 +116,9 @@
     font-weight: bold;
     margin:0px;
 }
+
 #rackMainMenu::item {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #404040, stop: 1 #000000);
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #202020, stop: 1 #000000);
     color: #FFFFFF;
     margin: 0px 10px 10px 10px;
     padding: 10px 20px 10px 20px ;
@@ -73,6 +127,7 @@
     border-radius: 6px;
     border-color: #404040;
 }
+
 #rackMainMenu::item:selected {
     border-color: #FFFFFF;
 }
@@ -102,7 +157,7 @@
 
 
 
-/*simple black gradient*/
+/*all settings buttons*/
 #rackSettingsCloseButton,
 #rackSettingsLeftArrowButton,
 #rackSettingsRightArrowButton,
@@ -129,7 +184,6 @@
 #rackSettingsBottomArrowButton:pressed {
     border-color: red
 }
-
 
 
 

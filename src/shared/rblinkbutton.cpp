@@ -26,22 +26,26 @@
 #include <QStyle>
 
 
+
 RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) :
-    RPushButton(text, parent)
+    RPushButton(text, parent),
+    m_blinking(false),
+    m_timer(new QTimer(this))
 {
     setCheckable(true);
-    m_blinking = false;
-    m_timer = new QTimer(this);
     m_timer->setInterval(300);
     QObject::connect(this, SIGNAL(toggled(bool)), this, SLOT(startTimer(bool)));
     QObject::connect(m_timer,SIGNAL(timeout()),this,SLOT(setBlinking()));
 }
 
 
-void RBlinkButton::startTimer(const bool &start)
+void RBlinkButton::startTimer(bool start)
 {
     if (start)
     {
+        m_blinking = true;
+        style()->unpolish(this);
+        style()->polish(this);
         m_timer->start();
     }
     else
