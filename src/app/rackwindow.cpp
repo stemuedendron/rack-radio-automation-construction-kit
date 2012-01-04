@@ -124,11 +124,6 @@ void RackWindow::createToolBars()
     addToolBar(Qt::BottomToolBarArea, pluginToolBar);
 
     settingsOKButton->click();
-
-
-    RPushButton *dummyButton = new RPushButton;
-    dummyButton->setObjectName("dummyButton");
-    mainToolBar->addWidget(dummyButton);
 }
 
 void RackWindow::createPluginHost(int position)
