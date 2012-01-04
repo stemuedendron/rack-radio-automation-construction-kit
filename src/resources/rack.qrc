@@ -27,5 +27,13 @@
         <file>images/play.png</file>
         <file>images/menu-main.png</file>
         <file>images/menu-main-hover.png</file>
+        <file>images/menu-delete-hover.png</file>
+        <file>images/menu-delete.png</file>
+        <file>images/menu-preview-hover.png</file>
+        <file>images/menu-preview.png</file>
+        <file>images/menu-cancel-hover.png</file>
+        <file>images/menu-cancel.png</file>
+        <file>images/menu-ok-hover.png</file>
+        <file>images/menu-ok.png</file>
     </qresource>
 </RCC>

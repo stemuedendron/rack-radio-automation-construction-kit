@@ -9,3 +9,6 @@ gimp:
 
 gimp-dbp installieren (batch processing plugin)
 http://members.ozemail.com.au/~hodsond/dbp.html
+
+hover:
+gamma + 10

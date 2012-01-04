@@ -100,11 +100,15 @@ void RackWindow::createToolBars()
     RPushButton *settingsOKButton = new RPushButton(tr("OK"));
     settingsOKButton->setObjectName("rackSettingsOKButton");
 
+    RPushButton *settingsCancelButton = new RPushButton(tr("Cancel"));
+    settingsCancelButton->setObjectName("rackSettingsCancelButton");
+
     //settings toolbar:
     QToolBar *settingsToolBar = new QToolBar;
     settingsToolBar->setObjectName("rackSettingsToolBar");
     settingsToolBar->setMovable(false);
     settingsToolBar->addWidget(settingsOKButton);
+    settingsToolBar->addWidget(settingsCancelButton);
 
     //settings toolbar signals & slots:
     QObject::connect(settingsOKButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(leaveSettingsMode()));

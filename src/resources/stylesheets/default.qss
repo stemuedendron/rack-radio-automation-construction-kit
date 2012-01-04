@@ -52,8 +52,9 @@
     background:none;
     border:none;
     image-position: top;
+    color: #EEEEEE;
     text-align: bottom;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     padding: 5px;
 }
@@ -78,19 +79,19 @@
 }
 
 #rackDeleteButton {
-    image: url(:/images/menu-main.png);
+    image: url(:/images/menu-delete.png);
 }
 
 #rackDeleteButton:hover {
-    image: url(:/images/menu-main-hover.png);
+    image: url(:/images/menu-delete-hover.png);
 }
 
 #rackPreviewButton {
-    image: url(:/images/menu-main.png);
+    image: url(:/images/menu-preview.png);
 }
 
 #rackPreviewButton:hover {
-    image: url(:/images/menu-main-hover.png);
+    image: url(:/images/menu-preview-hover.png);
 }
 
 [blinking="true"]#rackDeleteButton,
@@ -100,13 +101,20 @@
     qproperty-interval: 500;
 }
 
-
 #rackSettingsOKButton {
-    image: url(:/images/menu-main.png);
+    image: url(:/images/menu-ok.png);
 }
 
 #rackSettingsOKButton:hover {
-    image: url(:/images/menu-main-hover.png);
+    image: url(:/images/menu-ok-hover.png);
+}
+
+#rackSettingsCancelButton {
+    image: url(:/images/menu-cancel.png);
+}
+
+#rackSettingsCancelButton:hover {
+    image: url(:/images/menu-cancel-hover.png);
 }
 
 /*Main Menu*/
