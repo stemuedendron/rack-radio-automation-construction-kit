@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     RackWindow mainWindow;
 
     mainWindow.resize(800, 600);
-    mainWindow.setWindowState(Qt::WindowMaximized);
+//  mainWindow.setWindowState(Qt::WindowMaximized);
 
     mainWindow.show();
 

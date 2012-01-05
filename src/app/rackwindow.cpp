@@ -96,7 +96,7 @@ void RackWindow::createToolBars()
     QObject::connect(previewButton, SIGNAL(clicked()), deleteButton, SLOT(setUnchecked()));
 
     //main toolbar signals & slots:
-    QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen(bool)));
+    QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen()));
     QObject::connect(enterSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
     QObject::connect(quitAct, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mainToolBar, SLOT(hide()));
@@ -584,10 +584,9 @@ void RackWindow::saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml)
     xml->writeEndElement();
 }
 
-void RackWindow::toggleFullscreen(bool fs)
+void RackWindow::toggleFullscreen()
 {
-    if (fs) showFullScreen();
-    else showNormal();
+    setWindowState(windowState() ^ Qt::WindowFullScreen);
 }
 
 RackWindow::~RackWindow()
