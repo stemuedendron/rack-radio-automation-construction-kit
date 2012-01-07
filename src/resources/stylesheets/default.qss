@@ -68,7 +68,7 @@
 }
 
 #rackSettingsButton:open {
-    background-color: #9BBBF5;
+    background-color: #BBBBBB;
     color: #000000;
 }
 
@@ -96,7 +96,7 @@
 
 [blinking="true"]#rackDeleteButton,
 [blinking="true"]#rackPreviewButton {
-    background-color: #9BBBF5;
+    background-color: #BBBBBB;
     color: #000000;
     qproperty-interval: 500;
 }
