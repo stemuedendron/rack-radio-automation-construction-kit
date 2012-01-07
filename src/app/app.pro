@@ -28,7 +28,7 @@ SOURCES += \
     rackwindow.cpp \
     rsplitter.cpp \
     ../shared/rpushbutton.cpp \
-    ../shared/rblinkbutton.cpp
+    ../shared/rblinkbutton.cpp \
 
 HEADERS += \
     coreimpl.h \
@@ -48,6 +48,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     ../resources/stylesheets/default.qss
+
+
 
 
 
