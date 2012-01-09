@@ -31,6 +31,8 @@
 //showdate ?
 //show secondsleft ?
 
+//neue art scalierung checken!! graphics view framework????
+
 RRadioClock::RRadioClock(QWidget *parent, ICore *api)
     : QWidget(parent),
       m_core(api),
@@ -88,16 +90,28 @@ void RRadioClock::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    //QWidget descendants needs this to use style sheets:
+    QStyleOption opt;
+    opt.init(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
+
     //als property setzen
     //QColor color("#244BB0");
-    QColor color(Qt::white);
+
+    //FIXME: use stylesheet
+    //QColor color(Qt::white);
 
     int side = qMin(width(), height());
     painter.translate(width() / 2, height() / 2);
     painter.scale(side / 200.0, side / 200.0);
-    painter.setBrush(color);
-    painter.setPen(color);
-    painter.setFont(QFont("Sans Serif", 18, QFont::Bold));
+
+    //FIXME: use stylesheet properties
+//    painter.setBrush(color);
+//    painter.setPen(color);
+//    painter.setFont(QFont("Sans Serif", 18, QFont::Bold));
+
+    painter.setBrush(palette().foreground().color());
 
     QTime time = QTime::fromString(m_time);
 

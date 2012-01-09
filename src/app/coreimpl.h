@@ -36,7 +36,6 @@ public:
     CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
-
 public slots:
 
     void getHello(const QString &);

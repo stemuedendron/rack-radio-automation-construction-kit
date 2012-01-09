@@ -23,7 +23,21 @@
 /* R.A.C.K. default style sheet */
 
 
-/* todo: use variables and implement own stylesheet loader to parse the sheet */
+/* todo: use variables and implement own stylesheet loader to parse the sheet
+
+rack colors 1-9 over colordialog buttons
+
+
+*/
+
+
+
+RDigitalClock,
+RRadioClock {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #606060, stop: 1 #000000);
+    color: #FFFFFF;
+}
+
 
 
 /*ToolBars*/
@@ -139,6 +153,7 @@
 #rackMainMenu::item:selected {
     border-color: #FFFFFF;
 }
+
 
 #rackMainMenu::item:default {
     color: yellow;

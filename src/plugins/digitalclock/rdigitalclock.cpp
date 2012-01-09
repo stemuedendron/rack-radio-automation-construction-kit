@@ -88,16 +88,28 @@ RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
  void RDigitalClock::paintEvent(QPaintEvent *)
  {
 
+
      //als property setzen
      //QColor color("#244BB0");
-     QColor color(Qt::white);
+
+     //QColor color(Qt::white);
 
      QPainter painter(this);
      painter.setRenderHint(QPainter::Antialiasing);
-     painter.setPen(color);
+
+     //QWidget descendants needs this to use style sheets:
+     QStyleOption opt;
+     opt.init(this);
+     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+
+     //painter.setPen(color);
+
      painter.translate(width() / 2, height() / 2);
      painter.scale(width() / 100, width() / 100);
+
+     //FIXME: use stylesheet
      painter.setFont(QFont("Digital-7", 16));
+
      QString label;
 
      switch (m_pushed) {

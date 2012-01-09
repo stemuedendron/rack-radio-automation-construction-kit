@@ -92,8 +92,8 @@ void RackWindow::createToolBars()
     //make own exclusiv handling in which all buttons can be unchecked:
     QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
     QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
-    QObject::connect(deleteButton, SIGNAL(clicked()), previewButton, SLOT(setUnchecked()));
-    QObject::connect(previewButton, SIGNAL(clicked()), deleteButton, SLOT(setUnchecked()));
+    QObject::connect(deleteButton, SIGNAL(pressed()), previewButton, SLOT(setUnchecked()));
+    QObject::connect(previewButton, SIGNAL(pressed()), deleteButton, SLOT(setUnchecked()));
 
     //main toolbar signals & slots:
     QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen()));

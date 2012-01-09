@@ -35,10 +35,10 @@ ICore *ICore::instance()
 }
 
 
-CoreImpl::CoreImpl(RackWindow *mainwindow)
+CoreImpl::CoreImpl(RackWindow *mainwindow) :
+    m_mainwindow(mainwindow)
 {
     m_instance = this;
-    m_mainwindow = mainwindow;
     startTimer(1000);
 }
 
@@ -46,8 +46,6 @@ CoreImpl::~CoreImpl()
 {
     m_instance = 0;
 }
-
-
 
 void CoreImpl::timerEvent(QTimerEvent *)
 {
