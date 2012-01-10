@@ -72,6 +72,7 @@ RRadioClock {
     font-size: 11px;
     font-weight: bold;
     padding: 5px;
+    margin: 2px;
 }
 
 #rackSettingsButton {
@@ -133,8 +134,7 @@ RRadioClock {
 }
 
 #rackPluginToolBarButton:checked {
-    background-color: #BBBBBB;
-    color: #000000;
+    background-color: #326CB5;
 }
 
 
