@@ -29,14 +29,20 @@
 
 #include <QtGui>
 
+//TODO: method: delete one plugin
+//BUG: if only one plugin is in host it can be unchecked
+
+
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal)),
+    m_pluginToolBar(new QToolBar),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
     m_mapperclosePluginHost(new QSignalMapper(this))
 {
 
     setWindowTitle(tr("R.A.C.K."));
+    setContextMenuPolicy(Qt::NoContextMenu);
 
     QFile file(":/stylesheets/default.qss");
     file.open(QFile::ReadOnly);
@@ -44,12 +50,15 @@ RackWindow::RackWindow() :
     setStyleSheet(styleSheet);
 
     setCentralWidget(m_mainSplitter);
-
-    createPluginHost(0);
     createToolBars();
+    createPluginHost(0);
 
+    QObject::connect(this, SIGNAL(enterSettingsMode()), m_mainSplitter, SIGNAL(enterSettingsMode()));
+    QObject::connect(this, SIGNAL(leaveSettingsMode()), m_mainSplitter, SIGNAL(leaveSettingsMode()));
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperclosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
+
+    emit leaveSettingsMode();
 
 }
 
@@ -97,10 +106,10 @@ void RackWindow::createToolBars()
 
     //main toolbar signals & slots:
     QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen()));
-    QObject::connect(enterSettingsAct, SIGNAL(triggered()), m_coreImpl, SIGNAL(enterSettingsMode()));
+    QObject::connect(enterSettingsAct, SIGNAL(triggered()), SIGNAL(enterSettingsMode()));
     QObject::connect(quitAct, SIGNAL(triggered()), this, SLOT(close()));
-    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mainToolBar, SLOT(hide()));
-    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), mainToolBar, SLOT(show()));
+    QObject::connect(this, SIGNAL(enterSettingsMode()), mainToolBar, SLOT(hide()));
+    QObject::connect(this, SIGNAL(leaveSettingsMode()), mainToolBar, SLOT(show()));
 
 
     //settings toolbar buttons:
@@ -118,23 +127,13 @@ void RackWindow::createToolBars()
     settingsToolBar->addWidget(settingsCancelButton);
 
     //settings toolbar signals & slots:
-    QObject::connect(settingsOKButton, SIGNAL(clicked()), m_coreImpl, SIGNAL(leaveSettingsMode()));
-    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), settingsToolBar, SLOT(show()));
-    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), settingsToolBar, SLOT(hide()));
-
-
-    //plugin bar:
-    QToolBar *pluginToolBar = new QToolBar;
-    pluginToolBar->setObjectName("rackPluginToolBar");
-    pluginToolBar->setMovable(false);
-
+    QObject::connect(settingsOKButton, SIGNAL(clicked()), SIGNAL(leaveSettingsMode()));
+    QObject::connect(this, SIGNAL(enterSettingsMode()), settingsToolBar, SLOT(show()));
+    QObject::connect(this, SIGNAL(leaveSettingsMode()), settingsToolBar, SLOT(hide()));
 
     //add toolbars to mainwindow:
     addToolBar(Qt::BottomToolBarArea, mainToolBar);
     addToolBar(Qt::BottomToolBarArea, settingsToolBar);
-    addToolBar(Qt::BottomToolBarArea, pluginToolBar);
-
-    settingsOKButton->click();
 }
 
 void RackWindow::createPluginHost(int position)
@@ -154,15 +153,15 @@ void RackWindow::createPluginHost(int position)
     bottomButton->setObjectName("rackSettingsBottomArrowButton");
     RPushButton *closeButton = new RPushButton;
     closeButton->setObjectName("rackSettingsCloseButton");
-    RPushButton *newWidgetButton = new RPushButton(tr("new Widget ..."));
-    newWidgetButton->setFixedHeight(40);
+    RPushButton *addPluginWidgetButton = new RPushButton(tr("Add Widget ..."));
+    addPluginWidgetButton->setObjectName("rackAddPluginWidgetButton");
 
     QWidget *middleWidget = new QWidget;
     QVBoxLayout *middleLayout = new QVBoxLayout(middleWidget);
     middleLayout->setObjectName("rackPluginSettingsLayout");
     middleLayout->setSpacing(0);
     middleLayout->setContentsMargins(0,0,0,0);
-    middleLayout->addWidget(newWidgetButton, 0, Qt::AlignHCenter);
+    middleLayout->addWidget(addPluginWidgetButton, 0, Qt::AlignHCenter);
 
     QGridLayout *settingsLayout = new QGridLayout(settingsWidget);
     settingsLayout->setSpacing(0);
@@ -187,15 +186,15 @@ void RackWindow::createPluginHost(int position)
 
     //enter/leave settings signals:
     QSignalMapper *mapperShowSettingsMode = new QSignalMapper(pluginHost);
-    QObject::connect(m_coreImpl, SIGNAL(enterSettingsMode()), mapperShowSettingsMode, SLOT(map()));
-    mapperShowSettingsMode->setMapping(m_coreImpl, 1);
+    QObject::connect(this, SIGNAL(enterSettingsMode()), mapperShowSettingsMode, SLOT(map()));
+    mapperShowSettingsMode->setMapping(this, 1);
     QSignalMapper *mapperHideSettingsMode = new QSignalMapper(pluginHost);
-    QObject::connect(m_coreImpl, SIGNAL(leaveSettingsMode()), mapperHideSettingsMode, SLOT(map()));
-    mapperHideSettingsMode->setMapping(m_coreImpl, 0);
+    QObject::connect(this, SIGNAL(leaveSettingsMode()), mapperHideSettingsMode, SLOT(map()));
+    mapperHideSettingsMode->setMapping(this, 0);
     QObject::connect(mapperShowSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
     QObject::connect(mapperHideSettingsMode, SIGNAL(mapped(int)), overlayLayout, SLOT(setCurrentIndex(int)));
 
-    //create new plugin host widget signals:
+    //create plugin host widget signals:
     QSignalMapper *mapperCreatePluginHost = new QSignalMapper(pluginHost);
     QObject::connect(leftButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
     QObject::connect(rightButton, SIGNAL(clicked()), mapperCreatePluginHost, SLOT(map()));
@@ -207,9 +206,9 @@ void RackWindow::createPluginHost(int position)
     mapperCreatePluginHost->setMapping(bottomButton, NewSplitterBottom);
     QObject::connect(mapperCreatePluginHost, SIGNAL(mapped(int)), SLOT(createPluginHost(int)));
 
-    //load new plugin signals:
-    QObject::connect(newWidgetButton, SIGNAL(clicked()), m_mapperLoadNewPlugin, SLOT(map()));
-    m_mapperLoadNewPlugin->setMapping(newWidgetButton, pluginHost);
+    //load plugin signals:
+    QObject::connect(addPluginWidgetButton, SIGNAL(clicked()), m_mapperLoadNewPlugin, SLOT(map()));
+    m_mapperLoadNewPlugin->setMapping(addPluginWidgetButton, pluginHost);
 
     //close plugin host signals:
     QObject::connect(closeButton, SIGNAL(clicked()), m_mapperclosePluginHost, SLOT(map()));
@@ -219,6 +218,21 @@ void RackWindow::createPluginHost(int position)
     QSignalMapper *mapperSwitchPlugin = new QSignalMapper(pluginHost);
     mapperSwitchPlugin->setObjectName("rackPluginSwitchMapper");
     QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(int)), pluginStack, SLOT(setCurrentIndex(int)));
+
+    //create plugin toolbar for this pluginhost
+    QToolBar *pluginToolBar = new QToolBar;
+    pluginToolBar->setObjectName("rackPluginToolBar");
+    pluginToolBar->setMovable(false);
+    pluginToolBar->hide();
+    addToolBar(Qt::BottomToolBarArea, pluginToolBar);
+
+    //store the toolbars pointer as dynamic property of the pluginhost to access later when creating plugin toolbar buttons
+    pluginHost->setProperty("pluginHostToolBarPointer", qVariantFromValue((QWidget *)pluginToolBar));
+
+    //plugin bar signals & slots:
+    QObject::connect(this, SIGNAL(enterSettingsMode()), pluginToolBar, SLOT(hide()));
+    QObject::connect(this, SIGNAL(leaveSettingsMode()), pluginToolBar, SLOT(show()));
+
 
     //insert new pluginhost widget in splitter, create new splitter if necessary
     if (position == 0) {
@@ -258,6 +272,8 @@ void RackWindow::createPluginHost(int position)
         else if (parentSplitter->count() > 1)
         {
             RSplitter *newSplitter = new RSplitter(Qt::Orientation(abs(position)));
+            QObject::connect(this, SIGNAL(enterSettingsMode()), newSplitter, SIGNAL(enterSettingsMode()));
+            QObject::connect(this, SIGNAL(leaveSettingsMode()), newSplitter, SIGNAL(leaveSettingsMode()));
             widgetsizes = parentSplitter->sizes();
             parentSplitter->insertWidget(parentSplitter->indexOf(senderPluginHost), newSplitter);
             newSplitter->addWidget(senderPluginHost);
@@ -300,14 +316,36 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             int index = pluginStack->addWidget(newWidget);
             pluginStack->setCurrentIndex(index);
 
+
+            //create plugin button for settings mode
             QVBoxLayout *pluginSettingsLayout = qFindChild<QVBoxLayout *>(pluginHost, "rackPluginSettingsLayout");
-            RPushButton *pluginButton = new RPushButton(QString::number(index));
-            pluginButton->setFixedHeight(40);
+
+            RPushButton *pluginButton = new RPushButton(widgetPlugin->name());
+
             pluginSettingsLayout->insertWidget(pluginSettingsLayout->count() - 1, pluginButton);
 
             QSignalMapper *sm = qFindChild<QSignalMapper *>(pluginHost, "rackPluginSwitchMapper");
             QObject::connect(pluginButton, SIGNAL(clicked()), sm, SLOT(map()));
             sm->setMapping(pluginButton, index);
+
+            //middle button und task button koppeln!!!
+            //qbuttongroup checken
+
+            //create plugin toolbar button
+            RPushButton *pluginToolBarButton = new RPushButton(widgetPlugin->name());
+            pluginToolBarButton->setObjectName("rackPluginToolBarButton");
+            pluginToolBarButton->setCheckable(true);
+            pluginToolBarButton->setAutoExclusive(true);
+
+            //get the toolbar of this pluginhost
+            QToolBar *pluginToolBar = (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginHostToolBarPointer"));
+            pluginToolBar->addWidget(pluginToolBarButton);
+            if (pluginToolBar->children().count() == 1) pluginToolBarButton->setChecked(true);
+
+            //reuse the middle plugin button signal to show associated plugin widget
+            QObject::connect(pluginToolBarButton, SIGNAL(clicked()), pluginButton, SIGNAL(clicked()));
+
+            //QObject::connect(pluginButton, SIGNAL(clicked()), pluginToolBarButton, SLOT())
 
         }
     }
@@ -333,10 +371,15 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
             widgetsizes.replace(senderpos, widgetsizes.at(senderpos) + widgetsizes.at(senderpos+1));
             widgetsizes.removeAt(senderpos + 1);
         }
+
+        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginHostToolBarPointer"));
         delete pluginHost;
         splitter->setSizes(widgetsizes);
     }
-    else delete pluginHost;
+    else {
+        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginHostToolBarPointer"));
+        delete pluginHost;
+    }
     if (splitter->count()==1 && parentSplitter)
     {
         parentSplitter->insertWidget(parentSplitter->indexOf(splitter), splitter->widget(0));

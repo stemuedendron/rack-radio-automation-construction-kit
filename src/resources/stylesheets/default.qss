@@ -25,7 +25,7 @@
 
 /* todo: use variables and implement own stylesheet loader to parse the sheet
 
-rack colors 1-9 over colordialog buttons
+rack colors gradients 1-9 over colordialog buttons properties
 
 
 */
@@ -60,7 +60,8 @@ RRadioClock {
 }
 
 #rackSettingsToolBar > RPushButton,
-#rackMainToolBar > RPushButton {
+#rackMainToolBar > RPushButton,
+#rackPluginToolBar > RPushButton {
     height: 70px;
     width: 70px;
     background:none;
@@ -130,6 +131,12 @@ RRadioClock {
 #rackSettingsCancelButton:hover {
     image: url(:/images/menu-cancel-hover.png);
 }
+
+#rackPluginToolBarButton:checked {
+    background-color: #BBBBBB;
+    color: #000000;
+}
+
 
 /*Main Menu*/
 #rackMainMenu {

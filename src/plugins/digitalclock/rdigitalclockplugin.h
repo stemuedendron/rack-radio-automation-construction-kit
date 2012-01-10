@@ -36,6 +36,14 @@ public:
 
     QWidget *createRWidget(QWidget *parent, ICore *api);
 
+    QString name() const { return "Digital Clock"; }
+    QString description() const { return tr("This is a simple digital clock."); }
+    QString version() const { return "0.0.1"; }
+    QString url() const { return "http://rack-radio-automation-construction-kit.googlecode.com/"; }
+    QString vendor() const { return "rack"; }
+    QString license() const { return "GNU GPLv3+"; }
+    QString copyright() const { return "Copyright (C) Steffen Müller"; }
+
 };
 
 

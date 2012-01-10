@@ -34,6 +34,11 @@ public:
 
     explicit RSplitter(Qt::Orientation orientation, QWidget *parent = 0);
 
+signals:
+
+    void enterSettingsMode();
+    void leaveSettingsMode();
+
 protected:
 
     QSplitterHandle *createHandle();
@@ -50,16 +55,16 @@ public:
 
     RSplitterHandle(Qt::Orientation orientation, RSplitter *parent);
 
+public slots:
+
+    void enterSettingsMode();
+    void leaveSettingsMode();
+
 protected:
 
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
-
-private slots:
-
-    void enterSettingsMode();
-    void leaveSettingsMode();
 
 private:
 

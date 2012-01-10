@@ -36,6 +36,13 @@ public:
 
     QWidget *createRWidget(QWidget *parent, ICore *api);
 
+    QString name() const { return "Hotkeys"; }
+    QString description() const { return tr("The Hotkeys widget let you instantly play jingles, trailer, music beds or whatever you want."); }
+    QString version() const { return "0.0.1"; }
+    QString url() const { return "http://rack-radio-automation-construction-kit.googlecode.com/"; }
+    QString vendor() const { return "rack"; }
+    QString license() const { return "GNU GPLv3+"; }
+    QString copyright() const { return "Copyright (C) Steffen Müller"; }
 
 };
 

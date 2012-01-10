@@ -33,6 +33,14 @@ public:
 
     virtual QWidget *createRWidget(QWidget *parent, ICore *api) = 0;
 
+    virtual QString name() const = 0;
+    virtual QString description() const = 0;
+    virtual QString version() const = 0;
+    virtual QString url() const = 0;
+    virtual QString vendor() const = 0;
+    virtual QString license() const = 0;
+    virtual QString copyright() const = 0;
+
 //in this way we can plugins force to implement api methods:
 //public slots:
 
