@@ -173,6 +173,17 @@ RRadioClock {
 }
 
 
+/*this is a fallback if no image is provided:*/
+#rackPluginToolBar > RPushButton {
+    image: url(:/images/default-plugin.png);
+}
+#rackPluginToolBar > RPushButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+
+
+
+
 /*40 x 40 Buttons*/
 #rackSettingsCloseButton,
 #rackSettingsLeftArrowButton,

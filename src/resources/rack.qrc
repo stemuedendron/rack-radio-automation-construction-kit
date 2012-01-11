@@ -35,5 +35,7 @@
         <file>images/menu-cancel.png</file>
         <file>images/menu-ok-hover.png</file>
         <file>images/menu-ok.png</file>
+        <file>images/default-plugin-hover.png</file>
+        <file>images/default-plugin.png</file>
     </qresource>
 </RCC>

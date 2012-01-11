@@ -332,7 +332,18 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             //qbuttongroup checken
 
             //create plugin toolbar button
+
             RPushButton *pluginToolBarButton = new RPushButton(widgetPlugin->name());
+
+            //test classname for styling
+            //set object name of plugin bar button to something like this:
+            //plugin widget class name + rackPluginToolBarButton, e.g.
+            //
+            //RDigitalClock-rackPluginToolBarButton
+            //
+            //
+            //RPushButton *pluginToolBarButton = new RPushButton(newWidget->metaObject()->className());
+
             pluginToolBarButton->setObjectName("rackPluginToolBarButton");
             pluginToolBarButton->setCheckable(true);
             pluginToolBarButton->setAutoExclusive(true);
