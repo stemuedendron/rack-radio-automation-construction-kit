@@ -321,6 +321,8 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             QVBoxLayout *pluginSettingsLayout = qFindChild<QVBoxLayout *>(pluginHost, "rackPluginSettingsLayout");
 
             RPushButton *pluginButton = new RPushButton(widgetPlugin->name());
+            pluginButton->setCheckable(true);
+
 
             pluginSettingsLayout->insertWidget(pluginSettingsLayout->count() - 1, pluginButton);
 
@@ -335,11 +337,11 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
             RPushButton *pluginToolBarButton = new RPushButton(widgetPlugin->name());
 
-            //test classname for styling
+            //use classname for styling
             //set object name of plugin bar button to something like this:
             //plugin widget class name + rackPluginToolBarButton, e.g.
             //
-            //RDigitalClock-rackPluginToolBarButton
+            //RDigitalClockToolButton
             //
             //
             //RPushButton *pluginToolBarButton = new RPushButton(newWidget->metaObject()->className());
