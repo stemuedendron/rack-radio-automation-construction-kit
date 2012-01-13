@@ -157,7 +157,6 @@ void RackWindow::createPluginHost(int position)
     QToolBar *pluginHostToolBar = new QToolBar;
     pluginHostToolBar->setObjectName("rackPluginHostToolBar");
     pluginHostToolBar->setOrientation(Qt::Vertical);
-    pluginHostToolBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
     //actiongroup for exclusive handling of buttons:
     QActionGroup *ag = new QActionGroup(pluginHostToolBar);
     ag->setExclusive(true);
@@ -231,10 +230,9 @@ void RackWindow::createPluginHost(int position)
     mapperSwitchPlugin->setObjectName("rackPluginSwitchMapper");
     QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(int)), pluginStack, SLOT(setCurrentIndex(int)));
 
-    //create plugin toolbar for this pluginhost
+    //create plugin toolbar for mainwindow
     QToolBar *pluginToolBar = new QToolBar;
     pluginToolBar->setObjectName("rackPluginToolBar");
-    pluginToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     pluginToolBar->setMovable(false);
     pluginToolBar->hide();
     addToolBar(Qt::BottomToolBarArea, pluginToolBar);
@@ -352,12 +350,9 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             //create button for pluginhost toolbar:
             QToolButton *tb = new QToolButton;
             tb->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
+            tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             tb->setFocusPolicy(Qt::NoFocus);
             tb->setDefaultAction(act);
-            //tb->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-            QLabel *label = new QLabel(tb->text());
-
-            label->setObjectName("rackPluginHostToolBarLabel");
             RPushButton *settingsButton = new RPushButton;
             settingsButton->setObjectName("rackPluginHostToolBarSettingsButton");
             RPushButton *deleteButton = new RPushButton;
@@ -365,7 +360,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             QHBoxLayout *hl = new QHBoxLayout(tb);
             hl->setSpacing(0);
             hl->setContentsMargins(0,0,1,0);
-            hl->addWidget(label,1);
+            hl->addStretch();
             hl->addWidget(settingsButton);
             hl->addWidget(deleteButton);
             pluginHostToolBar->addWidget(tb);
@@ -373,9 +368,11 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             //create button for plugin toolbar:
             QToolButton *tb1 = new QToolButton;
             tb1->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
+            tb1->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
             tb1->setFocusPolicy(Qt::NoFocus);
             tb1->setDefaultAction(act);
             pluginToolBar->addWidget(tb1);
+
 
             //connect action trigger to PluginSwitchMapper;
             QObject::connect(act, SIGNAL(triggered()), sm, SLOT(map()));
