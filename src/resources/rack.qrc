@@ -38,5 +38,11 @@
         <file>images/default-plugin-hover.png</file>
         <file>images/default-plugin.png</file>
         <file>images/transparent-icon.png</file>
+        <file>images/digitalclock-hover.png</file>
+        <file>images/digitalclock.png</file>
+        <file>images/radioclock-hover.png</file>
+        <file>images/radioclock.png</file>
+        <file>images/hotkeys-hover.png</file>
+        <file>images/hotkeys.png</file>
     </qresource>
 </RCC>

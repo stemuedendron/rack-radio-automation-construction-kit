@@ -31,6 +31,45 @@ rack colors gradients 1-9 over colordialog buttons properties
 */
 
 
+/* Icons for plugin widgets follow the rule: classname + ToolButton */
+
+/* this is a fallback if no image is provided and MUST be before real images: */
+#rackPluginHostToolBar > QToolButton {
+    image: url(:/images/default-plugin.png);
+}
+#rackPluginHostToolBar > QToolButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+#rackPluginToolBar > QToolButton {
+    image: url(:/images/default-plugin.png);
+}
+#rackPluginToolBar > QTollButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+
+/* now the real ones: */
+QToolButton#RRadioClockToolButton {
+    image: url(:/images/radioclock.png);
+}
+QToolButton#RRadioClockToolButton:hover {
+    image: url(:/images/radioclock-hover.png);
+}
+
+QToolButton#RDigitalClockToolButton {
+    image: url(:/images/digitalclock.png);
+}
+QToolButton#RDigitalClockToolButton:hover {
+    image: url(:/images/digitalclock-hover.png);
+}
+
+QToolButton#RHotKeyWidgetToolButton {
+    image: url(:/images/hotkeys.png);
+}
+QToolButton#RHotKeyWidgetToolButton:hover {
+    image: url(:/images/hotkeys-hover.png);
+}
+
+
 
 RDigitalClock,
 RRadioClock {
@@ -60,15 +99,6 @@ RRadioClock {
     font-weight: bold;
 }
 
-/*this is a fallback if no image is provided:*/
-#rackPluginHostToolBar > QToolButton {
-    image: url(:/images/default-plugin.png);
-}
-
-#rackPluginHostToolBar > QToolButton:hover {
-    image: url(:/images/default-plugin-hover.png);
-}
-
 #rackPluginHostToolBar > QToolButton:checked {
     border-color: yellow;
 }
@@ -79,6 +109,14 @@ RRadioClock {
     width: 27px;
     border: none;
     margin-right: 3px;
+}
+
+#rackPluginHostToolBarSettingsButton:pressed {
+    border: 1px solid red;
+}
+
+#rackPluginHostToolBarDeleteButton:pressed {
+    border: 1px solid white;
 }
 
 #rackPluginHostToolBarSettingsButton {
@@ -151,15 +189,6 @@ QToolButton#qt_toolbar_ext_button
 /*this is the size for the qt bugfix dummy button and controls in this way the text position*/
 #rackPluginToolBar {
     icon-size: 52px;
-}
-
-/*this is a fallback if no image is provided:*/
-#rackPluginToolBar > QToolButton {
-    image: url(:/images/default-plugin.png);
-}
-
-#rackPluginToolBar > QTollButton:hover {
-    image: url(:/images/default-plugin-hover.png);
 }
 
 #rackPluginToolBar > QToolButton:checked {

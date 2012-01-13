@@ -35,9 +35,7 @@
 
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
-    m_mainSplitter(new RSplitter(Qt::Horizontal)),
-    m_mapperLoadNewPlugin(new QSignalMapper(this)),
-    m_mapperclosePluginHost(new QSignalMapper(this))
+    m_mainSplitter(new RSplitter(Qt::Horizontal))
 {
 
     setWindowTitle(tr("R.A.C.K."));
@@ -54,8 +52,6 @@ RackWindow::RackWindow() :
 
     QObject::connect(this, SIGNAL(enterSettingsMode()), m_mainSplitter, SIGNAL(enterSettingsMode()));
     QObject::connect(this, SIGNAL(leaveSettingsMode()), m_mainSplitter, SIGNAL(leaveSettingsMode()));
-    QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
-    QObject::connect(m_mapperclosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
 
     emit leaveSettingsMode();
 
@@ -217,18 +213,21 @@ void RackWindow::createPluginHost(int position)
     QObject::connect(mapperCreatePluginHost, SIGNAL(mapped(int)), SLOT(createPluginHost(int)));
 
     //load plugin signal:
-    QObject::connect(addPluginWidgetButton, SIGNAL(clicked()), m_mapperLoadNewPlugin, SLOT(map()));
-    m_mapperLoadNewPlugin->setMapping(addPluginWidgetButton, pluginHost);
+    QSignalMapper *mapperLoadNewPlugin = new QSignalMapper(pluginHost);
+    QObject::connect(addPluginWidgetButton, SIGNAL(clicked()), mapperLoadNewPlugin, SLOT(map()));
+    mapperLoadNewPlugin->setMapping(addPluginWidgetButton, pluginHost);
+    QObject::connect(mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
 
     //close plugin host signal:
-    QObject::connect(closeButton, SIGNAL(clicked()), m_mapperclosePluginHost, SLOT(map()));
-    m_mapperclosePluginHost->setMapping(closeButton, pluginHost);
-
+    QSignalMapper *mapperClosePluginHost = new QSignalMapper(pluginHost);
+    QObject::connect(closeButton, SIGNAL(clicked()), mapperClosePluginHost, SLOT(map()));
+    mapperClosePluginHost->setMapping(closeButton, pluginHost);
+    QObject::connect(mapperClosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
 
     //create plugin switch signalmapper
     QSignalMapper *mapperSwitchPlugin = new QSignalMapper(pluginHost);
     mapperSwitchPlugin->setObjectName("rackPluginSwitchMapper");
-    QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(int)), pluginStack, SLOT(setCurrentIndex(int)));
+    QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(QWidget *)), pluginStack, SLOT(setCurrentWidget(QWidget *)));
 
     //create plugin toolbar for mainwindow
     QToolBar *pluginToolBar = new QToolBar;
@@ -337,14 +336,13 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             QActionGroup *ag = qFindChild<QActionGroup *>(pluginHostToolBar);
 
             //add plugin widget to the widget stack:
-            int index = pluginStack->addWidget(newWidget);
-            pluginStack->setCurrentIndex(index);
+            pluginStack->setCurrentIndex(pluginStack->addWidget(newWidget));
 
             //create action for the toolbars:
             QAction *act = new QAction(widgetPlugin->name(), ag);
             act->setCheckable(true);
             act->setChecked(true);
-            //qt bugfix: set transparent dummy icon to move button text down
+            //qt bugfix: set transparent dummy icon to move button text down or right
             act->setIcon(QIcon(":/images/transparent-icon.png"));
 
             //create button for pluginhost toolbar:
@@ -376,9 +374,17 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
             //connect action trigger to PluginSwitchMapper;
             QObject::connect(act, SIGNAL(triggered()), sm, SLOT(map()));
-            sm->setMapping(act, index);
+            sm->setMapping(act, newWidget);
 
+            //connect delete signal
+            QObject::connect(deleteButton, SIGNAL(clicked()), act, SLOT(deleteLater()));
+            QObject::connect(deleteButton, SIGNAL(clicked()), newWidget, SLOT(deleteLater()));
+            QObject::connect(deleteButton, SIGNAL(clicked()), tb1, SLOT(deleteLater()));
+            QObject::connect(deleteButton, SIGNAL(clicked()), tb, SLOT(deleteLater()));
 
+            //connect settings signal
+            //if (plugin has settings) ...
+            //QObject::connect(settingsButton, SIGNAL(clicked()),
 
         }
     }
@@ -405,12 +411,12 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
             widgetsizes.removeAt(senderpos + 1);
         }
 
-        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginHostToolBarPointer"));
+        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
         delete pluginHost;
         splitter->setSizes(widgetsizes);
     }
     else {
-        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginHostToolBarPointer"));
+        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
         delete pluginHost;
     }
     if (splitter->count()==1 && parentSplitter)

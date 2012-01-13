@@ -27,7 +27,6 @@
 
 class CoreImpl;
 class RSplitter;
-class QSignalMapper;
 class QXmlStreamWriter;
 
 class RackWindow : public QMainWindow
@@ -80,8 +79,6 @@ private:
 
     CoreImpl *m_coreImpl;
     RSplitter *m_mainSplitter;
-    QSignalMapper *m_mapperLoadNewPlugin;
-    QSignalMapper *m_mapperclosePluginHost;
 
 };
 
