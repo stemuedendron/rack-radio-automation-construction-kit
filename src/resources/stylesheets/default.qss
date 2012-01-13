@@ -47,7 +47,6 @@ RRadioClock {
 #rackPluginHostToolBar > QToolButton {
     height: 24px;
     width: 200px;
-    image: url(:/images/default-plugin.png);
     image-position: left;
     padding: 2px;
     margin:1px;
@@ -59,6 +58,15 @@ RRadioClock {
     color: #000000;
     font-size: 12px;
     font-weight: bold;
+}
+
+/*this is a fallback if no image is provided:*/
+#rackPluginHostToolBar > QToolButton {
+    image: url(:/images/default-plugin.png);
+}
+
+#rackPluginHostToolBar > QToolButton:hover {
+    image: url(:/images/default-plugin-hover.png);
 }
 
 #rackPluginHostToolBar > QToolButton:checked {
