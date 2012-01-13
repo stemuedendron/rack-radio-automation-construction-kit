@@ -37,5 +37,6 @@
         <file>images/menu-ok.png</file>
         <file>images/default-plugin-hover.png</file>
         <file>images/default-plugin.png</file>
+        <file>images/transparent-icon.png</file>
     </qresource>
 </RCC>

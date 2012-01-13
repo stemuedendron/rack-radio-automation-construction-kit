@@ -38,7 +38,70 @@ RRadioClock {
     color: #FFFFFF;
 }
 
+#rackPluginHostToolBar {
+    border: none;
+    /*this is the size for the bugfix dummy button and controls in this way the text position*/
+    icon-size: 0px;
+}
 
+#rackPluginHostToolBar > QToolButton {
+    height: 24px;
+    width: 200px;
+    image: url(:/images/default-plugin.png);
+    image-position: left;
+    padding: 2px;
+    margin:1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #B6B6B6;
+    border-radius: 4px;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F3F3F3, stop: 1 #B6B6B6);
+}
+
+#rackPluginHostToolBar > QToolButton:checked {
+    border-color: yellow;
+}
+
+#rackPluginHostToolBarSettingsButton,
+#rackPluginHostToolBarDeleteButton {
+    height: 27px;
+    width: 27px;
+    border: none;
+    margin-right: 3px;
+}
+
+#rackPluginHostToolBarSettingsButton {
+    image: url(:/images/default-plugin.png);
+}
+
+#rackPluginHostToolBarSettingsButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+
+#rackPluginHostToolBarDeleteButton {
+    image: url(:/images/menu-delete.png);
+}
+
+#rackPluginHostToolBarDeleteButton:hover {
+    image: url(:/images/menu-delete-hover.png);
+}
+
+#rackPluginHostToolBarLabel {
+    color: #000000;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 40px;
+}
+
+/*
+QToolButton#qt_toolbar_ext_button
+{
+    color: #FFFFFF;
+    background-color: #FFFFFF;
+    border: 1px solid red;
+    width: 20px;
+}
+*/
 
 /*ToolBars*/
 #rackMainToolBar,
@@ -61,18 +124,24 @@ RRadioClock {
 
 #rackSettingsToolBar > RPushButton,
 #rackMainToolBar > RPushButton,
-#rackPluginToolBar > RPushButton {
+#rackPluginToolBar > QToolButton {
     height: 70px;
     width: 70px;
-    background:none;
-    border:none;
+
+
+    border-radius: 6px;
     image-position: top;
     color: #EEEEEE;
-    text-align: bottom;
     font-size: 11px;
     font-weight: bold;
     padding: 5px;
     margin: 2px;
+}
+
+#rackSettingsToolBar > RPushButton,
+#rackMainToolBar > RPushButton {
+background:none; border:none;
+    text-align: bottom;
 }
 
 #rackSettingsButton {
@@ -133,10 +202,6 @@ RRadioClock {
     image: url(:/images/menu-cancel-hover.png);
 }
 
-#rackPluginToolBarButton:checked {
-    background-color: #326CB5;
-}
-
 
 /*Main Menu*/
 #rackMainMenu {
@@ -161,7 +226,6 @@ RRadioClock {
     border-color: #FFFFFF;
 }
 
-
 #rackMainMenu::item:default {
     color: yellow;
     margin: 0px 0px 10px 0px;
@@ -172,15 +236,25 @@ RRadioClock {
     border-radius: 0px;
 }
 
+/*Plugin Toolbar*/
+
+/*this is the size for the qt bugfix dummy button and controls in this way the text position*/
+#rackPluginToolBar {
+    icon-size: 50px;
+}
 
 /*this is a fallback if no image is provided:*/
-#rackPluginToolBar > RPushButton {
+#rackPluginToolBar > QToolButton {
     image: url(:/images/default-plugin.png);
 }
-#rackPluginToolBar > RPushButton:hover {
+
+#rackPluginToolBar > QTollButton:hover {
     image: url(:/images/default-plugin-hover.png);
 }
 
+#rackPluginToolBar > QToolButton:checked {
+    background-color: #326CB5;
+}
 
 
 

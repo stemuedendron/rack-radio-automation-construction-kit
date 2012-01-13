@@ -27,7 +27,6 @@
 
 class CoreImpl;
 class RSplitter;
-class QToolBar;
 class QSignalMapper;
 class QXmlStreamWriter;
 
@@ -81,7 +80,6 @@ private:
 
     CoreImpl *m_coreImpl;
     RSplitter *m_mainSplitter;
-    QToolBar *m_pluginToolBar;
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperclosePluginHost;
 
