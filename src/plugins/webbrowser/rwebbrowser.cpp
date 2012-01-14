@@ -23,7 +23,7 @@
 #include "icore.h"
 #include "rwebbrowser.h"
 #include <QtGui>
-#include <QtWebKit/QWebView>
+#include <QtWebKit>
 
 RWebBrowser::RWebBrowser(QWidget *parent, ICore *api)
     : QWidget(parent),
@@ -31,12 +31,11 @@ RWebBrowser::RWebBrowser(QWidget *parent, ICore *api)
 {
 
     QWebView *view = new QWebView;
+    view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     view->load(QUrl("http://www.radiofrei.de/"));
 
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addWidget(view);
-
     setLayout(hl);
-
 
 }

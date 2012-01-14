@@ -35,6 +35,10 @@ public:
 
     explicit RWebBrowser(QWidget *parent = 0, ICore *api = 0);
 
+private slots:
+
+    void render();
+
 private:
 
     ICore* m_core;
