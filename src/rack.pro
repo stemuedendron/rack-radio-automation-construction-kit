@@ -25,7 +25,10 @@ SUBDIRS     = app \
               plugins/digitalclock \
               plugins/radioclock \
               plugins/hotkeywidget \
+              plugins/webbrowser \
               tests/rplayertest \
               tests/colordialog
+
+
 
 
