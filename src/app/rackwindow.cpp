@@ -419,6 +419,8 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
         delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
         delete pluginHost;
     }
+
+    //BUG: !!!!!!!!!
     if (splitter->count()==1 && parentSplitter)
     {
         parentSplitter->insertWidget(parentSplitter->indexOf(splitter), splitter->widget(0));
