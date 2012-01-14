@@ -377,6 +377,9 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             sm->setMapping(act, newWidget);
 
             //connect delete signal
+
+            //FIXME: set new active action in action group before delete this one
+            //act->actionGroup()->removeAction(act);
             QObject::connect(deleteButton, SIGNAL(clicked()), act, SLOT(deleteLater()));
             QObject::connect(deleteButton, SIGNAL(clicked()), newWidget, SLOT(deleteLater()));
             QObject::connect(deleteButton, SIGNAL(clicked()), tb1, SLOT(deleteLater()));
@@ -390,6 +393,10 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
     }
     else QMessageBox::information(this, "Error", "Could not load the plugin");
 }
+
+
+
+
 
 //needs handling if we should delete the plugins or not and save there content
 void RackWindow::closePluginHost(QWidget *pluginHost)
