@@ -35,7 +35,9 @@
 
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
-    m_mainSplitter(new RSplitter(Qt::Horizontal))
+    m_mainSplitter(new RSplitter(Qt::Horizontal)),
+    m_mapperLoadNewPlugin(new QSignalMapper(this)),
+    m_mapperClosePluginHost(new QSignalMapper(this))
 {
 
     setWindowTitle(tr("R.A.C.K."));
@@ -50,6 +52,8 @@ RackWindow::RackWindow() :
     createToolBars();
     createPluginHost(0);
 
+    QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
+    QObject::connect(m_mapperClosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
     QObject::connect(this, SIGNAL(enterSettingsMode()), m_mainSplitter, SIGNAL(enterSettingsMode()));
     QObject::connect(this, SIGNAL(leaveSettingsMode()), m_mainSplitter, SIGNAL(leaveSettingsMode()));
 
@@ -213,16 +217,12 @@ void RackWindow::createPluginHost(int position)
     QObject::connect(mapperCreatePluginHost, SIGNAL(mapped(int)), SLOT(createPluginHost(int)));
 
     //load plugin signal:
-    QSignalMapper *mapperLoadNewPlugin = new QSignalMapper(pluginHost);
-    QObject::connect(addPluginWidgetButton, SIGNAL(clicked()), mapperLoadNewPlugin, SLOT(map()));
-    mapperLoadNewPlugin->setMapping(addPluginWidgetButton, pluginHost);
-    QObject::connect(mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
+    QObject::connect(addPluginWidgetButton, SIGNAL(clicked()), m_mapperLoadNewPlugin, SLOT(map()));
+    m_mapperLoadNewPlugin->setMapping(addPluginWidgetButton, pluginHost);
 
     //close plugin host signal:
-    QSignalMapper *mapperClosePluginHost = new QSignalMapper(pluginHost);
-    QObject::connect(closeButton, SIGNAL(clicked()), mapperClosePluginHost, SLOT(map()));
-    mapperClosePluginHost->setMapping(closeButton, pluginHost);
-    QObject::connect(mapperClosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
+    QObject::connect(closeButton, SIGNAL(clicked()), m_mapperClosePluginHost, SLOT(map()));
+    m_mapperClosePluginHost->setMapping(closeButton, pluginHost);
 
     //create plugin switch signalmapper
     QSignalMapper *mapperSwitchPlugin = new QSignalMapper(pluginHost);
@@ -410,7 +410,6 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
             widgetsizes.replace(senderpos, widgetsizes.at(senderpos) + widgetsizes.at(senderpos+1));
             widgetsizes.removeAt(senderpos + 1);
         }
-
         delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
         delete pluginHost;
         splitter->setSizes(widgetsizes);
@@ -419,13 +418,12 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
         delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
         delete pluginHost;
     }
-
-    //BUG: !!!!!!!!!
     if (splitter->count()==1 && parentSplitter)
     {
         parentSplitter->insertWidget(parentSplitter->indexOf(splitter), splitter->widget(0));
         delete splitter;
     }
+
 //    QList<RSplitter *> splitters = qFindChildren<RSplitter *>(this);
 //    qDebug("splitter count: %d", splitters.size());
 }
