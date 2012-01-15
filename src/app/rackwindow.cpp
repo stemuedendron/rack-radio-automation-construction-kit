@@ -52,6 +52,23 @@ RackWindow::RackWindow() :
     createToolBars();
     createPluginHost(0);
 
+
+    //first test plugin widget list dialog
+
+//    QListWidget *pluginList = new QListWidget;
+//    pluginList->setParent(this, Qt::Dialog);
+//    pluginList->hide();
+//    pluginList->setWindowModality(Qt::ApplicationModal);
+//    QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), pluginList, SLOT(show()));
+
+
+
+
+
+
+    //////////////////////////////////////
+
+
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
     QObject::connect(this, SIGNAL(enterSettingsMode()), m_mainSplitter, SIGNAL(enterSettingsMode()));

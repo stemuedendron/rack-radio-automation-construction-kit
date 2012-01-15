@@ -27,9 +27,9 @@
 
 
 RColorDialog::RColorDialog(QWidget *parent) :
-    QDialog(parent, Qt::FramelessWindowHint)
+    QDialog(parent)
 {
-    setPalette(QPalette(Qt::lightGray));
+
     setFixedSize(220,300);
     QGridLayout *l = new QGridLayout;
     l->setSpacing(3);
@@ -52,15 +52,12 @@ RColorDialog::RColorDialog(QWidget *parent) :
     l->addWidget(closebt,3,2);
     setLayout(l);
 
+
+    setMask(geometry());
+
+
 }
 
-void RColorDialog::paintEvent(QPaintEvent *)
-{
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(Qt::red, 6));
-    painter.drawRect(2, 2, width()-4, height()-4);
-}
 
 void RColorDialog::setColor()
 {

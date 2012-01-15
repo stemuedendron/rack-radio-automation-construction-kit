@@ -34,10 +34,6 @@ public:
     explicit RColorDialog(QWidget *parent = 0);
     static QColor getColor(QWidget *parent, const QString &title, bool *ok = 0);
 
-protected:
-
-    void paintEvent(QPaintEvent *);
-
 private slots:
 
     void setColor();

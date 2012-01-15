@@ -23,11 +23,13 @@
 #ifndef RWEBBROWSER_H
 #define RWEBBROWSER_H
 
-#include <QWidget>
+#include <QMainWindow>
 
 class ICore;
+class QWebView;
+class QLineEdit;
 
-class RWebBrowser : public QWidget
+class RWebBrowser : public QMainWindow
 {
     Q_OBJECT
 
@@ -35,14 +37,20 @@ public:
 
     explicit RWebBrowser(QWidget *parent = 0, ICore *api = 0);
 
-private slots:
+protected slots:
 
-    void render();
+    void adjustLocation();
+    void changeLocation();
+    void adjustTitle();
+    void setProgress(int p);
+    void finishLoading(bool);
 
 private:
 
     ICore* m_core;
-
+    QWebView *m_webView;
+    QLineEdit *m_locationEdit;
+    int m_progress;
 };
 
 #endif // RWEBBROWSER_H

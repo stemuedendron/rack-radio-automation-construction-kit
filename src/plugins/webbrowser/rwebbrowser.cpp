@@ -26,16 +26,64 @@
 #include <QtWebKit>
 
 RWebBrowser::RWebBrowser(QWidget *parent, ICore *api)
-    : QWidget(parent),
-      m_core(api)
+    : QMainWindow(parent),
+      m_core(api),
+      m_webView(new QWebView),
+      m_locationEdit(new QLineEdit),
+      m_progress(0)
 {
 
-    QWebView *view = new QWebView;
-    view->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    view->load(QUrl("http://www.radiofrei.de/"));
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-    QHBoxLayout *hl = new QHBoxLayout;
-    hl->addWidget(view);
-    setLayout(hl);
+    //m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
 
+    QToolBar *toolBar = addToolBar(tr("Navigation"));
+    toolBar->addAction(m_webView->pageAction(QWebPage::Back));
+    toolBar->addAction(m_webView->pageAction(QWebPage::Forward));
+    toolBar->addAction(m_webView->pageAction(QWebPage::Reload));
+    toolBar->addAction(m_webView->pageAction(QWebPage::Stop));
+    toolBar->addWidget(m_locationEdit);
+
+    QObject::connect(m_webView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
+    QObject::connect(m_webView, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
+    QObject::connect(m_webView, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
+    QObject::connect(m_webView, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
+    QObject::connect(m_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
+
+    m_webView->load(QUrl("http://www.radiofrei.de/"));
+    setCentralWidget(m_webView);
+
+}
+
+void RWebBrowser::adjustLocation()
+{
+    m_locationEdit->setText(m_webView->url().toString());
+}
+
+void RWebBrowser::changeLocation()
+{
+    QUrl url = QUrl(m_locationEdit->text());
+    m_webView->load(url);
+    m_webView->setFocus();
+}
+
+void RWebBrowser::adjustTitle()
+{
+//    if (m_progress <= 0 || m_progress >= 100)
+//        setWindowTitle(m_webView->title());
+//    else
+//        setWindowTitle(QString("%1 (%2%)").arg(m_webView->title()).arg(m_progress));
+}
+
+void RWebBrowser::setProgress(int p)
+{
+//    m_progress = p;
+//    adjustTitle();
+}
+
+void RWebBrowser::finishLoading(bool)
+{
+//    m_progress = 100;
+//    adjustTitle();
 }
