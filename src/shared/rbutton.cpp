@@ -58,14 +58,23 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
                      << dev.engineIndex << "name:"
                      << dev.name << "driver:"
                      << dev.driver;
+
+
+
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
-    //QString file = qApp->applicationDirPath() + "/1.mp3";
 
-   // QString file = ":/audio/main.ogg";
+    QFile file("../../src/resources/audio/main.ogg");
+    QString filename = file.fileName();
+    qDebug() << filename;
 
-    QTemporaryFile *tmpFile = QTemporaryFile::createLocalFile(":/audio/main.ogg");
-    QString file = tmpFile->fileName();
+
+//    QString file = qApp->applicationDirPath();
+
+//    QTemporaryFile *tmpFile = QTemporaryFile::createLocalFile(":/audio/main.ogg");
+//    QString file = tmpFile->fileName();
+
+
 
     m_player = new RPlayer(this, m_device);
 
@@ -74,8 +83,8 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
     connect(m_player, SIGNAL(time(qint64)), this, SLOT(setLength(qint64)));
     connect(m_player, SIGNAL(position(qint64)), this, SLOT(setPosition(qint64)));
 
-    setText("1.mp3");
-    m_player->setURI(file);
+    setText("file");
+    m_player->setURI(filename);
     ////////////////////////////////////////////
 
 }
@@ -158,7 +167,7 @@ void RButton::resizeEvent(QResizeEvent *)
     refreshImage();
 }
 
-void RButton::setPosition(const qint64 &position)
+void RButton::setPosition(qint64 position)
 {
     if (position == m_position) return;
     m_position = position;
@@ -180,14 +189,14 @@ void RButton::setPositionClockColor(const QColor &color)
 }
 
 
-void RButton::setBorderRadius(const int &borderRadius)
+void RButton::setBorderRadius(int borderRadius)
 {
     if (borderRadius == m_borderRadius) return;
     m_borderRadius = borderRadius;
     refreshImage();
 }
 
-void RButton::setLength(const qint64 &length)
+void RButton::setLength(qint64 length)
 {
     if (length == m_length) return;
     m_length = length;

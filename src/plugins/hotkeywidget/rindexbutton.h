@@ -33,14 +33,14 @@ class RIndexButton : public RPushButton
 
 public:
 
-    explicit RIndexButton(const QString &title, const int &keys, QWidget *parent = 0);
+    explicit RIndexButton(const QString &title, int keys, QWidget *parent = 0);
     void setTitle(const QString &title);
-    void setKeys(const int &keys);
+    void setKeys(int keys);
     QString title() const;
 
 public slots:
 
-    void setEditMode(const bool &);
+    void setEditMode(bool);
 
 private:
 

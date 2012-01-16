@@ -23,7 +23,7 @@
 #include "rindexbutton.h"
 #include <QtGui>
 
-RIndexButton::RIndexButton(const QString &title, const int &keys, QWidget *parent) : RPushButton(parent)
+RIndexButton::RIndexButton(const QString &title, int keys, QWidget *parent) : RPushButton(parent)
 {
     setObjectName("rackHotkeyIndexButton");
     m_title = new QLabel;
@@ -37,17 +37,16 @@ RIndexButton::RIndexButton(const QString &title, const int &keys, QWidget *paren
     m_edit->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     m_edit->setObjectName("rackHotkeyEditMode");
     m_edit->setHidden(true);
-    QVBoxLayout * vl = new QVBoxLayout;
-    vl->addWidget(m_edit, 0, Qt::AlignJustify | Qt::AlignTop);
-    QWidget *lbwidget = new QWidget(this);
-    lbwidget->setLayout(vl);
 
-    QHBoxLayout *hl = new QHBoxLayout;
+    QWidget *lbwidget = new QWidget;
+    QVBoxLayout * vl = new QVBoxLayout(lbwidget);
+    vl->addWidget(m_edit, 0, Qt::AlignJustify | Qt::AlignTop);
+
+    QWidget *widget = new QWidget;
+    QHBoxLayout *hl = new QHBoxLayout(widget);
     hl->addWidget(m_title);
     hl->addWidget(m_keys);
     hl->addStretch();
-    QWidget *widget = new QWidget(this);
-    widget->setLayout(hl);
 
     QStackedLayout *sl = new QStackedLayout;
     sl->setStackingMode(QStackedLayout::StackAll);
@@ -62,7 +61,7 @@ void RIndexButton::setTitle(const QString &title)
     m_title->setText(title);
 }
 
-void RIndexButton::setKeys(const int &keys)
+void RIndexButton::setKeys(int keys)
 {
     QString keysStr = "(" + QString::number(keys) + " " + tr("keys") + ")";
     if (m_keys->text() == keysStr) return;
@@ -74,7 +73,7 @@ QString RIndexButton::title() const
     return m_title->text();
 }
 
-void RIndexButton::setEditMode(const bool &edit)
+void RIndexButton::setEditMode(bool edit)
 {
     m_edit->setVisible(edit);
 }

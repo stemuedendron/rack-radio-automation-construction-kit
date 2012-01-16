@@ -87,7 +87,7 @@ void MainWindow::tick(qint64 time)
 
 */
 
-bool RPlayer::init(const int &device)
+bool RPlayer::init(int device)
 {
     if (HIWORD(BASS_GetVersion())!=BASSVERSION)
     {
@@ -105,7 +105,7 @@ bool RPlayer::init(const int &device)
     return true;
 }
 
-bool RPlayer::free(const int &device)
+bool RPlayer::free(int device)
 {
     BASS_SetDevice(device);
     return (BASS_Free());
@@ -137,7 +137,7 @@ void CALLBACK stopSyncProc(HSYNC, DWORD, DWORD, void *user)
     pl->stop();
 }
 
-RPlayer::RPlayer(QObject *parent, const int &device)
+RPlayer::RPlayer(QObject *parent, int device)
     : QObject(parent),
     m_device(device),
     m_state(DisabledState),
@@ -155,7 +155,7 @@ RPlayer::~RPlayer()
     BASS_StreamFree(m_stream);
 }
 
-void RPlayer::setDevice(const int &device)
+void RPlayer::setDevice(int device)
 {
     if (device == m_device) return;
     if (BASS_ChannelSetDevice(m_stream, device)) m_device = device;
@@ -183,18 +183,18 @@ void RPlayer::setURI(const QString &uri)
     }
 }
 
-void RPlayer::setVolume(const float &vol)
+void RPlayer::setVolume(float vol)
 {
     m_volume = vol;
     BASS_ChannelSetAttribute(m_stream, BASS_ATTRIB_VOL, m_volume);
 }
 
-void RPlayer::setFadeInTime(const DWORD &time)
+void RPlayer::setFadeInTime(DWORD time)
 {
     m_fadeInTime = time;
 }
 
-void RPlayer::setFadeOutTime(const DWORD &time)
+void RPlayer::setFadeOutTime(DWORD time)
 {
     m_fadeOutTime = time;
 }

@@ -30,49 +30,45 @@ RPageEdit::RPageEdit(QWidget *parent) : QDialog(parent)
     setWindowTitle(tr("Edit Hotkey Page"));
 
     //create edit widget:
+    QWidget *wgEdit = new QWidget;
+    QFormLayout *fl0 = new QFormLayout(wgEdit);
     leEditTitle = new QLineEdit;
     sbEditRows = new QSpinBox;
     sbEditRows->setRange(1,10);
     sbEditCols = new QSpinBox;
     sbEditCols->setRange(1,10);
-    QFormLayout *fl0 = new QFormLayout;
     fl0->setContentsMargins(20,20,20,20);
     fl0->addRow(tr("Page Title:"), leEditTitle);
     fl0->addRow(tr("Rows:"), sbEditRows);
     fl0->addRow(tr("Cols:"), sbEditCols);
-    QWidget *wgEdit = new QWidget;
-    wgEdit->setLayout(fl0);
 
     //create add widget:
+    QWidget *wgAdd = new QWidget;
+    QFormLayout *fl1 = new QFormLayout(wgAdd);
     leAddTitle = new QLineEdit;
     sbAddRows = new QSpinBox;
     sbAddRows->setRange(1,10);
     sbAddCols = new QSpinBox;
     sbAddCols->setRange(1,10);
-    QFormLayout *fl1 = new QFormLayout;
     fl1->setContentsMargins(20,20,20,20);
     fl1->addRow(tr("Page Title:"), leAddTitle);
     fl1->addRow(tr("Rows:"), sbAddRows);
     fl1->addRow(tr("Cols:"), sbAddCols);
-    QWidget *wgAdd = new QWidget;
-    wgAdd->setLayout(fl1);
 
     //create clone widget:
+    QWidget *wgClone = new QWidget;
+    QFormLayout *fl2 = new QFormLayout(wgClone);
     leCloneTitle = new QLineEdit;
-    QFormLayout *fl2 = new QFormLayout;
     fl2->setContentsMargins(20,20,20,20);
     fl2->addRow(tr("Page Title:"), leCloneTitle);
-    QWidget *wgClone = new QWidget;
-    wgClone->setLayout(fl2);
 
     //create delete widget:
+    QWidget *wgDelete = new QWidget;
+    QHBoxLayout *bl = new QHBoxLayout(wgDelete);
     QLabel *lbDelete = new QLabel(tr("Are you shure to delete this Page?"));
     lbDelete->setWordWrap(true);
-    QHBoxLayout *bl = new QHBoxLayout;
     bl->setContentsMargins(20,20,20,20);
     bl->addWidget(lbDelete);
-    QWidget *wgDelete = new QWidget;
-    wgDelete->setLayout(bl);
 
     tabWidget = new QTabWidget;
     tabWidget->setObjectName("rackTabWidget");

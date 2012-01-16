@@ -27,14 +27,16 @@ SOURCES += \
     coreimpl.cpp \
     rackwindow.cpp \
     rsplitter.cpp \
+    rselectplugindialog.cpp \
     ../shared/rpushbutton.cpp \
-    ../shared/rblinkbutton.cpp \
+    ../shared/rblinkbutton.cpp
 
 HEADERS += \
     coreimpl.h \
     icore.h \
     rackwindow.h \
     rsplitter.h \
+    rselectplugindialog.h \
     ../libs/extensionsystem/iwidgetplugin.h \
     ../shared/rpushbutton.h \
     ../shared/rblinkbutton.h

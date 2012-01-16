@@ -74,3 +74,4 @@ QColor RColorDialog::getColor(QWidget *parent, const QString &title, bool *ok)
     if (ok) *ok = !!ret;
     if (ret) return dialog.colorValue;
 }
+

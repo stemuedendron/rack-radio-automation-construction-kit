@@ -52,7 +52,6 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     title->setObjectName("rackWidgetHeaderTitle");
     m_pageTitle = new QLabel;
     m_pageTitle->setObjectName("rackWidgetHeaderSubTitle");
-
     m_btEdit = new RBlinkButton(tr("Edit"));
     m_btEdit->setObjectName("rackButton");
     m_btEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -80,23 +79,22 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     connect(btNext,SIGNAL(clicked()),this,SLOT(showNextPage()));
     connect(this, SIGNAL(enableNPButtons(bool)), btNext, SLOT(setEnabled(bool)));
 
-    QGridLayout *hl = new QGridLayout;
+    QGridLayout *hl = new QGridLayout(header);
     hl->addWidget(title,        0, 0);
     hl->addWidget(m_pageTitle,  1, 0);
     hl->addWidget(m_btEdit,     0, 1, 2, 1);
     hl->addWidget(btIndex,      0, 2, 2, 1);
     hl->addWidget(btPrevious,   0, 3, 2, 1);
     hl->addWidget(btNext,       0, 4, 2, 1);
-    header->setLayout(hl);
 
     //create index page:
     QWidget *indexPage = new QWidget;
     indexPage->setObjectName("rackHotkeyIndexPage");
-    m_indexPageLayout = new QVBoxLayout;
+    m_indexPageLayout = new QVBoxLayout(indexPage);
     m_indexPageLayout->setSpacing(0);
     m_indexPageLayout->setContentsMargins(0,0,0,0);
     m_indexPageLayout->addStretch();
-    indexPage->setLayout(m_indexPageLayout);
+
     QScrollArea *indexPageScrollArea = new QScrollArea;
     indexPageScrollArea->setObjectName("rackHotkeyIndexPage");
     indexPageScrollArea->setWidgetResizable(true);
@@ -117,15 +115,20 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
     layout->addWidget(m_layout);
     setLayout(layout);
 
-    createHotkeyPage("1-Kaffeesatz",2,4);
-    createHotkeyPage("2-Kaffeesatz2",2,4);
-    createHotkeyPage("3-kaffeesatz3",3,4);
-    createHotkeyPage("4-Nowosti",4,6);
-    createHotkeyPage("5-V.I.P.",5,6);
+    //this is buggy, after 7 hotkey page creates we run in bug
+    // QFile::seek: IODevice is not open
+    // ASSERT: "!isEmpty()" in file /usr/include/QtCore/qlist.h, line 282
+
+
+    createHotkeyPage("1-Kaffeesatz",10,10);
+//    createHotkeyPage("2-Kaffeesatz2",2,4);
+//    createHotkeyPage("3-kaffeesatz3",3,4);
+//    createHotkeyPage("4-Nowosti",4,6);
+//    createHotkeyPage("5-V.I.P.",5,6);
 
 }
 
-void RHotKeyWidget::createHotkeyPage(QString title, const int &rows, const int &cols)
+void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
 {
     //TODO: allow lowercase titles and change the sort?
     title = title.at(0).toUpper() + title.mid(1);
@@ -151,10 +154,10 @@ int RHotKeyWidget::sortedInsert(const QString &title)
     return index;
 }
 
-void RHotKeyWidget::createHotKeys(const int &index, const int &rows, const int &cols)
+void RHotKeyWidget::createHotKeys(int index, int rows, int cols)
 {
     QWidget *hotkeyPage = new QWidget;
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout *layout = new QGridLayout(hotkeyPage);
     layout->setSpacing(1);
     layout->setContentsMargins(0,0,0,0);
     for (int row = 0; row < rows; row++)
@@ -167,11 +170,10 @@ void RHotKeyWidget::createHotKeys(const int &index, const int &rows, const int &
             layout->addWidget(hkb, row, col);
         }
     }
-    hotkeyPage->setLayout(layout);
     m_hotkeyStack->insertWidget(index, hotkeyPage);
 }
 
-void RHotKeyWidget::createIndexButton(const int &index, const QString &title, const int &keys)
+void RHotKeyWidget::createIndexButton(int index, const QString &title, int keys)
 {
     RIndexButton *button = new RIndexButton(title, keys);
     button->setEditMode(m_btEdit->isChecked());
@@ -182,13 +184,12 @@ void RHotKeyWidget::createIndexButton(const int &index, const QString &title, co
 
 void RHotKeyWidget::createEditModeLabel(QWidget *widget)
 {
-    QLabel *lbEdit = new QLabel(tr("Edit Mode"), this);
+    QLabel *lbEdit = new QLabel(tr("Edit Mode"));
     lbEdit->setObjectName("rackHotkeyEditMode");
     lbEdit->setHidden(!m_btEdit->isChecked());
     QObject::connect(m_btEdit, SIGNAL(toggled(bool)), lbEdit, SLOT(setVisible(bool)));
-    QVBoxLayout * l = new QVBoxLayout;
+    QVBoxLayout * l = new QVBoxLayout(widget);
     l->addWidget(lbEdit, 0, Qt::AlignJustify | Qt::AlignTop);
-    widget->setLayout(l);
 }
 
 void RHotKeyWidget::showIndexPage()
@@ -290,7 +291,7 @@ void RHotKeyWidget::editHotkeyPage()
                     }
                     else if (hkPageLayout->count() < dialog.sbEditRows->value() * dialog.sbEditCols->value())
                     {
-
+                        ///TODO: implemnent this!
                     }
                     btSender->setKeys(dialog.sbEditRows->value() * dialog.sbEditCols->value());
                 }

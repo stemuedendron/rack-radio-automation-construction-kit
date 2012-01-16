@@ -69,11 +69,11 @@ signals:
 public slots:
 
     void setPositionClockColor(const QColor &);
-    void setBorderRadius(const int &);
+    void setBorderRadius(int);
 
 private slots:
-    void setLength(const qint64 &);
-    void setPosition(const qint64 &);
+    void setLength(qint64);
+    void setPosition(qint64);
 
 protected:
 

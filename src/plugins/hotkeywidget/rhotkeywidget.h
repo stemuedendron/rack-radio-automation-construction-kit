@@ -52,7 +52,7 @@ public slots:
 
 private slots:
 
-    void createHotkeyPage(QString title, const int &rows, const int &cols);
+    void createHotkeyPage(QString title, int rows, int cols);
     void showIndexPage();
     void showPreviousPage();
     void showNextPage();
@@ -63,8 +63,8 @@ private:
 
     ICore* m_core;
     int sortedInsert(const QString &title);
-    void createHotKeys(const int &index, const int &rows, const int &cols);
-    void createIndexButton(const int &index, const QString &title, const int &keys);
+    void createHotKeys(int index, int rows, int cols);
+    void createIndexButton(int index, const QString &title, int keys);
     void createEditModeLabel(QWidget *widget);
     void editHotkeyPage();
     RBlinkButton *m_btEdit;

@@ -73,7 +73,7 @@ public:
      *        You can get a list of devices with RPlayer::getDevices()
      * @param parent
      */
-    explicit RPlayer(QObject *parent = 0, const int &device = 0);
+    explicit RPlayer(QObject *parent = 0, int device = 0);
 
     /**
      * @brief
@@ -92,13 +92,13 @@ public:
      * @brief
      *
      */
-    static bool init(const int &device);
+    static bool init(int device);
 
     /**
      * @brief
      *
      */
-    static bool free(const int &device);
+    static bool free(int device);
 
     /**
      * @brief
@@ -114,28 +114,28 @@ public slots:
      *
      * @param int
      */
-    void setDevice(const int &);
+    void setDevice(int);
 
     /**
      * @brief
      *
      * @param float
      */
-    void setVolume(const float &);
+    void setVolume(float);
 
     /**
      * @brief
      *
      * @param DWORD
      */
-    void setFadeInTime(const DWORD &);
+    void setFadeInTime(DWORD);
 
     /**
      * @brief
      *
      * @param DWORD
      */
-    void setFadeOutTime(const DWORD &);
+    void setFadeOutTime(DWORD);
 
     /**
      * @brief
