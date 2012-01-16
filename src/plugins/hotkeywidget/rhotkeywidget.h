@@ -63,9 +63,6 @@ private:
 
     ICore* m_core;
     int sortedInsert(const QString &title);
-    void createHotKeys(int index, int rows, int cols);
-    void createIndexButton(int index, const QString &title, int keys);
-    void createEditModeLabel(QWidget *widget);
     void editHotkeyPage();
     RBlinkButton *m_btEdit;
     QStringList m_pageList;

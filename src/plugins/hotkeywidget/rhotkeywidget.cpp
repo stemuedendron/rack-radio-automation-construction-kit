@@ -121,10 +121,10 @@ RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
 
 
     createHotkeyPage("1-Kaffeesatz",10,10);
-//    createHotkeyPage("2-Kaffeesatz2",2,4);
-//    createHotkeyPage("3-kaffeesatz3",3,4);
-//    createHotkeyPage("4-Nowosti",4,6);
-//    createHotkeyPage("5-V.I.P.",5,6);
+    createHotkeyPage("2-Kaffeesatz2",2,4);
+    createHotkeyPage("3-kaffeesatz3",3,4);
+    createHotkeyPage("4-Nowosti",4,6);
+    createHotkeyPage("5-V.I.P.",5,6);
 
 }
 
@@ -133,8 +133,39 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
     //TODO: allow lowercase titles and change the sort?
     title = title.at(0).toUpper() + title.mid(1);
     int index = sortedInsert(title);
-    createHotKeys(index, rows, cols);
-    createIndexButton(index, title, rows * cols);
+
+    //create hotkeys
+    QWidget *hotkeyPage = new QWidget;
+    QGridLayout *layout = new QGridLayout(hotkeyPage);
+    layout->setSpacing(1);
+    layout->setContentsMargins(0,0,0,0);
+    for (int row = 0; row < rows; row++)
+    {
+        for (int col = 0; col < cols; col++)
+        {
+            RButton *hkb = new RButton(RButton::bkHotKey);
+            hkb->setObjectName("rackHotkeyButton");
+
+            //we pass initialy 'this' as parent to avoid flicker
+            //(wich should normally notoccur, qt bug?)
+            QLabel *lbEdit = new QLabel(tr("Edit Mode"), this);
+            lbEdit->setObjectName("rackHotkeyEditMode");
+            lbEdit->setHidden(!m_btEdit->isChecked());
+            QVBoxLayout * l = new QVBoxLayout(hkb);
+            l->addWidget(lbEdit, 0, Qt::AlignJustify | Qt::AlignTop);
+            QObject::connect(m_btEdit, SIGNAL(toggled(bool)), lbEdit, SLOT(setVisible(bool)));
+            layout->addWidget(hkb, row, col);
+        }
+    }
+    m_hotkeyStack->insertWidget(index, hotkeyPage);
+
+    //create index button:
+    RIndexButton *button = new RIndexButton(title, rows * cols);
+    button->setEditMode(m_btEdit->isChecked());
+    connect(m_btEdit, SIGNAL(toggled(bool)), button, SLOT(setEditMode(bool)));
+    connect(button, SIGNAL(clicked()), this, SLOT(indexPageClicked()));
+    m_indexPageLayout->insertWidget(index, button);
+
 }
 
 int RHotKeyWidget::sortedInsert(const QString &title)
@@ -152,44 +183,6 @@ int RHotKeyWidget::sortedInsert(const QString &title)
         index = m_pageList.indexOf(title);
     }
     return index;
-}
-
-void RHotKeyWidget::createHotKeys(int index, int rows, int cols)
-{
-    QWidget *hotkeyPage = new QWidget;
-    QGridLayout *layout = new QGridLayout(hotkeyPage);
-    layout->setSpacing(1);
-    layout->setContentsMargins(0,0,0,0);
-    for (int row = 0; row < rows; row++)
-    {
-        for (int col = 0; col < cols; col++)
-        {
-            RButton *hkb = new RButton(RButton::bkHotKey);
-            hkb->setObjectName("rackHotkeyButton");
-            createEditModeLabel(hkb);
-            layout->addWidget(hkb, row, col);
-        }
-    }
-    m_hotkeyStack->insertWidget(index, hotkeyPage);
-}
-
-void RHotKeyWidget::createIndexButton(int index, const QString &title, int keys)
-{
-    RIndexButton *button = new RIndexButton(title, keys);
-    button->setEditMode(m_btEdit->isChecked());
-    connect(m_btEdit, SIGNAL(toggled(bool)), button, SLOT(setEditMode(bool)));
-    connect(button, SIGNAL(clicked()), this, SLOT(indexPageClicked()));
-    m_indexPageLayout->insertWidget(index, button);
-}
-
-void RHotKeyWidget::createEditModeLabel(QWidget *widget)
-{
-    QLabel *lbEdit = new QLabel(tr("Edit Mode"));
-    lbEdit->setObjectName("rackHotkeyEditMode");
-    lbEdit->setHidden(!m_btEdit->isChecked());
-    QObject::connect(m_btEdit, SIGNAL(toggled(bool)), lbEdit, SLOT(setVisible(bool)));
-    QVBoxLayout * l = new QVBoxLayout(widget);
-    l->addWidget(lbEdit, 0, Qt::AlignJustify | Qt::AlignTop);
 }
 
 void RHotKeyWidget::showIndexPage()

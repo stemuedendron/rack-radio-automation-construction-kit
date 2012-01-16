@@ -47,6 +47,11 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
                  << "driver:"
                  << dev.driver;
 
+    ///HERE WE RUN IN BUG!!!!!!!!
+    //FIXME:
+    //cause device[0] runs out of index, means device 0 is not valid, check rplayer and bass!!!!!!!
+
+
     m_device = devices[0].engineIndex;
 
     if (!RPlayer::init(m_device)) qWarning("Can't initialize device %d", m_device);
