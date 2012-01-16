@@ -30,13 +30,12 @@
 #include <QtGui>
 
 //TODO: method: delete one plugin
-//BUG: if only one plugin is in host it can be unchecked
-
 
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal)),
     m_mapperLoadNewPlugin(new QSignalMapper(this)),
+    m_mapperClosePlugin(new QSignalMapper(this)),
     m_mapperClosePluginHost(new QSignalMapper(this))
 {
 
@@ -70,6 +69,7 @@ RackWindow::RackWindow() :
 
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
+    QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));
     QObject::connect(m_mapperClosePluginHost, SIGNAL(mapped(QWidget*)), this, SLOT(closePluginHost(QWidget*)));
     QObject::connect(this, SIGNAL(enterSettingsMode()), m_mainSplitter, SIGNAL(enterSettingsMode()));
     QObject::connect(this, SIGNAL(leaveSettingsMode()), m_mainSplitter, SIGNAL(leaveSettingsMode()));
@@ -321,6 +321,10 @@ void RackWindow::createPluginHost(int position)
     }
 }
 
+
+//FIXME: keep loaded plugins in own plugin manager and
+//unload plugins to let load new version without
+//the need of restarting the application
 void RackWindow::loadPlugin(QWidget *pluginHost)
 {
     QDir pluginsDir(qApp->applicationDirPath());
@@ -388,16 +392,14 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             tb1->setDefaultAction(act);
             pluginToolBar->addWidget(tb1);
 
-
             //connect action trigger to PluginSwitchMapper;
             QObject::connect(act, SIGNAL(triggered()), sm, SLOT(map()));
             sm->setMapping(act, newWidget);
 
             //connect delete signal
-
-            //FIXME: set new active action in action group before delete this one
-            //act->actionGroup()->removeAction(act);
-            QObject::connect(deleteButton, SIGNAL(clicked()), act, SLOT(deleteLater()));
+            //remove act from actiongroup and delete it:
+            QObject::connect(deleteButton, SIGNAL(clicked()), m_mapperClosePlugin, SLOT(map()));
+            m_mapperClosePlugin->setMapping(deleteButton, act);
             QObject::connect(deleteButton, SIGNAL(clicked()), newWidget, SLOT(deleteLater()));
             QObject::connect(deleteButton, SIGNAL(clicked()), tb1, SLOT(deleteLater()));
             QObject::connect(deleteButton, SIGNAL(clicked()), tb, SLOT(deleteLater()));
@@ -412,7 +414,21 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 }
 
 
+void RackWindow::deletePluginSwitchAction(QObject *action)
+{
+    QAction *act = qobject_cast<QAction *>(action);
+    QActionGroup *ag = act->actionGroup();
 
+    //make sure we have a checked action in the actiongroup after we delete this one
+    if (act == ag->checkedAction() && ag->actions().count() > 1) {
+        if (act == ag->actions().last()) {
+            ag->actions().at(ag->actions().count() - 2)->trigger();
+        } else {
+            ag->actions().at(ag->actions().indexOf(act) + 1)->trigger();
+        }
+    }
+    delete act;
+}
 
 
 //needs handling if we should delete the plugins or not and save there content

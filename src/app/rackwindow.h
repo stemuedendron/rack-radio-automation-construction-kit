@@ -51,6 +51,7 @@ private slots:
     void createPluginHost(int);
     void closePluginHost(QWidget *pluginHost);
     void loadPlugin(QWidget *pluginHost);
+    void deletePluginSwitchAction(QObject *action);
 
     void toggleFullscreen();
 
@@ -81,6 +82,7 @@ private:
     CoreImpl *m_coreImpl;
     RSplitter *m_mainSplitter;
     QSignalMapper *m_mapperLoadNewPlugin;
+    QSignalMapper *m_mapperClosePlugin;
     QSignalMapper *m_mapperClosePluginHost;
 
 };
