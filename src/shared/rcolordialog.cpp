@@ -41,14 +41,14 @@ RColorDialog::RColorDialog(QWidget *parent) :
             RPushButton *bt = new RPushButton;
             bt->setFixedSize(60,60);
 
-            connect(bt, SIGNAL(pressed()),SLOT(setColor()));
+            connect(bt, SIGNAL(clicked()),SLOT(setColor()));
             l->addWidget(bt, i, j);
         }
     RPushButton *closebt = new RPushButton;
 
     closebt->setFixedSize(60,60);
 
-    connect(closebt,SIGNAL(pressed()),SLOT(close()));
+    connect(closebt,SIGNAL(clicked()),SLOT(close()));
     l->addWidget(closebt,3,2);
     setLayout(l);
 

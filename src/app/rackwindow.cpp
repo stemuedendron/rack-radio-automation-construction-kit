@@ -26,6 +26,7 @@
 #include "rsplitter.h"
 #include "rpushbutton.h"
 #include "rblinkbutton.h"
+#include "rselectplugindialog.h"
 
 #include <QtGui>
 
@@ -50,23 +51,6 @@ RackWindow::RackWindow() :
     setCentralWidget(m_mainSplitter);
     createToolBars();
     createPluginHost(0);
-
-
-    //first test plugin widget list dialog
-
-//    QListWidget *pluginList = new QListWidget;
-//    pluginList->setParent(this, Qt::Dialog);
-//    pluginList->hide();
-//    pluginList->setWindowModality(Qt::ApplicationModal);
-//    QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), pluginList, SLOT(show()));
-
-
-
-
-
-
-    //////////////////////////////////////
-
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));
@@ -340,77 +324,86 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 #endif
     pluginsDir.cd("plugins");
 
-    QString fileName = pluginsDir.entryList(QDir::Files).first();
-    QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-    QObject *plugin = pluginLoader.instance();
+    QStringList pluginList = pluginsDir.entryList(QDir::Files);
+    bool ok;
+    int newPluginIndex = RSelectPluginDialog::getIndex(this, pluginList, &ok);
+    if (ok) {
 
-    if (plugin) {
-        IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
-        if (widgetPlugin) {
-            QWidget *newWidget = widgetPlugin->createRWidget(this, CoreImpl::instance());
 
-            //get pointers from pluginhost:
-            QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
-            QToolBar *pluginHostToolBar = qFindChild<QToolBar *>(pluginHost, "rackPluginHostToolBar");
-            QToolBar *pluginToolBar = (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
-            QSignalMapper *sm = qFindChild<QSignalMapper *>(pluginHost, "rackPluginSwitchMapper");
-            QActionGroup *ag = qFindChild<QActionGroup *>(pluginHostToolBar);
 
-            //add plugin widget to the widget stack:
-            pluginStack->setCurrentIndex(pluginStack->addWidget(newWidget));
+        QString fileName = pluginsDir.entryList(QDir::Files).at(newPluginIndex);
 
-            //create action for the toolbars:
-            QAction *act = new QAction(widgetPlugin->name(), ag);
-            act->setCheckable(true);
-            act->setChecked(true);
-            //qt bugfix: set transparent dummy icon to move button text down or right
-            act->setIcon(QIcon(":/images/transparent-icon.png"));
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
 
-            //create button for pluginhost toolbar:
-            QToolButton *tb = new QToolButton;
-            tb->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
-            tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            tb->setFocusPolicy(Qt::NoFocus);
-            tb->setDefaultAction(act);
-            RPushButton *settingsButton = new RPushButton;
-            settingsButton->setObjectName("rackPluginHostToolBarSettingsButton");
-            RPushButton *deleteButton = new RPushButton;
-            deleteButton->setObjectName("rackPluginHostToolBarDeleteButton");
-            QHBoxLayout *hl = new QHBoxLayout(tb);
-            hl->setSpacing(0);
-            hl->setContentsMargins(0,0,1,0);
-            hl->addStretch();
-            hl->addWidget(settingsButton);
-            hl->addWidget(deleteButton);
-            pluginHostToolBar->addWidget(tb);
+        if (plugin) {
+            IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
+            if (widgetPlugin) {
+                QWidget *newWidget = widgetPlugin->createRWidget(this, CoreImpl::instance());
 
-            //create button for plugin toolbar:
-            QToolButton *tb1 = new QToolButton;
-            tb1->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
-            tb1->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-            tb1->setFocusPolicy(Qt::NoFocus);
-            tb1->setDefaultAction(act);
-            pluginToolBar->addWidget(tb1);
+                //get pointers from pluginhost:
+                QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
+                QToolBar *pluginHostToolBar = qFindChild<QToolBar *>(pluginHost, "rackPluginHostToolBar");
+                QToolBar *pluginToolBar = (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+                QSignalMapper *sm = qFindChild<QSignalMapper *>(pluginHost, "rackPluginSwitchMapper");
+                QActionGroup *ag = qFindChild<QActionGroup *>(pluginHostToolBar);
 
-            //connect action trigger to PluginSwitchMapper;
-            QObject::connect(act, SIGNAL(triggered()), sm, SLOT(map()));
-            sm->setMapping(act, newWidget);
+                //add plugin widget to the widget stack:
+                pluginStack->setCurrentIndex(pluginStack->addWidget(newWidget));
 
-            //connect delete signal
-            //remove act from actiongroup and delete it:
-            QObject::connect(deleteButton, SIGNAL(clicked()), m_mapperClosePlugin, SLOT(map()));
-            m_mapperClosePlugin->setMapping(deleteButton, act);
-            QObject::connect(deleteButton, SIGNAL(clicked()), newWidget, SLOT(deleteLater()));
-            QObject::connect(deleteButton, SIGNAL(clicked()), tb1, SLOT(deleteLater()));
-            QObject::connect(deleteButton, SIGNAL(clicked()), tb, SLOT(deleteLater()));
+                //create action for the toolbars:
+                QAction *act = new QAction(widgetPlugin->name(), ag);
+                act->setCheckable(true);
+                act->setChecked(true);
+                //qt bugfix: set transparent dummy icon to move button text down or right
+                act->setIcon(QIcon(":/images/transparent-icon.png"));
 
-            //connect settings signal
-            //if (plugin has settings) ...
-            //QObject::connect(settingsButton, SIGNAL(clicked()),
+                //create button for pluginhost toolbar:
+                QToolButton *tb = new QToolButton;
+                tb->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
+                tb->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+                tb->setFocusPolicy(Qt::NoFocus);
+                tb->setDefaultAction(act);
+                RPushButton *settingsButton = new RPushButton;
+                settingsButton->setObjectName("rackPluginHostToolBarSettingsButton");
+                RPushButton *deleteButton = new RPushButton;
+                deleteButton->setObjectName("rackPluginHostToolBarDeleteButton");
+                QHBoxLayout *hl = new QHBoxLayout(tb);
+                hl->setSpacing(0);
+                hl->setContentsMargins(0,0,1,0);
+                hl->addStretch();
+                hl->addWidget(settingsButton);
+                hl->addWidget(deleteButton);
+                pluginHostToolBar->addWidget(tb);
 
+                //create button for plugin toolbar:
+                QToolButton *tb1 = new QToolButton;
+                tb1->setObjectName(QLatin1String(newWidget->metaObject()->className()) + "ToolButton");
+                tb1->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+                tb1->setFocusPolicy(Qt::NoFocus);
+                tb1->setDefaultAction(act);
+                pluginToolBar->addWidget(tb1);
+
+                //connect action trigger to PluginSwitchMapper;
+                QObject::connect(act, SIGNAL(triggered()), sm, SLOT(map()));
+                sm->setMapping(act, newWidget);
+
+                //connect delete signal
+                //remove act from actiongroup and delete it:
+                QObject::connect(deleteButton, SIGNAL(clicked()), m_mapperClosePlugin, SLOT(map()));
+                m_mapperClosePlugin->setMapping(deleteButton, act);
+                QObject::connect(deleteButton, SIGNAL(clicked()), newWidget, SLOT(deleteLater()));
+                QObject::connect(deleteButton, SIGNAL(clicked()), tb1, SLOT(deleteLater()));
+                QObject::connect(deleteButton, SIGNAL(clicked()), tb, SLOT(deleteLater()));
+
+                //connect settings signal
+                //if (plugin has settings) ...
+                //QObject::connect(settingsButton, SIGNAL(clicked()),
+
+            }
         }
+        else QMessageBox::information(this, "Error", "Could not load the plugin");
     }
-    else QMessageBox::information(this, "Error", "Could not load the plugin");
 }
 
 

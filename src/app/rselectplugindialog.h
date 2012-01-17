@@ -25,13 +25,15 @@
 
 #include <QDialog>
 
+class QListWidget;
+
 class RSelectPluginDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    explicit RSelectPluginDialog(QWidget *parent = 0);
+    explicit RSelectPluginDialog(const QStringList &plugins, QWidget *parent = 0);
     static int getIndex(QWidget *parent, const QStringList &plugins, bool *ok = 0);
 
 private slots:
@@ -40,7 +42,7 @@ private slots:
 
 private:
 
-    int m_index;
+    QListWidget *m_pluginList;
     
 };
 

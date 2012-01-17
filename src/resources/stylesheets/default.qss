@@ -418,9 +418,9 @@ RackWindow {
     border: 4px solid #FF0000;
     background-color: #CBCDCE;
     min-height: 400px;
-    max-height: 400px;
+/*    max-height: 400px; */
     min-width: 300px;
-    max-width: 300px;
+/*    max-width: 300px; */
 }
 
 
