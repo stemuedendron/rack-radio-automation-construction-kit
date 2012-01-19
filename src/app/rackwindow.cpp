@@ -32,6 +32,12 @@
 
 //TODO: method: delete one plugin
 
+//TODO: only one qpluginloader per plugin (use member e.g. QList pluginLibs)
+// create many pluginwidgets form this loader
+
+//BUG: if we load many plugins each in one pluginhost (splitter) then we have many toolbars
+//that mak the window width grown
+
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal)),
