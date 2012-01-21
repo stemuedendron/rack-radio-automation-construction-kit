@@ -118,6 +118,20 @@ void RackWindow::createToolBars()
     QObject::connect(this, SIGNAL(leaveSettingsMode()), mainToolBar, SLOT(show()));
 
 
+
+
+
+    /////////////////////////save tests
+    QAction *saveAct = new QAction(tr("Save"), this);
+    mainMenu->addAction(saveAct);
+    QObject::connect(saveAct, SIGNAL(triggered()), this, SLOT(savePluginHosts()));
+    ////////////////////////////
+
+
+
+
+
+
     //settings toolbar buttons:
     RPushButton *settingsOKButton = new RPushButton(tr("OK"));
     settingsOKButton->setObjectName("rackSettingsOKButton");
@@ -330,6 +344,9 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 #endif
     pluginsDir.cd("plugins");
 
+
+
+
     QStringList pluginList = pluginsDir.entryList(QDir::Files);
     bool ok;
     int newPluginIndex = RSelectPluginDialog::getIndex(this, pluginList, &ok);
@@ -339,8 +356,45 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
         QString fileName = pluginsDir.entryList(QDir::Files).at(newPluginIndex);
 
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = pluginLoader.instance();
+
+
+        //QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        //QObject *plugin = pluginLoader.instance();
+
+
+        ///test
+
+        QList<QPluginLoader *> loadedPlugins = qFindChildren<QPluginLoader *>(this);
+
+        QObject *plugin = 0;
+
+        for (int i = 0; i < loadedPlugins.size(); ++i) {
+            if (loadedPlugins.at(i)->fileName() == pluginsDir.absoluteFilePath(fileName)) {
+                plugin = loadedPlugins.at(i)->instance();
+                break;
+            }
+        }
+
+        if (!plugin) {
+            QPluginLoader *pluginLoader = new QPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+            plugin = pluginLoader->instance();
+        }
+
+
+        //debug code
+        qDebug() << "we have the following plugins loaded:";
+        QList<QPluginLoader *> debugPlugins = qFindChildren<QPluginLoader *>(this);
+        for (int i = 0; i < debugPlugins.size(); ++i) {
+            qDebug() << debugPlugins.at(i)->fileName();
+        }
+        //////////
+
+
+//        m_pluginLoader = new QPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+//        QObject *plugin = m_pluginLoader->instance();
+
+        /////////////////
+
 
         if (plugin) {
             IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
@@ -463,6 +517,17 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
         delete splitter;
     }
 
+
+    ///test
+//    if (m_pluginLoader->unload()) {
+
+//        delete m_pluginLoader;
+//        m_pluginLoader = 0;
+//        qDebug() << "unloaded";
+//    }
+
+    //////////////////
+
 //    QList<RSplitter *> splitters = qFindChildren<RSplitter *>(this);
 //    qDebug("splitter count: %d", splitters.size());
 }
@@ -546,71 +611,80 @@ void RackWindow::savePluginHosts()
     QSettings settings("RadioFrei", "Layouts");
     settings.clear();
 
-    QObjectList allObj = children();
-
-    QList<RSplitter*> allsplitters;
-
-    for (int i = 0; i < children().count(); ++i)
+    QList<QObject *> allObjects = qFindChildren<QObject *>(this);
+    settings.setValue("Alle-Objekte", allObjects.count());
+    for (int i = 0; i < allObjects.count(); ++i)
     {
-       settings.setValue(children().at(i)->metaObject()->className(), "nix");
+       settings.setValue(allObjects.at(i)->metaObject()->className(), QString::number(i));
       //  if (qobject_cast<RSplitter *>(children().at(i))) allsplitters << qobject_cast<RSplitter *>(children().at(i));
     }
 
-    settings.setValue("AlleSplitter",allsplitters.count());
-    settings.setValue("Alle", allObj.count());
 
-    QList<QWidget *> allWidgets = qFindChildren<QWidget *>(this);
+//    QObjectList allObj = children();
 
-    for (int i = 0; i < allWidgets.count(); ++i)
-    {
-        settings.setValue(allWidgets.at(i)->metaObject()->className(), i);
-    }
+//    QList<RSplitter*> allsplitters;
 
-    settings.beginWriteArray("widgets");
+//    for (int i = 0; i < children().count(); ++i)
+//    {
+//       settings.setValue(children().at(i)->metaObject()->className(), "nix");
+//      //  if (qobject_cast<RSplitter *>(children().at(i))) allsplitters << qobject_cast<RSplitter *>(children().at(i));
+//    }
 
-    for (int i = 0; i < allObj.count(); ++i)
-    {
-      settings.setArrayIndex(i);
-      settings.setValue(allObj.at(i)->metaObject()->className(), "nix");
-    }
-     settings.endArray();
+//    settings.setValue("AlleSplitter",allsplitters.count());
+//    settings.setValue("Alle", allObj.count());
 
-     settings.beginGroup("splitters/test");
 
-     // foreach (QObject* child, children()) settings.setValue(child->metaObject()->className(), child->parent()->metaObject()->className());
 
-     settings.setValue("rwigetcount",allObj.count());
-     settings.endGroup();
 
-     //nothing to save here but the plugins inside the rMain RWidget
-     //    if (count() == 1)
-     //    {
 
-     //    }
-     //    //we have at least 2 Rwidgets
-     //    else
-     //    {
+//    QList<QWidget *> allWidgets = qFindChildren<QWidget *>(this);
 
-     //    }
-     //get the root widget if we have more than one rwidget (if it is rsplitter):
-     RSplitter *root = qobject_cast<RSplitter *>(layout()->itemAt(0)->widget());
-     if (root)
-     {
 
-         settings.setValue("splitterSizes", root->saveState());
+//    for (int i = 0; i < allWidgets.count(); ++i)
+//    {
+//        settings.setValue(allWidgets.at(i)->metaObject()->className(), i);
+//    }
 
-         saveSplittertoXML(root);
-         saveSplitter(root);
-     }
+//    settings.beginWriteArray("widgets");
+
+//    for (int i = 0; i < allObj.count(); ++i)
+//    {
+//      settings.setArrayIndex(i);
+//      settings.setValue(allObj.at(i)->metaObject()->className(), "nix");
+//    }
+//     settings.endArray();
+
+//     settings.beginGroup("splitters/test");
+
+//     // foreach (QObject* child, children()) settings.setValue(child->metaObject()->className(), child->parent()->metaObject()->className());
+
+//     settings.setValue("rwigetcount",allObj.count());
+//     settings.endGroup();
+
+//     //nothing to save here but the plugins inside the rMain RWidget
+//     //    if (count() == 1)
+//     //    {
+
+//     //    }
+//     //    //we have at least 2 Rwidgets
+//     //    else
+//     //    {
+
+//     //    }
+//     //get the root widget if we have more than one rwidget (if it is rsplitter):
+//     RSplitter *root = qobject_cast<RSplitter *>(layout()->itemAt(0)->widget());
+//     if (root)
+//     {
+
+//         settings.setValue("splitterSizes", root->saveState());
+
+//         saveSplittertoXML(root);
+//         saveSplitter(root);
+//     }
 
 }
 
 //Variante 1: XML mit QSettings schreiben und splitter.state sichern:
-/**
- * @brief
- *
- * @param splitter
- */
 void RackWindow::saveSplitter(RSplitter *splitter)
 {
     QString setting;
@@ -626,12 +700,6 @@ void RackWindow::saveSplitter(RSplitter *splitter)
     settings.setValue("layout", setting);
 }
 
-/**
- * @brief
- *
- * @param obj
- * @param xml
- */
 void RackWindow::saveSplitterItem(QObject *obj, QXmlStreamWriter *xml)
 {
     QString className = obj->metaObject()->className();
@@ -651,12 +719,6 @@ void RackWindow::saveSplitterItem(QObject *obj, QXmlStreamWriter *xml)
 
 
 //Variante 2: XML in eigene Datei schreiben und orientation und sizes extra sichern:
-
-/**
- * @brief
- *
- * @param splitter
- */
 void RackWindow::saveSplittertoXML(RSplitter *splitter)
 {
     QXmlStreamWriter xml;
@@ -677,13 +739,6 @@ void RackWindow::saveSplittertoXML(RSplitter *splitter)
     xml.writeEndDocument();
 }
 
-
-/**
- * @brief
- *
- * @param obj
- * @param xml
- */
 void RackWindow::saveSplitterItemtoXML(QObject *obj, QXmlStreamWriter *xml)
 {
     QString className = obj->metaObject()->className();

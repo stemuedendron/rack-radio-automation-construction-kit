@@ -32,8 +32,8 @@ RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
        m_pushed(false)
  {
 
-     QFontDatabase fontDB;
-     fontDB.addApplicationFont(":/fonts/digital-7.ttf");
+//     QFontDatabase fontDB;
+//     fontDB.addApplicationFont(":/fonts/digital-7.ttf");
 
      //connect to api
      QObject::connect(m_core, SIGNAL(dateStrChanged(QString)), this, SLOT(setDate(QString)));
@@ -108,7 +108,7 @@ RDigitalClock::RDigitalClock(QWidget *parent, ICore *api)
      painter.scale(width() / 100, width() / 100);
 
      //FIXME: use stylesheet
-     painter.setFont(QFont("Digital-7", 16));
+     //painter.setFont(QFont("Digital-7", 16));
 
      QString label;
 
