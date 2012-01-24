@@ -27,11 +27,6 @@
 #include <QObject>
 #include <QBasicTimer>
 
-
-/**
- * @brief
- *
- */
 struct audiodevice
 {
     int engineIndex;
@@ -41,21 +36,14 @@ struct audiodevice
     QString userComment;
 };
 
-/**
- * @brief
- *
- */
 class RPlayer : public QObject
 {
     Q_OBJECT
     Q_ENUMS(State)
+    Q_PROPERTY(QString uri READ uri WRITE setURI)
 
 public:
 
-    /**
-     * @brief
-     *
-     */
     enum State
     {
         LoadingState,
@@ -75,139 +63,35 @@ public:
      */
     explicit RPlayer(QObject *parent = 0, int device = 0);
 
-    /**
-     * @brief
-     *
-     */
     ~RPlayer();
 
-    /**
-     * @brief
-     *
-     */
     State getState() const {return m_state;}
 
-
-    /**
-     * @brief
-     *
-     */
     static bool init(int device);
-
-    /**
-     * @brief
-     *
-     */
     static bool free(int device);
-
-    /**
-     * @brief
-     *
-     */
     static QList<audiodevice> getDevices();
+
+    QString uri() const {return m_uri;}
+    void setURI(const QString &uri) {m_uri = uri;}
 
 
 public slots:
 
-    /**
-     * @brief
-     *
-     * @param int
-     */
     void setDevice(int);
-
-    /**
-     * @brief
-     *
-     * @param float
-     */
     void setVolume(float);
-
-    /**
-     * @brief
-     *
-     * @param DWORD
-     */
     void setFadeInTime(DWORD);
-
-    /**
-     * @brief
-     *
-     * @param DWORD
-     */
     void setFadeOutTime(DWORD);
-
-    /**
-     * @brief
-     *
-     * @param QString
-     */
-    void setURI(const QString &);
-
-    /**
-     * @brief
-     *
-     */
+//    void setURI(const QString &);
     void play();
-
-    /**
-     * @brief
-     *
-     */
     void pause();
-
-    /**
-     * @brief
-     *
-     */
     void stop();
-
-    /**
-     * @brief
-     *
-     */
     void fadeOut();
-
-    /**
-     * @brief
-     *
-     */
     void fadeIn();
-
-    /**
-     * @brief
-     *
-     */
     void playPause();
-
-    /**
-     * @brief
-     *
-     */
     void playStop();
-
-    /**
-     * @brief
-     *
-     */
     void playFadeOut();
-
-    /**
-     * @brief
-     *
-     */
     void fadeInStop();
-
-    /**
-     * @brief
-     *
-     */
     void fadeInPause();
-
-    /**
-     * @brief
-     *
-     */
     void fadeInFadeOut();
 
 signals:
@@ -235,11 +119,6 @@ signals:
 
 protected:
 
-    /**
-     * @brief
-     *
-     * @param event
-     */
     void timerEvent(QTimerEvent *event);
 
 private:
@@ -252,6 +131,10 @@ private:
     DWORD m_fadeOutTime; /**< TODO */
     bool m_isFadingOut; /**< TODO */
     QBasicTimer m_timer; /**< TODO */
+
+    QString m_uri;
+
+
 
 };
 

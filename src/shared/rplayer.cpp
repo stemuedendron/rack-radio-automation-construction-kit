@@ -161,27 +161,27 @@ void RPlayer::setDevice(int device)
     if (BASS_ChannelSetDevice(m_stream, device)) m_device = device;
 }
 
-void RPlayer::setURI(const QString &uri)
-{
-    //FIXME maybe this is wrong! if a plugin load its audio files while no device is available,
-    //it fails! we should change the device context somewhere else (channelsetdevice?)
+//void RPlayer::setURI(const QString &uri)
+//{
+//    //FIXME maybe this is wrong! if a plugin load its audio files while no device is available,
+//    //it fails! we should change the device context somewhere else (channelsetdevice?)
 
-    //other way: the plugin first must check the device and then load its audio, maybe better?
+//    //other way: the plugin first must check the device and then load its audio, maybe better?
 
-    if (BASS_SetDevice(m_device))
-    {
-        if (m_stream) BASS_StreamFree(m_stream);
-        m_stream = BASS_StreamCreateFile(false, qPrintable(uri), 0, 0, 0);
-        if (m_stream)
-        {
-            BASS_ChannelSetSync(m_stream, BASS_SYNC_END, 0, &stopSyncProc, this);
-            emit time(qint64(BASS_ChannelBytes2Seconds(m_stream, BASS_ChannelGetLength(m_stream, BASS_POS_BYTE))*1000));
-            m_state = StoppedState;
-        }
-        else m_state = ErrorState;
-        emit stateChanged();
-    }
-}
+//    if (BASS_SetDevice(m_device))
+//    {
+//        if (m_stream) BASS_StreamFree(m_stream);
+//        m_stream = BASS_StreamCreateFile(false, qPrintable(uri), 0, 0, 0);
+//        if (m_stream)
+//        {
+//            BASS_ChannelSetSync(m_stream, BASS_SYNC_END, 0, &stopSyncProc, this);
+//            emit time(qint64(BASS_ChannelBytes2Seconds(m_stream, BASS_ChannelGetLength(m_stream, BASS_POS_BYTE))*1000));
+//            m_state = StoppedState;
+//        }
+//        else m_state = ErrorState;
+//        emit stateChanged();
+//    }
+//}
 
 void RPlayer::setVolume(float vol)
 {
@@ -201,13 +201,37 @@ void RPlayer::setFadeOutTime(DWORD time)
 
 void RPlayer::play()
 {
-    if (BASS_ChannelPlay(m_stream, false))
+    if (BASS_SetDevice(m_device))
     {
-        m_timer.start(50, this);
-        m_state = PlayingState;
+        if (m_stream) BASS_StreamFree(m_stream);
+        m_stream = BASS_StreamCreateFile(false, qPrintable(m_uri), 0, 0, 0);
+        if (m_stream)
+        {
+            BASS_ChannelSetSync(m_stream, BASS_SYNC_END, 0, &stopSyncProc, this);
+            emit time(qint64(BASS_ChannelBytes2Seconds(m_stream, BASS_ChannelGetLength(m_stream, BASS_POS_BYTE))*1000));
+
+            if (BASS_ChannelPlay(m_stream, false))
+            {
+                m_timer.start(50, this);
+                m_state = PlayingState;
+            }
+            else m_state = ErrorState;
+            emit stateChanged();
+        }
+        else m_state = ErrorState;
+        emit stateChanged();
     }
-    else m_state = ErrorState;
-    emit stateChanged();
+
+
+// old implementation:
+
+//    if (BASS_ChannelPlay(m_stream, false))
+//    {
+//        m_timer.start(50, this);
+//        m_state = PlayingState;
+//    }
+//    else m_state = ErrorState;
+//    emit stateChanged();
 }
 
 void RPlayer::pause()
