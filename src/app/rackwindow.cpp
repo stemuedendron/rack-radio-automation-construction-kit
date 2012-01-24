@@ -358,27 +358,27 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
 
 
-        //QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-        //QObject *plugin = pluginLoader.instance();
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
 
 
         ///test
 
-        QList<QPluginLoader *> loadedPlugins = qFindChildren<QPluginLoader *>(this);
+//        QList<QPluginLoader *> loadedPlugins = qFindChildren<QPluginLoader *>(this);
 
-        QObject *plugin = 0;
+//        QObject *plugin = 0;
 
-        for (int i = 0; i < loadedPlugins.size(); ++i) {
-            if (loadedPlugins.at(i)->fileName() == pluginsDir.absoluteFilePath(fileName)) {
-                plugin = loadedPlugins.at(i)->instance();
-                break;
-            }
-        }
+//        for (int i = 0; i < loadedPlugins.size(); ++i) {
+//            if (loadedPlugins.at(i)->fileName() == pluginsDir.absoluteFilePath(fileName)) {
+//                plugin = loadedPlugins.at(i)->instance();
+//                break;
+//            }
+//        }
 
-        if (!plugin) {
-            QPluginLoader *pluginLoader = new QPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
-            plugin = pluginLoader->instance();
-        }
+//        if (!plugin) {
+//            QPluginLoader *pluginLoader = new QPluginLoader(pluginsDir.absoluteFilePath(fileName), this);
+//            plugin = pluginLoader->instance();
+//        }
 
 
         //debug code
@@ -387,6 +387,8 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
         for (int i = 0; i < debugPlugins.size(); ++i) {
             qDebug() << debugPlugins.at(i)->fileName();
         }
+
+
         //////////
 
 
@@ -618,6 +620,8 @@ void RackWindow::savePluginHosts()
        settings.setValue(allObjects.at(i)->metaObject()->className(), QString::number(i));
       //  if (qobject_cast<RSplitter *>(children().at(i))) allsplitters << qobject_cast<RSplitter *>(children().at(i));
     }
+
+
 
 
 //    QObjectList allObj = children();
