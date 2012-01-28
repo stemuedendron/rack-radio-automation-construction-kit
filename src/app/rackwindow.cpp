@@ -271,7 +271,8 @@ void RackWindow::createPluginHost(int position)
 
 
     //insert new pluginhost widget in splitter, create new splitter if necessary
-    if (position == 0) {
+    if (position == 0)
+    {
         m_mainSplitter->addWidget(pluginHost);
         return;
     }
@@ -398,9 +399,11 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
         /////////////////
 
 
-        if (plugin) {
+        if (plugin)
+        {
             IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
-            if (widgetPlugin) {
+            if (widgetPlugin)
+            {
                 QWidget *newWidget = widgetPlugin->createRWidget(this, CoreImpl::instance());
 
                 //get pointers from pluginhost:
@@ -476,9 +479,12 @@ void RackWindow::deletePluginSwitchAction(QObject *action)
 
     //make sure we have a checked action in the actiongroup after we delete this one
     if (act == ag->checkedAction() && ag->actions().count() > 1) {
-        if (act == ag->actions().last()) {
+        if (act == ag->actions().last())
+        {
             ag->actions().at(ag->actions().count() - 2)->trigger();
-        } else {
+        }
+        else
+        {
             ag->actions().at(ag->actions().indexOf(act) + 1)->trigger();
         }
     }
