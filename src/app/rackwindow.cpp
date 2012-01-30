@@ -489,6 +489,7 @@ void RackWindow::deletePluginSwitchAction(QObject *action)
         }
     }
     delete act;
+    act = 0;
 }
 
 
@@ -512,17 +513,22 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
             widgetsizes.removeAt(senderpos + 1);
         }
         delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+        pluginHost->setProperty("pluginToolBar", 0);
         delete pluginHost;
+        pluginHost = 0;
         splitter->setSizes(widgetsizes);
     }
     else {
         delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+        pluginHost->setProperty("pluginToolBar", 0);
         delete pluginHost;
+        pluginHost = 0;
     }
     if (splitter->count()==1 && parentSplitter)
     {
         parentSplitter->insertWidget(parentSplitter->indexOf(splitter), splitter->widget(0));
         delete splitter;
+        splitter = 0;
     }
 
 
