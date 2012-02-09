@@ -24,6 +24,7 @@
 #include "rackwindow.h"
 
 #include <QTime>
+#include <QFileSystemModel>
 
 // The Core Singleton, access only from app classes
 // plugins get a pointer to core api
@@ -36,15 +37,33 @@ ICore *ICore::instance()
 
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
-    m_mainwindow(mainwindow)
+    m_mainwindow(mainwindow),
+    m_fileSystemModel(new QFileSystemModel(this))
 {
     m_instance = this;
+
+    //create models:
+    QStringList filters;
+    filters << "*.mp3" << "*.ogg" << "*.wav";
+    m_fileSystemModel->setRootPath("/");
+    m_fileSystemModel->setNameFilters(filters);
+    m_fileSystemModel->setNameFilterDisables(false);
+    m_fileSystemModel->sort(Qt::AscendingOrder);
+
+    m_modelList.append(m_fileSystemModel);
+
+
     startTimer(1000);
 }
 
 CoreImpl::~CoreImpl()
 {
     m_instance = 0;
+}
+
+QList<QAbstractItemModel *> CoreImpl::modelList() const
+{
+    return m_modelList;
 }
 
 void CoreImpl::timerEvent(QTimerEvent *)

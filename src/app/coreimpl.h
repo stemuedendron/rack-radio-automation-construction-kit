@@ -26,6 +26,7 @@
 #include "icore.h"
 
 class RackWindow;
+class QFileSystemModel;
 
 class CoreImpl : public ICore
 {
@@ -36,6 +37,8 @@ public:
     CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
+    QList<QAbstractItemModel *> modelList() const;
+
 public slots:
 
     void getHello(const QString &);
@@ -43,6 +46,11 @@ public slots:
 private:
 
     RackWindow *m_mainwindow;
+
+    QList<QAbstractItemModel *> m_modelList;
+
+    //core implemented models to be used in plugin widgets
+    QFileSystemModel *m_fileSystemModel;
 
     //maybe we need this?
     //friend class RackWindow;

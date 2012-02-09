@@ -25,6 +25,7 @@
 
 #include <QObject>
 
+class QAbstractItemModel;
 
 //this is the rack core api interface
 class ICore : public QObject
@@ -37,6 +38,8 @@ public:
     virtual ~ICore() {}
 
     static ICore *instance();
+
+    virtual QList<QAbstractItemModel *> modelList() const = 0;
 
 public slots:
 
