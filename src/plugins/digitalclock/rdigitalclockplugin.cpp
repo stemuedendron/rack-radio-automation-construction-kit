@@ -26,11 +26,11 @@
 
 
 QWidget *RDigitalClockPlugin::createRWidget(QWidget *parent, ICore *api)
- {
+{
 
     return new RDigitalClock(parent, api);
 
- }
+}
 
 
 Q_EXPORT_PLUGIN2(rdigitalclockplugin, RDigitalClockPlugin)

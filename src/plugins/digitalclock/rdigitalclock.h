@@ -51,7 +51,7 @@ protected:
 
 private:
 
-    ICore* m_core;
+    ICore *m_core;
     bool m_pushed;
     QString m_date;
     QString m_time;

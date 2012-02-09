@@ -44,5 +44,6 @@
         <file>images/radioclock.png</file>
         <file>images/hotkeys-hover.png</file>
         <file>images/hotkeys.png</file>
+        <file>images/folder.png</file>
     </qresource>
 </RCC>

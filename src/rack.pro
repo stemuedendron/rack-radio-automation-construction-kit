@@ -23,8 +23,9 @@
 TEMPLATE    = subdirs
 SUBDIRS     = app \
               plugins/digitalclock \
-              plugins/radioclock \
               plugins/hotkeywidget \
+              plugins/librarywidget \
+              plugins/radioclock \
               plugins/webbrowser \
               tests/rplayertest \
               tests/colordialog
