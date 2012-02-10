@@ -1,8 +1,8 @@
 #include "rsortfilterproxymodel.h"
 
-RSortFilterProxyModel::RSortFilterProxyModel() :
+RSortFilterProxyModel::RSortFilterProxyModel(QObject *parent) :
     QSortFilterProxyModel(parent),
-    m_sourceRoot(0)
+    m_sourceRoot()
 {
 }
 
