@@ -27,7 +27,7 @@
 int main(int argc, char *argv[])
 {
 
-//    QApplication::setStyle(new QWindowsStyle);
+    QApplication::setStyle(new QWindowsStyle);
     QApplication app(argc, argv);
     app.setOrganizationName("Radio F.R.E.I.");
     app.setApplicationName("r.a.c.k. - Radio Automation Construction Kit");

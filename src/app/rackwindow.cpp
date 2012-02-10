@@ -54,6 +54,7 @@ RackWindow::RackWindow() :
     QString styleSheet = QLatin1String(file.readAll());
     setStyleSheet(styleSheet);
 
+    m_mainSplitter->setObjectName("rackMainSplitter");
     setCentralWidget(m_mainSplitter);
     createToolBars();
     createPluginHost(0);

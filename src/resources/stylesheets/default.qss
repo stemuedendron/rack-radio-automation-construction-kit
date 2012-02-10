@@ -30,7 +30,6 @@ rack colors gradients 1-9 over colordialog buttons properties
 
 */
 
-
 /* Icons for plugin widgets follow the rule: classname + ToolButton */
 
 /* this is a fallback if no image is provided and MUST be before real images: */
@@ -67,6 +66,11 @@ QToolButton#RHotKeyWidgetToolButton {
 }
 QToolButton#RHotKeyWidgetToolButton:hover {
     image: url(:/images/hotkeys-hover.png);
+}
+
+
+#rackMainSplitter {
+    margin: 2px;
 }
 
 /*todo: communicate over radius property to set the widget mask to round rect with style sheet radius*/
@@ -596,8 +600,8 @@ QPushButton:pressed {
 
 #rackFooterButton {
     min-width: 96px;
-    min-height: 34px;
-    max-height: 34px;
+    min-height: 32px;
+    max-height: 32px;
 }
 
 
@@ -693,9 +697,10 @@ QPushButton:pressed {
 /*Library Widget*/
 
 [isFolder="true"]#rackLibraryViewButton {
-    image: url(:/images/folder.png);
-    image-position: left center;
-    padding-left: 5px;
+    background-image: url(:/images/folder.png);
+    background-repeat: none;
+    background-position: center left;
+    padding-left: 52px;
 }
 
 [isFolder="true"]#rackLibraryViewButton:pressed {
@@ -717,6 +722,9 @@ QPushButton:pressed {
     min-height: 60px;
     min-width: 60px;
     color: #FFFFFF;
+    text-align: left;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 /*End Library Widget*/
