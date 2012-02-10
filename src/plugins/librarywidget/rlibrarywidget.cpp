@@ -29,6 +29,7 @@
 RLibraryWidget::RLibraryWidget(QWidget *parent, ICore *api) :
     QWidget(parent),
     m_core(api),
+    m_model(0),
     m_folderButtonView(new RLibraryFolderButtonView)
 {
 
@@ -45,7 +46,6 @@ RLibraryWidget::RLibraryWidget(QWidget *parent, ICore *api) :
         m_folderButtonView->setRootIndex(model->index(model->rootPath()));
     }
 
-
     QObject::connect(m_folderButtonView, SIGNAL(clicked(QModelIndex)), this, SLOT(listClicked(QModelIndex)));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -58,12 +58,8 @@ RLibraryWidget::RLibraryWidget(QWidget *parent, ICore *api) :
 
 void RLibraryWidget::listClicked(const QModelIndex &index)
 {
-    QFileSystemModel *model = qobject_cast<QFileSystemModel *>(m_model);
-    if (model)
+    if (m_model->hasChildren(index))
     {
-        if (model->isDir(index))
-        {
-            m_folderButtonView->setRootIndex(index);
-        }
+        m_folderButtonView->setRootIndex(index);
     }
 }

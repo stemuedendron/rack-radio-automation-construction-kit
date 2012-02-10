@@ -215,11 +215,11 @@ void RLibraryFolderButtonView::buttonClicked()
 void RLibraryFolderButtonView::oneLevelUp()
 {
 
-    QFileSystemModel *model = qobject_cast<QFileSystemModel *>(m_model);
-    if (model)
-    {
-        if (m_root == model->index(model->rootPath())) return;
-    }
+//    QFileSystemModel *model = qobject_cast<QFileSystemModel *>(m_model);
+//    if (model)
+//    {
+//        if (m_root == model->index(model->rootPath())) return;
+//    }
 
     if (m_model->parent(m_root).isValid())
     {
