@@ -44,7 +44,7 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 
     //create models:
     QStringList filters;
-    filters << "*.mp3" << "*.ogg" << "*.wav";
+    filters << "*.wav" << "*.ogg" << "*.aiff" << "*.mp3" << "*.mp2" << "*.mp1" << "*.mus";
     m_fileSystemModel->setRootPath("/");
     m_fileSystemModel->setNameFilters(filters);
     m_fileSystemModel->setNameFilterDisables(false);
