@@ -29,7 +29,7 @@
 class QAbstractItemModel;
 class QModelIndex;
 class RPushButton;
-class QTimer;
+class RLibraryButton;
 
 class RLibraryFolderButtonView : public QWidget
 {
@@ -87,7 +87,7 @@ private:
     int m_cols;
     int m_currentPage;
 
-    RPushButton *createOneButton();
+    RLibraryButton *createOneButton();
 
 };
 

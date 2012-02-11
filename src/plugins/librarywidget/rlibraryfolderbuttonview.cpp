@@ -22,6 +22,7 @@
 
 #include "rlibraryfolderbuttonview.h"
 #include "rpushbutton.h"
+#include "rlibrarybutton.h"
 #include <QtGui>
 
 RLibraryFolderButtonView::RLibraryFolderButtonView(QWidget *parent) :
@@ -119,7 +120,8 @@ void RLibraryFolderButtonView::updateButtonCount()
     if (newRows == m_rows && newCols == m_cols) return;
 
     m_buttons->setUpdatesEnabled(false);
-    qDeleteAll(m_buttons->findChildren<QObject *>());
+    qDeleteAll(m_buttons->findChildren<RLibraryButton *>());
+    delete m_buttons->layout();
     m_buttons->setUpdatesEnabled(true);
     QGridLayout *newLayout = new QGridLayout(m_buttons);
     newLayout->setSpacing(3);
@@ -128,7 +130,7 @@ void RLibraryFolderButtonView::updateButtonCount()
     {
         for (int col = 0; col < newCols; col++)
         {
-            RPushButton *b = createOneButton();
+            RLibraryButton *b = createOneButton();
             newLayout->addWidget(b, row, col);
         }
     }
@@ -146,9 +148,9 @@ void RLibraryFolderButtonView::updateButtonCount()
 
 }
 
-RPushButton *RLibraryFolderButtonView::createOneButton()
+RLibraryButton *RLibraryFolderButtonView::createOneButton()
 {
-    RPushButton *b = new RPushButton;
+    RLibraryButton *b = new RLibraryButton;
     b->setObjectName("rackLibraryViewButton");
     b->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
@@ -175,7 +177,7 @@ void RLibraryFolderButtonView::setButtonData()
 
     for (int i = 0; i < m_buttons->layout()->count(); i++)
     {
-        RPushButton *button = qobject_cast<RPushButton *>(m_buttons->layout()->itemAt(i)->widget());
+        RLibraryButton *button = qobject_cast<RLibraryButton *>(m_buttons->layout()->itemAt(i)->widget());
         button->setProperty("isFolder", false);
 
         if (m_model->hasIndex(i + indexOffset, 0, m_root))
@@ -203,7 +205,7 @@ void RLibraryFolderButtonView::buttonClicked()
 {
     if (!m_model) return;
 
-    RPushButton *button = qobject_cast<RPushButton *>(sender());
+    RLibraryButton *button = qobject_cast<RLibraryButton *>(sender());
     int buttonIndex = m_buttons->layout()->indexOf(button) + m_currentPage * m_buttons->layout()->count();
 
     if (m_model->hasIndex(buttonIndex, 0, m_root))

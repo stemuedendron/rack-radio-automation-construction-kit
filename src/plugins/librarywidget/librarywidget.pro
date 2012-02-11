@@ -30,13 +30,15 @@ HEADERS = \
     rlibrarywidget.h \
     rlibrarywidgetplugin.h \
     ../../shared/rpushbutton.h \
-    rlibraryfolderbuttonview.h
+    rlibraryfolderbuttonview.h \
+    rlibrarybutton.h
 
 SOURCES = \
     rlibrarywidget.cpp \
     rlibrarywidgetplugin.cpp \
     ../../shared/rpushbutton.cpp \
-    rlibraryfolderbuttonview.cpp
+    rlibraryfolderbuttonview.cpp \
+    rlibrarybutton.cpp
 
 TARGET = $$qtLibraryTarget(librarywidgetplugin)
 
