@@ -73,6 +73,13 @@ QToolButton#RHotKeyWidgetToolButton:hover {
     margin: 2px;
 }
 
+#rackAddPluginWidgetButton {
+    color: #000000;
+    font-size: 12px;
+    padding: 8px;
+}
+
+
 /*todo: communicate over radius property to set the widget mask to round rect with style sheet radius*/
 RColorDialog {
     background-color: lightgray;
