@@ -26,6 +26,7 @@
 #include <QObject>
 
 class QAbstractItemModel;
+class QItemSelection;
 
 //this is the rack core api interface
 class ICore : public QObject
@@ -40,6 +41,13 @@ public:
     static ICore *instance();
 
     virtual QList<QAbstractItemModel *> modelList() const = 0;
+
+
+    //plugins store there selection(s) here and have to make sure
+    //the selection is property cleared
+
+    //if we only want one item to be inserted just use a QModelIndex
+    QItemSelection currentItemSelection;
 
 public slots:
 
