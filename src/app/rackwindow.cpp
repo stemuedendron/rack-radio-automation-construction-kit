@@ -36,7 +36,7 @@
 // create many pluginwidgets form this loader
 
 //BUG: if we load many plugins each in one pluginhost (splitter) then we have many toolbars
-//that mak the window width grown
+//that make the window width grown
 
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
@@ -105,11 +105,20 @@ void RackWindow::createToolBars()
     mainToolBar->addWidget(deleteButton);
     mainToolBar->addWidget(previewButton);
 
+
+
+
+
     //make own exclusiv handling in which all buttons can be unchecked:
     QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
     QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
     QObject::connect(deleteButton, SIGNAL(pressed()), previewButton, SLOT(setUnchecked()));
     QObject::connect(previewButton, SIGNAL(pressed()), deleteButton, SLOT(setUnchecked()));
+
+
+
+
+
 
     //main toolbar signals & slots:
     QObject::connect(fullscreenAct, SIGNAL(triggered(bool)), this, SLOT(toggleFullscreen()));

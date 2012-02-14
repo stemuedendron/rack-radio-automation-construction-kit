@@ -27,6 +27,8 @@
 int main(int argc, char *argv[])
 {
 
+    //TODO: read carefully QApplication and Qt Namespace docs!!!!
+
     QApplication::setStyle(new QWindowsStyle);
     QApplication app(argc, argv);
     app.setOrganizationName("Radio F.R.E.I.");

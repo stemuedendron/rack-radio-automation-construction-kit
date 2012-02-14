@@ -30,7 +30,8 @@ SOURCES += \
     rselectplugindialog.cpp \
     ../shared/rpushbutton.cpp \
     ../shared/rblinkbutton.cpp \
-    rsortfilterproxymodel.cpp
+    rsortfilterproxymodel.cpp \
+    rpreviewwidget.cpp
 
 HEADERS += \
     coreimpl.h \
@@ -41,7 +42,8 @@ HEADERS += \
     ../libs/extensionsystem/iwidgetplugin.h \
     ../shared/rpushbutton.h \
     ../shared/rblinkbutton.h \
-    rsortfilterproxymodel.h
+    rsortfilterproxymodel.h \
+    rpreviewwidget.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

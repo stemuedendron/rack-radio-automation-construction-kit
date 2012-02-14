@@ -38,6 +38,16 @@ public:
     ICore() {}
     virtual ~ICore() {}
 
+    enum State
+    {
+        NormalState,
+        InsertState,
+        PreviewState,
+        DeleteState
+    };
+
+    virtual State state() const = 0;
+
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
 
@@ -49,9 +59,19 @@ public:
 
 public slots:
 
+    virtual void setNormalState() = 0;
+    virtual void setInsertState() = 0;
+    virtual void setPreviewState() = 0;
+    virtual void setDeleteState() = 0;
+
     virtual void getHello(const QString &) = 0;
 
 signals:
+
+    void normalStateEntered();
+    void insertStateEntered();
+    void previewStateEntered();
+    void deleteStateEntered();
 
     void timeStrChanged(QString);
     void dateStrChanged(QString);

@@ -29,6 +29,7 @@
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
+    m_state(NormalState),
     m_fileSystemModel(new QFileSystemModel(this))
 {
 
@@ -50,6 +51,36 @@ CoreImpl::~CoreImpl()
 {
 
 }
+
+ICore::State CoreImpl::state() const
+{
+    return m_state;
+}
+
+void CoreImpl::setNormalState()
+{
+    m_state = NormalState;
+    emit normalStateEntered();
+}
+
+void CoreImpl::setInsertState()
+{
+    m_state = InsertState;
+    emit insertStateEntered();
+}
+
+void CoreImpl::setPreviewState()
+{
+    m_state = PreviewState;
+    emit previewStateEntered();
+}
+
+void CoreImpl::setDeleteState()
+{
+    m_state = DeleteState;
+    emit deleteStateEntered();
+}
+
 
 QList<QAbstractItemModel *> CoreImpl::modelList() const
 {

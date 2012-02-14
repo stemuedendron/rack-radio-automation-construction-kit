@@ -37,15 +37,24 @@ public:
     CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
+    State state() const;
+
     QList<QAbstractItemModel *> modelList() const;
 
 public slots:
+
+    void setNormalState();
+    void setInsertState();
+    void setPreviewState();
+    void setDeleteState();
 
     void getHello(const QString &);
 
 private:
 
     RackWindow *m_mainwindow;
+
+    State m_state;
 
     QList<QAbstractItemModel *> m_modelList;
 
