@@ -38,16 +38,14 @@ public:
     ICore() {}
     virtual ~ICore() {}
 
-    static ICore *instance();
-
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
 
     //plugins store there selection(s) here and have to make sure
-    //the selection is property cleared
+    //the selection is properly cleared
 
     //if we only want one item to be inserted just use a QModelIndex
-    QItemSelection currentItemSelection;
+    //QItemSelection currentItemSelection;
 
 public slots:
 

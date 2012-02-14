@@ -26,21 +26,11 @@
 #include <QTime>
 #include <QFileSystemModel>
 
-// The Core Singleton, access only from app classes
-// plugins get a pointer to core api
-static CoreImpl *m_instance = 0;
-
-ICore *ICore::instance()
-{
-    return m_instance;
-}
-
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
     m_fileSystemModel(new QFileSystemModel(this))
 {
-    m_instance = this;
 
     //create models:
     QStringList filters;
@@ -58,7 +48,7 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 
 CoreImpl::~CoreImpl()
 {
-    m_instance = 0;
+
 }
 
 QList<QAbstractItemModel *> CoreImpl::modelList() const

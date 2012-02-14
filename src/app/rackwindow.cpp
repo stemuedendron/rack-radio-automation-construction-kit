@@ -405,7 +405,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
             if (widgetPlugin)
             {
-                QWidget *newWidget = widgetPlugin->createRWidget(this, CoreImpl::instance());
+                QWidget *newWidget = widgetPlugin->createRWidget(this, m_coreImpl);
 
                 //get pointers from pluginhost:
                 QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
