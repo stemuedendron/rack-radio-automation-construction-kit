@@ -40,9 +40,8 @@ public slots:
 protected:
 
     void paintEvent(QPaintEvent *);
-    bool eventFilter(QObject *, QEvent *);
-    void timerEvent(QTimerEvent *);
-    
+    bool eventFilter(QObject *obj, QEvent *event);
+
 };
 
 #endif // RPREVIEWWIDGET_H

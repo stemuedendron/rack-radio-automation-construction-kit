@@ -59,19 +59,18 @@ public:
 
 public slots:
 
-    virtual void setNormalState() = 0;
-    virtual void setInsertState() = 0;
-    virtual void setPreviewState() = 0;
-    virtual void setDeleteState() = 0;
+    virtual void setNormalState(bool set) = 0;
+    virtual void setInsertState(bool set) = 0;
+    virtual void setPreviewState(bool set) = 0;
 
     virtual void getHello(const QString &) = 0;
 
 signals:
 
-    void normalStateEntered();
-    void insertStateEntered();
-    void previewStateEntered();
-    void deleteStateEntered();
+    void normalStateChanged(bool set);
+    void insertStateChanged(bool set);
+    void previewStateChanged(bool set);
+    void deleteStateChanged(bool set);
 
     void timeStrChanged(QString);
     void dateStrChanged(QString);

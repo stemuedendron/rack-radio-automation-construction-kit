@@ -21,14 +21,23 @@
 */
 
 #include "rpreviewwidget.h"
+#include "rpushbutton.h"
 
 #include <QtGui>
 
 RPreviewWidget::RPreviewWidget(QWidget *parent) :
     QWidget(parent)
 {
-    setVisible(false);
-//    qApp->installEventFilter(this);
+    setObjectName("rackPreviewWidget");
+    qApp->installEventFilter(this);
+
+    RPushButton *play = new RPushButton(tr("Play"));
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(play);
+
+    setLayout(layout);
+
 }
 
 void RPreviewWidget::paintEvent(QPaintEvent *)
@@ -39,35 +48,15 @@ void RPreviewWidget::paintEvent(QPaintEvent *)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
-bool RPreviewWidget::eventFilter(QObject *, QEvent *)
+bool RPreviewWidget::eventFilter(QObject *obj, QEvent *event)
 {
-//    if (obj->inherits("QLineEdit") || obj->inherits("QTextEdit")) {
-//        if (event->type() == QEvent::FocusIn) {
-//             QWidget *w = qobject_cast<QWidget *>(obj);
-//             this->setKeyReceiver(w);
-
-//             this->move(x(), parentWidget()->height());
-//             this->setVisible(true);
-//             startTimer(25);
-
-//        }
-//        if (event->type() == QEvent::FocusOut) {
-//           // this->setVisible(false);
-//        }
-//    } else if (obj == parent()) {
-//        if (event->type() == QEvent::Resize) {
-//            move((parentWidget()->width() - width()) / 2,  parentWidget()->height() - height());
-//        }
-//    }
-//    return QWidget::eventFilter(obj, event);
+    if (obj == parent())
+    {
+        if (event->type() == QEvent::Resize) {
+            move((parentWidget()->width() - width()) / 2,  parentWidget()->height() - height());
+        }
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
-void RPreviewWidget::timerEvent(QTimerEvent *)
-{
-//    if (y() <= (parentWidget()->height() - height())) {
-//        killTimer(event->timerId());
-//        move(x(), parentWidget()->height() - height());
-//    } else {
-//        move(x(), y() - 30 );
-//    }
-}
+

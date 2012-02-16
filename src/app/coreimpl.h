@@ -43,10 +43,10 @@ public:
 
 public slots:
 
-    void setNormalState();
-    void setInsertState();
-    void setPreviewState();
-    void setDeleteState();
+    void setNormalState(bool set);
+    void setInsertState(bool set);
+    void setPreviewState(bool set);
+    void setDeleteState(bool set);
 
     void getHello(const QString &);
 
@@ -55,6 +55,8 @@ private:
     RackWindow *m_mainwindow;
 
     State m_state;
+    void setState(State astate, bool set);
+    void emitStateChangeSignals();
 
     QList<QAbstractItemModel *> m_modelList;
 

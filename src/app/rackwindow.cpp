@@ -27,6 +27,7 @@
 #include "rpushbutton.h"
 #include "rblinkbutton.h"
 #include "rselectplugindialog.h"
+#include "rpreviewwidget.h"
 
 #include <QtGui>
 
@@ -58,6 +59,10 @@ RackWindow::RackWindow() :
     setCentralWidget(m_mainSplitter);
     createToolBars();
     createPluginHost(0);
+
+    RPreviewWidget *previewWidget = new RPreviewWidget(this);
+    previewWidget->setVisible(false);
+    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(setVisible(bool)));
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));
@@ -110,13 +115,15 @@ void RackWindow::createToolBars()
 
 
     //make own exclusiv handling in which all buttons can be unchecked:
-    QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
-    QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
-    QObject::connect(deleteButton, SIGNAL(pressed()), previewButton, SLOT(setUnchecked()));
-    QObject::connect(previewButton, SIGNAL(pressed()), deleteButton, SLOT(setUnchecked()));
+//    QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
+//    QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
+//    QObject::connect(deleteButton, SIGNAL(pressed()), previewButton, SLOT(setUnchecked()));
+//    QObject::connect(previewButton, SIGNAL(pressed()), deleteButton, SLOT(setUnchecked()));
 
-
-
+    QObject::connect(deleteButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setDeleteState(bool)));
+    QObject::connect(m_coreImpl, SIGNAL(deleteStateChanged(bool)), deleteButton,SLOT(setChecked(bool)));
+    QObject::connect(previewButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setPreviewState(bool)));
+    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewButton,SLOT(setChecked(bool)));
 
 
 

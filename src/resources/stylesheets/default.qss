@@ -68,6 +68,11 @@ QToolButton#RHotKeyWidgetToolButton:hover {
     image: url(:/images/hotkeys-hover.png);
 }
 
+#rackPreviewWidget {
+    min-width: 300px;
+    min-height: 100px;
+    background-color: gray;
+}
 
 #rackMainSplitter {
     margin: 2px;

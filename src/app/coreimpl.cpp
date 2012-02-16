@@ -57,28 +57,63 @@ ICore::State CoreImpl::state() const
     return m_state;
 }
 
-void CoreImpl::setNormalState()
+void CoreImpl::setNormalState(bool set)
 {
-    m_state = NormalState;
-    emit normalStateEntered();
+    setState(NormalState, set);
 }
 
-void CoreImpl::setInsertState()
+void CoreImpl::setInsertState(bool set)
 {
-    m_state = InsertState;
-    emit insertStateEntered();
+    if (m_state == NormalState)
+    {
+        setState(InsertState, set);
+    }
 }
 
-void CoreImpl::setPreviewState()
+void CoreImpl::setPreviewState(bool set)
 {
-    m_state = PreviewState;
-    emit previewStateEntered();
+    setState(PreviewState, set);
 }
 
-void CoreImpl::setDeleteState()
+void CoreImpl::setDeleteState(bool set)
 {
-    m_state = DeleteState;
-    emit deleteStateEntered();
+   setState(DeleteState, set);
+}
+
+void CoreImpl::setState(ICore::State astate, bool set)
+{
+    if (m_state == astate && set) return;
+    set ? m_state = astate : m_state = NormalState;
+    emitStateChangeSignals();
+}
+
+void CoreImpl::emitStateChangeSignals()
+{
+    switch (m_state)
+    {
+        case NormalState:
+            emit insertStateChanged(false);
+            emit previewStateChanged(false);
+            emit deleteStateChanged(false);
+            emit normalStateChanged(true);
+            break;
+        case InsertState:
+            emit normalStateChanged(false);
+            emit insertStateChanged(true);
+            break;
+        case PreviewState:
+            emit normalStateChanged(false);
+            emit insertStateChanged(false);
+            emit deleteStateChanged(false);
+            emit previewStateChanged(true);
+            break;
+        case DeleteState:
+            emit normalStateChanged(false);
+            emit insertStateChanged(false);
+            emit previewStateChanged(false);
+            emit deleteStateChanged(true);
+            break;
+    }
 }
 
 
@@ -97,3 +132,7 @@ void CoreImpl::getHello(const QString &str)
 {
     m_mainwindow->setWindowTitle(str);
 }
+
+
+
+
