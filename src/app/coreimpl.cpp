@@ -57,9 +57,9 @@ ICore::State CoreImpl::state() const
     return m_state;
 }
 
-void CoreImpl::setNormalState(bool set)
+void CoreImpl::setNormalState()
 {
-    setState(NormalState, set);
+    setState(NormalState, true);
 }
 
 void CoreImpl::setInsertState(bool set)

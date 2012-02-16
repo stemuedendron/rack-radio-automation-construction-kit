@@ -26,10 +26,13 @@
 #include <QtGui>
 
 RPreviewWidget::RPreviewWidget(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_ani(new QPropertyAnimation(this, "pos", this)),
+    m_in(false)
 {
     setObjectName("rackPreviewWidget");
     qApp->installEventFilter(this);
+    m_ani->setDuration(200);
 
     RPushButton *play = new RPushButton(tr("Play"));
 
@@ -38,6 +41,25 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 
     setLayout(layout);
 
+}
+
+void RPreviewWidget::fadeInOut(bool in)
+{
+    if(in)
+    {
+        m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
+        m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height()));
+        m_ani->setEasingCurve(QEasingCurve::InBack);
+        m_in = true;
+    }
+    else
+    {
+        m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height()));
+        m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height()));
+        m_ani->setEasingCurve(QEasingCurve::OutBack);
+        m_in = false;
+    }
+    m_ani->start();
 }
 
 void RPreviewWidget::paintEvent(QPaintEvent *)
@@ -53,7 +75,9 @@ bool RPreviewWidget::eventFilter(QObject *obj, QEvent *event)
     if (obj == parent())
     {
         if (event->type() == QEvent::Resize) {
-            move((parentWidget()->width() - width()) / 2,  parentWidget()->height() - height());
+            int h = 0;
+            m_in ? h = parentWidget()->height() - height() : h = parentWidget()->height();
+            move((parentWidget()->width() - width()) / 2,  h);
         }
     }
     return QWidget::eventFilter(obj, event);

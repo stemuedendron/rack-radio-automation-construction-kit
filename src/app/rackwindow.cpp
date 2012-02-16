@@ -61,8 +61,7 @@ RackWindow::RackWindow() :
     createPluginHost(0);
 
     RPreviewWidget *previewWidget = new RPreviewWidget(this);
-    previewWidget->setVisible(false);
-    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(setVisible(bool)));
+    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(fadeInOut(bool)));
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));

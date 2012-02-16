@@ -43,7 +43,7 @@ public:
 
 public slots:
 
-    void setNormalState(bool set);
+    void setNormalState();
     void setInsertState(bool set);
     void setPreviewState(bool set);
     void setDeleteState(bool set);

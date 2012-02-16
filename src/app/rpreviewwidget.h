@@ -25,6 +25,8 @@
 
 #include <QWidget>
 
+class QPropertyAnimation;
+
 class RPreviewWidget : public QWidget
 {
     Q_OBJECT
@@ -33,14 +35,22 @@ public:
 
     explicit RPreviewWidget(QWidget *parent = 0);
     
+
 signals:
     
 public slots:
+
+    void fadeInOut(bool in);
 
 protected:
 
     void paintEvent(QPaintEvent *);
     bool eventFilter(QObject *obj, QEvent *event);
+
+private:
+
+    QPropertyAnimation *m_ani;
+    bool m_in;
 
 };
 

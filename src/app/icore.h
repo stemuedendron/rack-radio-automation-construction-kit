@@ -59,7 +59,7 @@ public:
 
 public slots:
 
-    virtual void setNormalState(bool set) = 0;
+    virtual void setNormalState() = 0;
     virtual void setInsertState(bool set) = 0;
     virtual void setPreviewState(bool set) = 0;
 
