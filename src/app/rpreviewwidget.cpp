@@ -45,6 +45,7 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 
 void RPreviewWidget::fadeIn()
 {
+    raise();
     m_ani->stop();
     m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
     m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height()));

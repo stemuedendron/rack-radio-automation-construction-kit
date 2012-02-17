@@ -128,6 +128,9 @@ void RackWindow::createToolBars()
 //    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewButton,SLOT(setChecked(bool)));
 
     //delete state:
+
+    //TODO reusable slot in core for this (add transition)
+    //bool signals from core after state change
     m_coreImpl->normalState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->insertState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->previewState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
