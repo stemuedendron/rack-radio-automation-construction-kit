@@ -60,8 +60,9 @@ RackWindow::RackWindow() :
     createToolBars();
     createPluginHost(0);
 
-    //RPreviewWidget *previewWidget = new RPreviewWidget(this);
-    //QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(fadeInOut(bool)));
+    RPreviewWidget *previewWidget = new RPreviewWidget(this);
+    QObject::connect(m_coreImpl->previewState, SIGNAL(entered()), previewWidget, SLOT(fadeIn()));
+    QObject::connect(m_coreImpl->previewState, SIGNAL(exited()), previewWidget, SLOT(fadeOut()));
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));
@@ -126,23 +127,31 @@ void RackWindow::createToolBars()
 //    QObject::connect(previewButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setPreviewState(bool)));
 //    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewButton,SLOT(setChecked(bool)));
 
+    //delete state:
     m_coreImpl->normalState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->insertState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->previewState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
+    m_coreImpl->editState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->deleteState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->normalState);
 
-    deleteButton->setCheckable(false);
-    connect(m_coreImpl->deleteState, SIGNAL(entered()), deleteButton, SLOT(setBlinking()));
+    QObject::connect(m_coreImpl->deleteState, SIGNAL(entered()), deleteButton, SLOT(startBlinking()));
+    QObject::connect(m_coreImpl->deleteState, SIGNAL(exited()), deleteButton, SLOT(stopBlinking()));
 
-
+    //preview state:
     m_coreImpl->normalState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->insertState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->deleteState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
+    m_coreImpl->editState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->previewState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->normalState);
 
+    QObject::connect(m_coreImpl->previewState, SIGNAL(entered()), previewButton, SLOT(startBlinking()));
+    QObject::connect(m_coreImpl->previewState, SIGNAL(exited()), previewButton, SLOT(stopBlinking()));
 
-
-
+    //normal state:
+    m_coreImpl->insertState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
+    m_coreImpl->deleteState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
+    m_coreImpl->previewState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
+    m_coreImpl->editState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
 
 
 

@@ -21,46 +21,42 @@
 */
 
 #include "rblinkbutton.h"
-#include <QTimer>
-#include <QVariant>
-#include <QStyle>
-
-
+#include <QtGui>
 
 RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) :
     RPushButton(text, parent),
     m_blinking(false),
     m_timer(new QTimer(this))
 {
-    setCheckable(true);
     m_timer->setInterval(300);
-    QObject::connect(this, SIGNAL(toggled(bool)), this, SLOT(startTimer(bool)));
-    QObject::connect(m_timer,SIGNAL(timeout()),this,SLOT(setBlinking()));
+    QObject::connect(m_timer,SIGNAL(timeout()),this,SLOT(timeOut()));
 }
 
-
-void RBlinkButton::startTimer(bool start)
+void RBlinkButton::startBlinking()
 {
-    if (start)
-    {
-        m_blinking = true;
-        style()->unpolish(this);
-        style()->polish(this);
-        m_timer->start();
-    }
-    else
-    {
-        m_timer->stop();
-        m_blinking = false;
-        style()->unpolish(this);
-        style()->polish(this);
-    }
-
+    toggleBlinking(true);
+    m_timer->start();
 }
 
-void RBlinkButton::setBlinking()
+void RBlinkButton::stopBlinking()
 {
-    m_blinking ? m_blinking = false : m_blinking = true;
+    m_timer->stop();
+    toggleBlinking(false);
+}
+
+void RBlinkButton::setBlinking(bool blink)
+{
+    blink ? startBlinking() : stopBlinking();
+}
+
+void RBlinkButton::timeOut()
+{
+   toggleBlinking(!m_blinking);
+}
+
+void RBlinkButton::toggleBlinking(bool blink)
+{
+    m_blinking = blink;
     style()->unpolish(this);
     style()->polish(this);
 }

@@ -35,12 +35,12 @@ public:
 
     explicit RPreviewWidget(QWidget *parent = 0);
     
-
 signals:
     
 public slots:
 
-    void fadeInOut(bool in);
+    void fadeIn();
+    void fadeOut();
 
 protected:
 

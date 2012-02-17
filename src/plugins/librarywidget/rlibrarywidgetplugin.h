@@ -35,7 +35,7 @@ public:
 
     QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
-    QString name() const { return "Library Widget"; }
+    QString name() const { return "Library"; }
     QString description() const { return tr("The Library Widget permits access to playable Items."); }
     QString version() const { return "0.0.1"; }
     QString url() const { return "http://rack-radio-automation-construction-kit.googlecode.com/"; }

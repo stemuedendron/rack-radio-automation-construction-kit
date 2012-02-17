@@ -33,14 +33,11 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 
     //state machine:
     QStateMachine *machine = new QStateMachine(this);
-    normalState = new QState;
-    insertState = new QState;
-    deleteState = new QState;
-    previewState = new QState;
-    machine->addState(normalState);
-    machine->addState(insertState);
-    machine->addState(deleteState);
-    machine->addState(previewState);
+    normalState = new QState(machine);
+    insertState = new QState(machine);
+    deleteState = new QState(machine);
+    previewState = new QState(machine);
+    editState = new QState(machine);
     machine->setInitialState(normalState);
     machine->start();
 

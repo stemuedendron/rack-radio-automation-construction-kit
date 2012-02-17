@@ -32,7 +32,7 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 {
     setObjectName("rackPreviewWidget");
     qApp->installEventFilter(this);
-    m_ani->setDuration(200);
+    m_ani->setDuration(150);
 
     RPushButton *play = new RPushButton(tr("Play"));
 
@@ -43,23 +43,24 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 
 }
 
-void RPreviewWidget::fadeInOut(bool in)
+void RPreviewWidget::fadeIn()
 {
-    if(in)
-    {
-        m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
-        m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height()));
-        m_ani->setEasingCurve(QEasingCurve::InBack);
-        m_in = true;
-    }
-    else
-    {
-        m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height()));
-        m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height()));
-        m_ani->setEasingCurve(QEasingCurve::OutBack);
-        m_in = false;
-    }
+    m_ani->stop();
+    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
+    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height()));
+    m_ani->setEasingCurve(QEasingCurve::InBack);
     m_ani->start();
+    m_in = true;
+}
+
+void RPreviewWidget::fadeOut()
+{
+    m_ani->stop();
+    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height()));
+    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height()));
+    m_ani->setEasingCurve(QEasingCurve::OutBack);
+    m_ani->start();
+    m_in = false;
 }
 
 void RPreviewWidget::paintEvent(QPaintEvent *)

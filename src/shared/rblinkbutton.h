@@ -39,17 +39,22 @@ public:
     int interval() const {return m_timer->interval();}
     void setInterval(int interval) {m_timer->setInterval(interval);}
 
-signals:
+public slots:
 
-private slots:
+    void startBlinking();
+    void stopBlinking();
+    void setBlinking(bool blink);
 
-    void startTimer(bool);
-    void setBlinking();
+
+protected slots:
+
+    void timeOut();
 
 private:
 
     bool m_blinking;
     QTimer *m_timer;
+    void toggleBlinking(bool blink);
 
 };
 

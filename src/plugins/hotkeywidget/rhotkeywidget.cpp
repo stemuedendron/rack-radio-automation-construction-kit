@@ -28,6 +28,9 @@
 #include "rpushbutton.h"
 #include <QtGui>
 
+///THIS IS BROKEN UNTIL WE USE THE BRAND NEW STATE MACHINE!!!!!!!!!!!!!
+
+
 //switch to model view?
 
 //review to use qlistwidget instead of qvboxlayout (and qstringlist?) for index page to enable an easy drag and drop implementation
@@ -39,6 +42,9 @@
 //switch to hotkey page at defined clock (7.00 kaffeesatz) (abfrage + rotes blinken?)
 
 //TODO: show number of currently played hotkeys on index button
+
+
+//TODO: use global and private edit state
 
 RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     : QWidget(parent),
@@ -52,32 +58,42 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     title->setObjectName("rackWidgetHeaderTitle");
     m_pageTitle = new QLabel;
     m_pageTitle->setObjectName("rackWidgetHeaderSubTitle");
+
     m_btEdit = new RBlinkButton(tr("Edit"));
     m_btEdit->setObjectName("rackButton");
     m_btEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    connect(m_btEdit, SIGNAL(toggled(bool)), this, SIGNAL(editMode(bool)));
+
+    //m_btEdit->setCheckable(true);
+    QObject::connect(m_btEdit, SIGNAL(toggled(bool)), this, SIGNAL(editMode(bool)));
+
+    //edit state:
+    m_core->normalState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->editState);
+    m_core->editState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+
+    QObject::connect(m_core->editState, SIGNAL(entered()), m_btEdit, SLOT(startBlinking()));
+    QObject::connect(m_core->editState, SIGNAL(exited()), m_btEdit, SLOT(stopBlinking()));
 
 
     RPushButton *btIndex = new RPushButton(tr("Index"));
     btIndex->setObjectName("rackButton");
     btIndex->setDisabled(true);
     btIndex->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    connect(btIndex,SIGNAL(clicked()),this,SLOT(showIndexPage()));
-    connect(this, SIGNAL(enableIndexButton(bool)), btIndex, SLOT(setEnabled(bool)));
+    QObject::connect(btIndex,SIGNAL(clicked()),this,SLOT(showIndexPage()));
+    QObject::connect(this, SIGNAL(enableIndexButton(bool)), btIndex, SLOT(setEnabled(bool)));
 
     RPushButton *btPrevious = new RPushButton;
     btPrevious->setObjectName("rackLeftArrowButton");
     btPrevious->setDisabled(true);
     btPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    connect(btPrevious,SIGNAL(clicked()),this,SLOT(showPreviousPage()));
-    connect(this, SIGNAL(enableNPButtons(bool)), btPrevious, SLOT(setEnabled(bool)));
+    QObject::connect(btPrevious,SIGNAL(clicked()),this,SLOT(showPreviousPage()));
+    QObject::connect(this, SIGNAL(enableNPButtons(bool)), btPrevious, SLOT(setEnabled(bool)));
 
     RPushButton *btNext = new RPushButton;
     btNext->setObjectName("rackRightArrowButton");
     btNext->setDisabled(true);
     btNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    connect(btNext,SIGNAL(clicked()),this,SLOT(showNextPage()));
-    connect(this, SIGNAL(enableNPButtons(bool)), btNext, SLOT(setEnabled(bool)));
+    QObject::connect(btNext,SIGNAL(clicked()),this,SLOT(showNextPage()));
+    QObject::connect(this, SIGNAL(enableNPButtons(bool)), btNext, SLOT(setEnabled(bool)));
 
     QGridLayout *hl = new QGridLayout(header);
     hl->addWidget(title,        0, 0);
@@ -102,7 +118,7 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
 
     //create the hotkey stack widget:
     m_hotkeyStack = new QStackedWidget;
-    connect(m_hotkeyStack,SIGNAL(currentChanged(int)),this,SLOT(hotkeyStackChanged(int)));
+    QObject::connect(m_hotkeyStack,SIGNAL(currentChanged(int)),this,SLOT(hotkeyStackChanged(int)));
     m_layout = new QStackedWidget;
     m_layout->addWidget(indexPageScrollArea);
     m_layout->addWidget(m_hotkeyStack);
@@ -115,11 +131,8 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     layout->addWidget(m_layout);
     setLayout(layout);
 
-    //this is buggy, after 7 hotkey page creates we run in bug
-    // QFile::seek: IODevice is not open
-    // ASSERT: "!isEmpty()" in file /usr/include/QtCore/qlist.h, line 282
 
-
+    //only tests:
     createHotkeyPage("1-Kaffeesatz",10,10);
     createHotkeyPage("2-Kaffeesatz2",2,4);
     createHotkeyPage("3-kaffeesatz3",3,4);
@@ -147,13 +160,20 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
             hkb->setObjectName("rackHotkeyButton");
 
             //we pass initialy 'this' as parent to avoid flicker
-            //(wich should normally notoccur, qt bug?)
+            //(wich should normally not occur, qlabel bug?)
             QLabel *lbEdit = new QLabel(tr("Edit Mode"), this);
             lbEdit->setObjectName("rackHotkeyEditMode");
+
+
             lbEdit->setHidden(!m_btEdit->isChecked());
+
+
             QVBoxLayout * l = new QVBoxLayout(hkb);
             l->addWidget(lbEdit, 0, Qt::AlignJustify | Qt::AlignTop);
-            QObject::connect(m_btEdit, SIGNAL(toggled(bool)), lbEdit, SLOT(setVisible(bool)));
+
+            QObject::connect(m_core->editState, SIGNAL(entered()), lbEdit, SLOT(show()));
+            QObject::connect(m_core->editState, SIGNAL(exited()), lbEdit, SLOT(hide()));
+
             layout->addWidget(hkb, row, col);
         }
     }
@@ -161,9 +181,12 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
 
     //create index button:
     RIndexButton *button = new RIndexButton(title, rows * cols);
+
     button->setEditMode(m_btEdit->isChecked());
-    connect(m_btEdit, SIGNAL(toggled(bool)), button, SLOT(setEditMode(bool)));
-    connect(button, SIGNAL(clicked()), this, SLOT(indexPageClicked()));
+
+    QObject::connect(m_btEdit, SIGNAL(toggled(bool)), button, SLOT(setEditMode(bool)));
+
+    QObject::connect(button, SIGNAL(clicked()), this, SLOT(indexPageClicked()));
     m_indexPageLayout->insertWidget(index, button);
 
 }
