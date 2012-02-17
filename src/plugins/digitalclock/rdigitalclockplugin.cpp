@@ -25,10 +25,10 @@
 #include <QtGui>
 
 
-QWidget *RDigitalClockPlugin::createRWidget(QWidget *parent, ICore *api)
+QWidget *RDigitalClockPlugin::createRWidget(ICore *api, QWidget *parent)
 {
 
-    return new RDigitalClock(parent, api);
+    return new RDigitalClock(api, parent);
 
 }
 

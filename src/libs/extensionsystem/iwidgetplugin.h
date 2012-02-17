@@ -31,7 +31,7 @@ class IWidgetPlugin
 public:
     virtual ~IWidgetPlugin() {}
 
-    virtual QWidget *createRWidget(QWidget *parent, ICore *api) = 0;
+    virtual QWidget *createRWidget(ICore *api, QWidget *parent = 0) = 0;
 
     virtual QString name() const = 0;
     virtual QString description() const = 0;

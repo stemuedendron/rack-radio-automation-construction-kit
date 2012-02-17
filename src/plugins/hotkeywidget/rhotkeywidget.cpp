@@ -40,7 +40,7 @@
 
 //TODO: show number of currently played hotkeys on index button
 
-RHotKeyWidget::RHotKeyWidget(QWidget *parent, ICore *api)
+RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     : QWidget(parent),
       m_core(api)
 {

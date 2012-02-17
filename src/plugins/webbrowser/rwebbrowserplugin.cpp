@@ -25,10 +25,10 @@
 #include <QtGui>
 
 
-QWidget *RWebBrowserPlugin::createRWidget(QWidget *parent, ICore *api)
+QWidget *RWebBrowserPlugin::createRWidget(ICore *api, QWidget *parent)
  {
 
-    return new RWebBrowser(parent, api);
+    return new RWebBrowser(api, parent);
 
  }
 

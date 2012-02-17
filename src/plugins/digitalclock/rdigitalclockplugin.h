@@ -34,7 +34,7 @@ class RDigitalClockPlugin : public QObject, IWidgetPlugin
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, ICore *api);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
     QString name() const { return "Digital Clock"; }
     QString description() const { return tr("This is a simple digital clock."); }

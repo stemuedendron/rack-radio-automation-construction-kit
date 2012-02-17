@@ -33,7 +33,7 @@ class RDigitalClock : public QWidget
 
 public:
 
-    explicit RDigitalClock(QWidget *parent = 0, ICore *api = 0);
+    explicit RDigitalClock(ICore *api, QWidget *parent = 0);
 
 public slots:
 

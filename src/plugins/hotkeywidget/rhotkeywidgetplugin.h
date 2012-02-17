@@ -34,7 +34,7 @@ class RHotKeyWidgetPlugin : public QObject, IWidgetPlugin
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, ICore *api);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
     QString name() const { return "Hotkeys"; }
     QString description() const { return tr("The Hotkeys widget let you instantly play jingles, trailer, music beds or whatever you want."); }

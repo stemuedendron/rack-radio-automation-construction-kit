@@ -25,8 +25,9 @@
 
 #include <QObject>
 
+class QState;
 class QAbstractItemModel;
-class QItemSelection;
+//class QItemSelection;
 
 //this is the rack core api interface
 class ICore : public QObject
@@ -38,15 +39,22 @@ public:
     ICore() {}
     virtual ~ICore() {}
 
-    enum State
-    {
-        NormalState,
-        InsertState,
-        PreviewState,
-        DeleteState
-    };
+    QState *normalState;
+    QState *insertState;
+    QState *deleteState;
+    QState *previewState;
 
-    virtual State state() const = 0;
+//    enum State
+//    {
+//        NormalState,
+//        InsertState,
+//        PreviewState,
+//        DeleteState
+//    };
+
+
+//    virtual State state() const = 0;
+
 
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
@@ -59,18 +67,18 @@ public:
 
 public slots:
 
-    virtual void setNormalState() = 0;
-    virtual void setInsertState(bool set) = 0;
-    virtual void setPreviewState(bool set) = 0;
+//    virtual void setInsertState(bool set = true) = 0;
+//    virtual void setPreviewState(bool set = true) = 0;
 
     virtual void getHello(const QString &) = 0;
 
 signals:
 
-    void normalStateChanged(bool set);
-    void insertStateChanged(bool set);
-    void previewStateChanged(bool set);
-    void deleteStateChanged(bool set);
+//    void normalStateChanged(bool set);
+//    void insertStateChanged(bool set);
+//    void deleteStateChanged(bool set);
+//    void previewStateChanged(bool set);
+
 
     void timeStrChanged(QString);
     void dateStrChanged(QString);

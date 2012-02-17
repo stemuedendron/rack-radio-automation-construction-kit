@@ -33,7 +33,7 @@ class RWebBrowserPlugin : public QObject, IWidgetPlugin
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, ICore *api);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
     QString name() const { return "Web Browser"; }
     QString description() const { return tr("This is a simple webbrowser."); }

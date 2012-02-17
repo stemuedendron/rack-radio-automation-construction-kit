@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QPersistentModelIndex>
 
+class ICore;
 class QAbstractItemModel;
 class QModelIndex;
 class RPushButton;
@@ -37,7 +38,7 @@ class RLibraryFolderButtonView : public QWidget
 
 public:
 
-    explicit RLibraryFolderButtonView(QWidget *parent = 0);
+    explicit RLibraryFolderButtonView(ICore *api, QWidget *parent = 0);
 
     void setModel (QAbstractItemModel *model);
     QAbstractItemModel *model() const;
@@ -76,6 +77,7 @@ protected:
 
 private:
 
+    ICore *m_core;
     QAbstractItemModel *m_model;
     QPersistentModelIndex m_root;
     QWidget *m_header;

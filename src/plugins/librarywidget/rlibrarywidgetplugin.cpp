@@ -25,10 +25,10 @@
 #include <QtGui>
 
 
-QWidget *RLibraryWidgetPlugin::createRWidget(QWidget *parent, ICore *api)
+QWidget *RLibraryWidgetPlugin::createRWidget(ICore *api, QWidget *parent)
 {
 
-    return new RLibraryWidget(parent, api);
+    return new RLibraryWidget(api, parent);
 
 }
 

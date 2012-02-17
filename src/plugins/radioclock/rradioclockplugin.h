@@ -34,7 +34,7 @@ class RRadioClockPlugin : public QObject, IWidgetPlugin
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, ICore *api);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
     QString name() const { return "Radio Clock"; }
     QString description() const { return tr("This is a simple radio clock."); }

@@ -35,7 +35,7 @@ class RWebBrowser : public QMainWindow
 
 public:
 
-    explicit RWebBrowser(QWidget *parent = 0, ICore *api = 0);
+    explicit RWebBrowser(ICore *api, QWidget *parent = 0);
 
 protected slots:
 

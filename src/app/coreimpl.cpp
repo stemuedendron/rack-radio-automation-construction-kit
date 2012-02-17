@@ -23,15 +23,27 @@
 #include "coreimpl.h"
 #include "rackwindow.h"
 
-#include <QTime>
-#include <QFileSystemModel>
+#include <QtGui>
 
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
-    m_state(NormalState),
     m_fileSystemModel(new QFileSystemModel(this))
 {
+
+    //state machine:
+    QStateMachine *machine = new QStateMachine(this);
+    normalState = new QState;
+    insertState = new QState;
+    deleteState = new QState;
+    previewState = new QState;
+    machine->addState(normalState);
+    machine->addState(insertState);
+    machine->addState(deleteState);
+    machine->addState(previewState);
+    machine->setInitialState(normalState);
+    machine->start();
+
 
     //create models:
     QStringList filters;
@@ -52,69 +64,88 @@ CoreImpl::~CoreImpl()
 
 }
 
-ICore::State CoreImpl::state() const
-{
-    return m_state;
-}
+//void CoreImpl::setInsertState(bool set)
+//{
+//    set ? emit enterInsertState() : emit enterNormalState();
+//}
 
-void CoreImpl::setNormalState()
-{
-    setState(NormalState, true);
-}
+//void CoreImpl::setPreviewState(bool set)
+//{
+//    set ? emit enterPreviewState() : emit enterNormalState();
+//}
 
-void CoreImpl::setInsertState(bool set)
-{
-    if (m_state == NormalState)
-    {
-        setState(InsertState, set);
-    }
-}
+//void CoreImpl::setDeleteState(bool set)
+//{
+//    set ? emit enterDeleteState() : emit enterNormalState();
+//}
 
-void CoreImpl::setPreviewState(bool set)
-{
-    setState(PreviewState, set);
-}
 
-void CoreImpl::setDeleteState(bool set)
-{
-   setState(DeleteState, set);
-}
+//ICore::State CoreImpl::state() const
+//{
+//    return m_state;
+//}
 
-void CoreImpl::setState(ICore::State astate, bool set)
-{
-    if (m_state == astate && set) return;
-    set ? m_state = astate : m_state = NormalState;
-    emitStateChangeSignals();
-}
+//void CoreImpl::setInsertState(bool set)
+//{
+//    if (m_state == NormalState)
+//    {
+//        setState(InsertState, set);
+//    }
+//}
 
-void CoreImpl::emitStateChangeSignals()
-{
-    switch (m_state)
-    {
-        case NormalState:
-            emit insertStateChanged(false);
-            emit previewStateChanged(false);
-            emit deleteStateChanged(false);
-            emit normalStateChanged(true);
-            break;
-        case InsertState:
-            emit normalStateChanged(false);
-            emit insertStateChanged(true);
-            break;
-        case PreviewState:
-            emit normalStateChanged(false);
-            emit insertStateChanged(false);
-            emit deleteStateChanged(false);
-            emit previewStateChanged(true);
-            break;
-        case DeleteState:
-            emit normalStateChanged(false);
-            emit insertStateChanged(false);
-            emit previewStateChanged(false);
-            emit deleteStateChanged(true);
-            break;
-    }
-}
+//void CoreImpl::setPreviewState(bool set)
+//{
+//    setState(PreviewState, set);
+//}
+
+//void CoreImpl::setDeleteState(bool set)
+//{
+//   setState(DeleteState, set);
+//}
+
+//void CoreImpl::setState(ICore::State astate, bool set)
+//{
+//    if (m_state == astate && set) return;
+
+//    emitStateChangeSignals(set);
+
+//    set ? m_state = astate : m_state = NormalState;
+//    emitStateChangeSignals(true);
+
+
+//    if (set)
+//    {
+//        if (m_state == astate) return;
+//        emitStateChangeSignals(true);
+//        m_state = astate;
+
+//    }
+//    else
+//    {
+//        if (m_state != astate) return;
+//        emitStateChangeSignals(false);
+//        m_state = NormalState;
+//    }
+
+
+
+//}
+
+//void CoreImpl::emitStateChangeSignals(bool set)
+//{
+//    switch (m_state)
+//    {
+//        case InsertState:
+//            emit normalStateChanged(set);
+//            break;
+//        case PreviewState:
+//            emit previewStateChanged(set);
+//            break;
+//        case DeleteState:
+//            emit deleteStateChanged(set);
+//            break;
+//    }
+//}
 
 
 QList<QAbstractItemModel *> CoreImpl::modelList() const

@@ -33,7 +33,7 @@ class RRadioClock : public QWidget
 
 public:
 
-    explicit RRadioClock(QWidget *parent = 0, ICore *api = 0);
+    explicit RRadioClock(ICore *api, QWidget *parent = 0);
 
 public slots:
 

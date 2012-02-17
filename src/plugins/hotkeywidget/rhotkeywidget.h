@@ -40,7 +40,7 @@ class RHotKeyWidget : public QWidget
 
 public:
 
-    explicit RHotKeyWidget(QWidget *parent = 0, ICore *api = 0);
+    explicit RHotKeyWidget(ICore *api, QWidget *parent = 0);
 
 signals:
 

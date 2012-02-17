@@ -60,8 +60,8 @@ RackWindow::RackWindow() :
     createToolBars();
     createPluginHost(0);
 
-    RPreviewWidget *previewWidget = new RPreviewWidget(this);
-    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(fadeInOut(bool)));
+    //RPreviewWidget *previewWidget = new RPreviewWidget(this);
+    //QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewWidget, SLOT(fadeInOut(bool)));
 
     QObject::connect(m_mapperLoadNewPlugin, SIGNAL(mapped(QWidget*)), this, SLOT(loadPlugin(QWidget*)));
     QObject::connect(m_mapperClosePlugin, SIGNAL(mapped(QObject*)), this, SLOT(deletePluginSwitchAction(QObject*)));
@@ -119,10 +119,32 @@ void RackWindow::createToolBars()
 //    QObject::connect(deleteButton, SIGNAL(pressed()), previewButton, SLOT(setUnchecked()));
 //    QObject::connect(previewButton, SIGNAL(pressed()), deleteButton, SLOT(setUnchecked()));
 
-    QObject::connect(deleteButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setDeleteState(bool)));
-    QObject::connect(m_coreImpl, SIGNAL(deleteStateChanged(bool)), deleteButton,SLOT(setChecked(bool)));
-    QObject::connect(previewButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setPreviewState(bool)));
-    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewButton,SLOT(setChecked(bool)));
+
+
+//    QObject::connect(deleteButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setDeleteState(bool)));
+//    QObject::connect(m_coreImpl, SIGNAL(deleteStateChanged(bool)), deleteButton,SLOT(setChecked(bool)));
+//    QObject::connect(previewButton, SIGNAL(toggled(bool)), m_coreImpl, SLOT(setPreviewState(bool)));
+//    QObject::connect(m_coreImpl, SIGNAL(previewStateChanged(bool)), previewButton,SLOT(setChecked(bool)));
+
+    m_coreImpl->normalState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
+    m_coreImpl->insertState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
+    m_coreImpl->previewState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
+    m_coreImpl->deleteState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->normalState);
+
+    deleteButton->setCheckable(false);
+    connect(m_coreImpl->deleteState, SIGNAL(entered()), deleteButton, SLOT(setBlinking()));
+
+
+    m_coreImpl->normalState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
+    m_coreImpl->insertState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
+    m_coreImpl->deleteState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
+    m_coreImpl->previewState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->normalState);
+
+
+
+
+
+
 
 
 
@@ -420,7 +442,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
             IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
             if (widgetPlugin)
             {
-                QWidget *newWidget = widgetPlugin->createRWidget(this, m_coreImpl);
+                QWidget *newWidget = widgetPlugin->createRWidget(m_coreImpl, this);
 
                 //get pointers from pluginhost:
                 QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");

@@ -36,7 +36,7 @@ class RLibraryWidget : public QWidget
 
 public:
 
-    explicit RLibraryWidget(QWidget *parent = 0, ICore *api = 0);
+    explicit RLibraryWidget(ICore *api, QWidget *parent = 0);
 
 private slots:
 

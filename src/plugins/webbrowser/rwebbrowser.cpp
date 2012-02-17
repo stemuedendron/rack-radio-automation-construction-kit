@@ -25,7 +25,7 @@
 #include <QtGui>
 #include <QtWebKit>
 
-RWebBrowser::RWebBrowser(QWidget *parent, ICore *api)
+RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     : QMainWindow(parent),
       m_core(api),
       m_webView(new QWebView),

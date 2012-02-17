@@ -26,11 +26,11 @@
 
 #include <QtGui>
 
-RLibraryWidget::RLibraryWidget(QWidget *parent, ICore *api) :
+RLibraryWidget::RLibraryWidget(ICore *api, QWidget *parent) :
     QWidget(parent),
     m_core(api),
     m_model(0),
-    m_folderButtonView(new RLibraryFolderButtonView)
+    m_folderButtonView(new RLibraryFolderButtonView(m_core, this))
 {
 
     if (!m_core->modelList().isEmpty())

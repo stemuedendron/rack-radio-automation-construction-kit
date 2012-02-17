@@ -33,7 +33,7 @@ class RLibraryWidgetPlugin : public QObject, IWidgetPlugin
 
 public:
 
-    QWidget *createRWidget(QWidget *parent, ICore *api);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
     QString name() const { return "Library Widget"; }
     QString description() const { return tr("The Library Widget permits access to playable Items."); }

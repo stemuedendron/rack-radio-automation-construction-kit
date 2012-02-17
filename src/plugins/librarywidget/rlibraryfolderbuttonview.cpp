@@ -21,12 +21,14 @@
 */
 
 #include "rlibraryfolderbuttonview.h"
+#include "icore.h"
 #include "rpushbutton.h"
 #include "rlibrarybutton.h"
 #include <QtGui>
 
-RLibraryFolderButtonView::RLibraryFolderButtonView(QWidget *parent) :
+RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) :
     QWidget(parent),
+    m_core(api),
     m_model(0),
     m_header(new QWidget),
     m_buttons(new QWidget),
@@ -71,6 +73,20 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(QWidget *parent) :
 
     RPushButton *b3 = new RPushButton(tr("New"));
     b3->setObjectName("rackFooterButton");
+
+
+    //state test:
+    m_core->normalState->addTransition(b3, SIGNAL(clicked()), m_core->insertState);
+    m_core->insertState->addTransition(b3, SIGNAL(clicked()), m_core->normalState);
+    m_core->normalState->assignProperty(b3, "text", "normalState");
+    m_core->insertState->assignProperty(b3, "text", "insertState");
+    m_core->deleteState->assignProperty(b3, "text", "delete");
+    m_core->previewState->assignProperty(b3, "text", "preview");
+
+
+
+
+
     RPushButton *b4 = new RPushButton(tr("Info"));
     b4->setObjectName("rackFooterButton");
     RPushButton *b5 = new RPushButton(tr("Edit"));
