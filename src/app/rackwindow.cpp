@@ -134,7 +134,6 @@ void RackWindow::createToolBars()
     m_coreImpl->normalState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->insertState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->previewState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
-    m_coreImpl->editState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->deleteState);
     m_coreImpl->deleteState->addTransition(deleteButton, SIGNAL(clicked()), m_coreImpl->normalState);
 
     QObject::connect(m_coreImpl->deleteState, SIGNAL(entered()), deleteButton, SLOT(startBlinking()));
@@ -144,7 +143,6 @@ void RackWindow::createToolBars()
     m_coreImpl->normalState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->insertState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->deleteState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
-    m_coreImpl->editState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->previewState);
     m_coreImpl->previewState->addTransition(previewButton, SIGNAL(clicked()), m_coreImpl->normalState);
 
     QObject::connect(m_coreImpl->previewState, SIGNAL(entered()), previewButton, SLOT(startBlinking()));
@@ -154,7 +152,6 @@ void RackWindow::createToolBars()
     m_coreImpl->insertState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
     m_coreImpl->deleteState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
     m_coreImpl->previewState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
-    m_coreImpl->editState->addTransition(this, SIGNAL(enterSettingsMode()), m_coreImpl->normalState);
 
 
 

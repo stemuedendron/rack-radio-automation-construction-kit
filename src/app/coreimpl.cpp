@@ -37,7 +37,6 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     insertState = new QState(machine);
     deleteState = new QState(machine);
     previewState = new QState(machine);
-    editState = new QState(machine);
     machine->setInitialState(normalState);
     machine->start();
 

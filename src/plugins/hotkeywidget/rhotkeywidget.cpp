@@ -63,16 +63,29 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     m_btEdit->setObjectName("rackButton");
     m_btEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-    //m_btEdit->setCheckable(true);
+    m_btEdit->setCheckable(true);
     QObject::connect(m_btEdit, SIGNAL(toggled(bool)), this, SIGNAL(editMode(bool)));
+    QObject::connect(m_btEdit, SIGNAL(toggled(bool)), m_btEdit, SLOT(setBlinking(bool)));
 
-    //edit state:
-    m_core->normalState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->editState);
-    m_core->editState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
 
-    QObject::connect(m_core->editState, SIGNAL(entered()), m_btEdit, SLOT(startBlinking()));
-    QObject::connect(m_core->editState, SIGNAL(exited()), m_btEdit, SLOT(stopBlinking()));
 
+    //global state handling:
+    QObject::connect(m_core->normalState, SIGNAL(exited()), m_btEdit, SLOT(setUnchecked()));
+
+    //variante 1: edit only in normalState
+//    m_core->insertState->assignProperty(m_btEdit, "enabled", false);
+//    m_core->deleteState->assignProperty(m_btEdit, "enabled", false);
+//    m_core->previewState->assignProperty(m_btEdit, "enabled", false);
+//    m_core->normalState->assignProperty(m_btEdit, "enabled", true);
+
+    //variante 2: edit can switch back to normalState:
+    m_core->insertState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+    m_core->deleteState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+    m_core->previewState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+
+
+
+    ////end state hanling
 
     RPushButton *btIndex = new RPushButton(tr("Index"));
     btIndex->setObjectName("rackButton");
@@ -170,9 +183,8 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
 
             QVBoxLayout * l = new QVBoxLayout(hkb);
             l->addWidget(lbEdit, 0, Qt::AlignJustify | Qt::AlignTop);
+            QObject::connect(m_btEdit, SIGNAL(toggled(bool)), lbEdit, SLOT(setVisible(bool)));
 
-            QObject::connect(m_core->editState, SIGNAL(entered()), lbEdit, SLOT(show()));
-            QObject::connect(m_core->editState, SIGNAL(exited()), lbEdit, SLOT(hide()));
 
             layout->addWidget(hkb, row, col);
         }

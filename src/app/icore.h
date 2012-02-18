@@ -43,7 +43,6 @@ public:
     QState *insertState;
     QState *deleteState;
     QState *previewState;
-    QState *editState;
 
 //    enum State
 //    {
