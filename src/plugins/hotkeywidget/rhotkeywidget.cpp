@@ -70,7 +70,7 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
 
 
     //global state handling:
-    QObject::connect(m_core->normalState, SIGNAL(exited()), m_btEdit, SLOT(setUnchecked()));
+//    QObject::connect(m_core->normalState, SIGNAL(exited()), m_btEdit, SLOT(setUnchecked()));
 
     //variante 1: edit only in normalState
 //    m_core->insertState->assignProperty(m_btEdit, "enabled", false);
@@ -79,10 +79,12 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
 //    m_core->normalState->assignProperty(m_btEdit, "enabled", true);
 
     //variante 2: edit can switch back to normalState:
-    m_core->insertState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
-    m_core->deleteState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
-    m_core->previewState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+//    m_core->insertState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+//    m_core->deleteState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
+//    m_core->previewState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
 
+    //variante 3: parallel states:
+    //button onclick must handling global + user state
 
 
     ////end state hanling
