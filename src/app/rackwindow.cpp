@@ -111,9 +111,6 @@ void RackWindow::createToolBars()
     mainToolBar->addWidget(previewButton);
 
 
-
-
-
     //make own exclusiv handling in which all buttons can be unchecked:
 //    QObject::connect(mainMenu, SIGNAL(aboutToShow()), deleteButton, SLOT(setUnchecked()));
 //    QObject::connect(mainMenu, SIGNAL(aboutToShow()), previewButton, SLOT(setUnchecked()));
@@ -412,7 +409,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
         ///test
 
-//        QList<QPluginLoader *> loadedPlugins = qFindChildren<QPluginLoader *>(this);
+//        QList<QPluginLoader *> loadedPlugins = findChildren<QPluginLoader *>();
 
 //        QObject *plugin = 0;
 
@@ -431,7 +428,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
 
         //debug code
         qDebug() << "we have the following plugins loaded:";
-        QList<QPluginLoader *> debugPlugins = qFindChildren<QPluginLoader *>(this);
+        QList<QPluginLoader *> debugPlugins = findChildren<QPluginLoader *>();
         for (int i = 0; i < debugPlugins.size(); ++i) {
             qDebug() << debugPlugins.at(i)->fileName();
         }
@@ -454,11 +451,11 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
                 QWidget *newWidget = widgetPlugin->createRWidget(m_coreImpl, this);
 
                 //get pointers from pluginhost:
-                QStackedWidget *pluginStack = qFindChild<QStackedWidget *>(pluginHost, "rackPluginStack");
-                QToolBar *pluginHostToolBar = qFindChild<QToolBar *>(pluginHost, "rackPluginHostToolBar");
+                QStackedWidget *pluginStack = pluginHost->findChild<QStackedWidget *>("rackPluginStack");
+                QToolBar *pluginHostToolBar = pluginHost->findChild<QToolBar *>("rackPluginHostToolBar");
                 QToolBar *pluginToolBar = (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
-                QSignalMapper *sm = qFindChild<QSignalMapper *>(pluginHost, "rackPluginSwitchMapper");
-                QActionGroup *ag = qFindChild<QActionGroup *>(pluginHostToolBar);
+                QSignalMapper *sm = pluginHost->findChild<QSignalMapper *>("rackPluginSwitchMapper");
+                QActionGroup *ag = pluginHostToolBar->findChild<QActionGroup *>();
 
                 //add plugin widget to the widget stack:
                 pluginStack->setCurrentIndex(pluginStack->addWidget(newWidget));
@@ -589,7 +586,7 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
 
     //////////////////
 
-//    QList<RSplitter *> splitters = qFindChildren<RSplitter *>(this);
+//    QList<RSplitter *> splitters = findChildren<RSplitter *>();
 //    qDebug("splitter count: %d", splitters.size());
 }
 
@@ -672,7 +669,7 @@ void RackWindow::savePluginHosts()
     QSettings settings("RadioFrei", "Layouts");
     settings.clear();
 
-    QList<QObject *> allObjects = qFindChildren<QObject *>(this);
+    QList<QObject *> allObjects = findChildren<QObject *>();
     settings.setValue("Alle-Objekte", allObjects.count());
     for (int i = 0; i < allObjects.count(); ++i)
     {
@@ -700,7 +697,7 @@ void RackWindow::savePluginHosts()
 
 
 
-//    QList<QWidget *> allWidgets = qFindChildren<QWidget *>(this);
+//    QList<QWidget *> allWidgets = findChildren<QWidget *>();
 
 
 //    for (int i = 0; i < allWidgets.count(); ++i)

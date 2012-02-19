@@ -25,9 +25,6 @@
 
 #include <QtGui>
 
-
-//TODO: make sure the preview button is always visible!
-
 RPreviewWidget::RPreviewWidget(QWidget *parent) :
     QWidget(parent),
     m_ani(new QPropertyAnimation(this, "pos", this)),
@@ -50,9 +47,8 @@ void RPreviewWidget::fadeIn()
 {
     raise();
     m_ani->stop();
-    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
-    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height() + 4));
-    m_ani->setEasingCurve(QEasingCurve::InBack);
+    m_ani->setStartValue(QPoint(x(), parentWidget()->height()));
+    m_ani->setEndValue(QPoint(x(), parentWidget()->height() - height() + 4));
     m_ani->start();
     m_in = true;
 }
@@ -60,9 +56,8 @@ void RPreviewWidget::fadeIn()
 void RPreviewWidget::fadeOut()
 {
     m_ani->stop();
-    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height() + 4));
-    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height()));
-    m_ani->setEasingCurve(QEasingCurve::OutBack);
+    m_ani->setStartValue(QPoint(x(), parentWidget()->height() - height() + 4));
+    m_ani->setEndValue(QPoint(x(), parentWidget()->height()));
     m_ani->start();
     m_in = false;
 }
@@ -80,12 +75,24 @@ bool RPreviewWidget::eventFilter(QObject *obj, QEvent *event)
     if (obj == parent())
     {
         if (event->type() == QEvent::Resize) {
-            int h = 0;
-            m_in ? h = parentWidget()->height() - height() + 4 : h = parentWidget()->height();
-            move((parentWidget()->width() - width()) / 2,  h);
+
+            //calc x position
+            int x = (parentWidget()->width() - width()) / 2;
+            QToolBar *mainToolBar = parentWidget()->findChild<QToolBar *>("rackMainToolBar");
+            if (mainToolBar)
+            {
+                if (x <= mainToolBar->width() + 1) x = mainToolBar->width() + 2;
+            }
+
+            //calc y position
+            int y = 0;
+            m_in ? y = parentWidget()->height() - height() + 4 : y = parentWidget()->height();
+
+            move(x, y);
         }
     }
     return QWidget::eventFilter(obj, event);
 }
+
 
 
