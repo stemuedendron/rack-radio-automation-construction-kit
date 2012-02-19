@@ -25,6 +25,9 @@
 
 #include <QtGui>
 
+
+//TODO: make sure the preview button is always visible!
+
 RPreviewWidget::RPreviewWidget(QWidget *parent) :
     QWidget(parent),
     m_ani(new QPropertyAnimation(this, "pos", this)),
@@ -32,7 +35,7 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 {
     setObjectName("rackPreviewWidget");
     qApp->installEventFilter(this);
-    m_ani->setDuration(150);
+    m_ani->setDuration(50);
 
     RPushButton *play = new RPushButton(tr("Play"));
 
@@ -48,7 +51,7 @@ void RPreviewWidget::fadeIn()
     raise();
     m_ani->stop();
     m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height()));
-    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height()));
+    m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height() - height() + 4));
     m_ani->setEasingCurve(QEasingCurve::InBack);
     m_ani->start();
     m_in = true;
@@ -57,7 +60,7 @@ void RPreviewWidget::fadeIn()
 void RPreviewWidget::fadeOut()
 {
     m_ani->stop();
-    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height()));
+    m_ani->setStartValue(QPoint(pos().x(), parentWidget()->height() - height() + 4));
     m_ani->setEndValue(QPoint(pos().x(), parentWidget()->height()));
     m_ani->setEasingCurve(QEasingCurve::OutBack);
     m_ani->start();
@@ -78,7 +81,7 @@ bool RPreviewWidget::eventFilter(QObject *obj, QEvent *event)
     {
         if (event->type() == QEvent::Resize) {
             int h = 0;
-            m_in ? h = parentWidget()->height() - height() : h = parentWidget()->height();
+            m_in ? h = parentWidget()->height() - height() + 4 : h = parentWidget()->height();
             move((parentWidget()->width() - width()) / 2,  h);
         }
     }
