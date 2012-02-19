@@ -710,6 +710,15 @@ QPushButton:pressed {
 
 /*Library Widget*/
 
+/*
+[isFolder="false"]#rackLibraryViewButton {
+    background-image: url(:/images/pfl-small.png);
+    background-repeat: none;
+    background-origin: content;
+    padding: 4px
+}
+*/
+
 [isFolder="true"]#rackLibraryViewButton {
     background-image: url(:/images/folder.png);
     background-repeat: none;
