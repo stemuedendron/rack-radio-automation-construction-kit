@@ -87,10 +87,10 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
     //state test:
     m_core->normalState->addTransition(b3, SIGNAL(clicked()), m_core->insertState);
     m_core->insertState->addTransition(b3, SIGNAL(clicked()), m_core->normalState);
-    m_core->normalState->assignProperty(b3, "text", "normalState");
-    m_core->insertState->assignProperty(b3, "text", "insertState");
-    m_core->deleteState->assignProperty(b3, "text", "delete");
-    m_core->previewState->assignProperty(b3, "text", "preview");
+//    m_core->normalState->assignProperty(b3, "text", "normalState");
+//    m_core->insertState->assignProperty(b3, "text", "insertState");
+//    m_core->deleteState->assignProperty(b3, "text", "delete");
+//    m_core->previewState->assignProperty(b3, "text", "preview");
 
 
 
