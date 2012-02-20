@@ -695,6 +695,10 @@ QPushButton:pressed {
     background-color: rgba(0,0,255,30%);
 }
 
+[previewState="true"]#rackHotkeyButton {
+    background-image: url(:/images/pfl-small.png);
+}
+
 /*
 [playingOrPaused="true"]#rackHotkeyButton {
     border-color: #FFFFFF;
