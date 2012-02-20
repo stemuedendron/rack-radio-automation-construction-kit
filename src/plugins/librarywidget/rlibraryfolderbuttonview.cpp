@@ -26,6 +26,15 @@
 #include "rlibrarybutton.h"
 #include <QtGui>
 
+
+/* BUG: we get a crash if we:
+   - load library widegt plugin
+   - click insert normal state test button
+   - delete plugin
+   - load it again and click state change button
+*/
+
+
 RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) :
     QWidget(parent),
     m_core(api),
