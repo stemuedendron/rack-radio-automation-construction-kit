@@ -38,6 +38,7 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     deleteState = new QState(machine);
     previewState = new QState(machine);
     machine->setInitialState(normalState);
+    machine->setGlobalRestorePolicy(QStateMachine::RestoreProperties);
     machine->start();
 
 
