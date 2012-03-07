@@ -66,28 +66,7 @@ RHotKeyWidget::RHotKeyWidget(ICore *api, QWidget *parent)
     m_btEdit->setCheckable(true);
     QObject::connect(m_btEdit, SIGNAL(toggled(bool)), this, SIGNAL(editMode(bool)));
     QObject::connect(m_btEdit, SIGNAL(toggled(bool)), m_btEdit, SLOT(setBlinking(bool)));
-
-
-
-    //global state handling:
-//    QObject::connect(m_core->normalState, SIGNAL(exited()), m_btEdit, SLOT(setUnchecked()));
-
-    //variante 1: edit only in normalState
-//    m_core->insertState->assignProperty(m_btEdit, "enabled", false);
-//    m_core->deleteState->assignProperty(m_btEdit, "enabled", false);
-//    m_core->previewState->assignProperty(m_btEdit, "enabled", false);
-//    m_core->normalState->assignProperty(m_btEdit, "enabled", true);
-
-    //variante 2: edit can switch back to normalState:
-//    m_core->insertState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
-//    m_core->deleteState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
-//    m_core->previewState->addTransition(m_btEdit, SIGNAL(clicked()), m_core->normalState);
-
-    //variante 3: parallel states:
-    //button onclick must handling global + user state
-
-
-    ////end state hanling
+    QObject::connect(m_core, SIGNAL(normalStateChanged(bool)), m_btEdit, SLOT(setEnabled(bool)));
 
     RPushButton *btIndex = new RPushButton(tr("Index"));
     btIndex->setObjectName("rackButton");
@@ -173,6 +152,8 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
         {
             RButton *hkb = new RButton(RButton::bkHotKey);
             hkb->setObjectName("rackHotkeyButton");
+            QObject::connect(m_core, SIGNAL(stateChanged(ICore::CoreState)), hkb, SLOT(setState(ICore::CoreState)));
+
 
             //we pass initialy 'this' as parent to avoid flicker
             //(wich should normally not occur, qlabel bug?)

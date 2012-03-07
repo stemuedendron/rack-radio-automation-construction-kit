@@ -27,11 +27,10 @@
 #include <QtGui>
 
 
-/* BUG: we get a crash if we:
-   - load library widegt plugin
-   - click insert normal state test button
-   - delete plugin
-   - load it again and click state change button
+/* TODO
+
+  add selection to show 'insert provider'
+
 */
 
 
@@ -82,20 +81,6 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
 
     RPushButton *b3 = new RPushButton(tr("New"));
     b3->setObjectName("rackFooterButton");
-
-
-    //state test:
-    m_core->normalState->addTransition(b3, SIGNAL(clicked()), m_core->insertState);
-    m_core->insertState->addTransition(b3, SIGNAL(clicked()), m_core->normalState);
-//    m_core->normalState->assignProperty(b3, "text", "normalState");
-//    m_core->insertState->assignProperty(b3, "text", "insertState");
-//    m_core->deleteState->assignProperty(b3, "text", "delete");
-//    m_core->previewState->assignProperty(b3, "text", "preview");
-
-
-
-
-
     RPushButton *b4 = new RPushButton(tr("Info"));
     b4->setObjectName("rackFooterButton");
     RPushButton *b5 = new RPushButton(tr("Edit"));
@@ -126,6 +111,10 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
     QObject::connect(b1, SIGNAL(clicked()), this, SLOT(previousPage()));
     QObject::connect(b2, SIGNAL(clicked()), this, SLOT(nextPage()));
 
+}
+
+RLibraryFolderButtonView::~RLibraryFolderButtonView()
+{
 }
 
 void RLibraryFolderButtonView::resizeEvent(QResizeEvent *)
@@ -203,7 +192,11 @@ void RLibraryFolderButtonView::setButtonData()
     for (int i = 0; i < m_buttons->layout()->count(); i++)
     {
         RLibraryButton *button = qobject_cast<RLibraryButton *>(m_buttons->layout()->itemAt(i)->widget());
+
         button->setProperty("isFolder", false);
+        button->setState(ICore::NormalState);
+        QObject::disconnect(button, SIGNAL(clicked()), m_core, SIGNAL(toggleInsertState()));
+        QObject::disconnect(m_core, SIGNAL(stateChanged(ICore::CoreState)), button, SLOT(setState(ICore::CoreState)));
 
         if (m_model->hasIndex(i + indexOffset, 0, m_root))
         {
@@ -213,6 +206,12 @@ void RLibraryFolderButtonView::setButtonData()
             {
                 button->setProperty("isFolder", true);
             }
+            else
+            {
+                button->setState(m_core->state());
+                QObject::connect(m_core, SIGNAL(stateChanged(ICore::CoreState)), button, SLOT(setState(ICore::CoreState)));
+                QObject::connect(button, SIGNAL(clicked()), m_core, SLOT(toggleInsertState()));
+            }
         }
         else
         {
@@ -220,6 +219,7 @@ void RLibraryFolderButtonView::setButtonData()
             button->setEnabled(false);
         }
 
+        //change this, move folder property in rpushbutton class
         style()->unpolish(button);
         style()->polish(button);
 

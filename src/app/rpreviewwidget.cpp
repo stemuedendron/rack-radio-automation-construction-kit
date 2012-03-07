@@ -43,23 +43,14 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 
 }
 
-void RPreviewWidget::fadeIn()
+void RPreviewWidget::fade(bool in)
 {
     raise();
     m_ani->stop();
-    m_ani->setStartValue(QPoint(x(), parentWidget()->height()));
-    m_ani->setEndValue(QPoint(x(), parentWidget()->height() - height() + 4));
+    in ? m_ani->setStartValue(QPoint(x(), parentWidget()->height())) : m_ani->setStartValue(QPoint(x(), parentWidget()->height() - height() + 4));
+    in ? m_ani->setEndValue(QPoint(x(), parentWidget()->height() - height() + 4)) : m_ani->setEndValue(QPoint(x(), parentWidget()->height()));
     m_ani->start();
-    m_in = true;
-}
-
-void RPreviewWidget::fadeOut()
-{
-    m_ani->stop();
-    m_ani->setStartValue(QPoint(x(), parentWidget()->height() - height() + 4));
-    m_ani->setEndValue(QPoint(x(), parentWidget()->height()));
-    m_ani->start();
-    m_in = false;
+    m_in = in;
 }
 
 void RPreviewWidget::paintEvent(QPaintEvent *)

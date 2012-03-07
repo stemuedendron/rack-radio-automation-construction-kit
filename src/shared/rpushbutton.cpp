@@ -21,26 +21,33 @@
 */
 
 #include "rpushbutton.h"
+#include "icore.h"
+#include <QtGui>
 
 RPushButton::RPushButton(QWidget *parent) :
-    QPushButton(parent)
+    QPushButton(parent),
+    m_state(ICore::NormalState)
 {
     setFocusPolicy(Qt::NoFocus);
 }
 
 RPushButton::RPushButton(const QString &text, QWidget *parent) :
-    QPushButton(text, parent)
+    QPushButton(text, parent),
+    m_state(ICore::NormalState)
 {
     setFocusPolicy(Qt::NoFocus);
 }
 
-RPushButton::RPushButton(const QIcon &icon, const QString &text, QWidget *parent) :
-    QPushButton(icon, text, parent)
+void RPushButton::setState(ICore::CoreState state)
 {
-    setFocusPolicy(Qt::NoFocus);
+    m_state = state;
+    style()->unpolish(this);
+    style()->polish(this);
 }
 
 void RPushButton::setUnchecked()
 {
     if (isCheckable()) setChecked(false);
 }
+
+

@@ -26,7 +26,6 @@
 #include "icore.h"
 
 class RackWindow;
-class QState;
 class QFileSystemModel;
 
 class CoreImpl : public ICore
@@ -38,33 +37,27 @@ public:
     CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
-
-//    State state() const;
+    ICore::CoreState state() const;
 
     QList<QAbstractItemModel *> modelList() const;
 
 public slots:
 
-//    void setInsertState(bool set = true);
-//    void setDeleteState(bool set = true);
-//    void setPreviewState(bool set = true);
+    void setNormalState();
+    void toggleInsertState();
+    void toggleDeleteState();
+    void togglePreviewState();
 
     void getHello(const QString &);
-
-signals:
-
-//    void enterNormalState();
-//    void enterInsertState();
-//    void enterDeleteState();
-//    void enterPreviewState();
 
 private:
 
     RackWindow *m_mainwindow;
 
-//    State m_state;
-//    void setState(State astate, bool set);
-//    void emitStateChangeSignals(bool set);
+    ICore::CoreState m_state;
+    ICore::CoreState m_oldState;
+    void toggleState(ICore::CoreState stateOne, ICore::CoreState stateTwo);
+    void emitStateChangeSignals(ICore::CoreState state, bool set);
 
     QList<QAbstractItemModel *> m_modelList;
 
@@ -73,7 +66,6 @@ private:
 
     //maybe we need this?
     //friend class RackWindow;
-
 
 protected:
 

@@ -23,21 +23,30 @@
 #ifndef RPUSHBUTTON_H
 #define RPUSHBUTTON_H
 
+#include "icore.h"
 #include <QPushButton>
 
 class RPushButton : public QPushButton
 {
     Q_OBJECT
+    Q_PROPERTY(int state READ state)
 
 public:
 
     explicit RPushButton(QWidget *parent = 0);
     explicit RPushButton(const QString &text, QWidget *parent=0);
-    RPushButton(const QIcon& icon, const QString &text, QWidget *parent=0);
+
+    int state() const {return m_state;}
+
 
 public slots:
 
+    void setState(ICore::CoreState state);
     void setUnchecked();
+
+private:
+
+    ICore::CoreState m_state;
 
 };
 

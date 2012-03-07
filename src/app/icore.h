@@ -24,8 +24,8 @@
 #define ICORE_H
 
 #include <QObject>
+#include <QMetaType>
 
-class QState;
 class QAbstractItemModel;
 //class QItemSelection;
 
@@ -33,28 +33,22 @@ class QAbstractItemModel;
 class ICore : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(CoreState)
 
 public:
 
     ICore() {}
     virtual ~ICore() {}
 
-    QState *normalState;
-    QState *insertState;
-    QState *deleteState;
-    QState *previewState;
+    enum CoreState
+    {
+        NormalState,
+        InsertState,
+        PreviewState,
+        DeleteState
+    };
 
-//    enum State
-//    {
-//        NormalState,
-//        InsertState,
-//        PreviewState,
-//        DeleteState
-//    };
-
-
-//    virtual State state() const = 0;
-
+    virtual CoreState state() const = 0;
 
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
@@ -67,22 +61,26 @@ public:
 
 public slots:
 
-//    virtual void setInsertState(bool set = true) = 0;
-//    virtual void setPreviewState(bool set = true) = 0;
+    virtual void setNormalState() = 0;
+    virtual void toggleInsertState() = 0;
+    virtual void toggleDeleteState() = 0;
+    virtual void togglePreviewState() = 0;
 
     virtual void getHello(const QString &) = 0;
 
 signals:
 
-//    void normalStateChanged(bool set);
-//    void insertStateChanged(bool set);
-//    void deleteStateChanged(bool set);
-//    void previewStateChanged(bool set);
-
+    void stateChanged(ICore::CoreState);
+    void normalStateChanged(bool);
+    void insertStateChanged(bool);
+    void deleteStateChanged(bool);
+    void previewStateChanged(bool);
 
     void timeStrChanged(QString);
     void dateStrChanged(QString);
 
 };
+
+//Q_DECLARE_METATYPE(ICore::CoreState)
 
 #endif // ICORE_H

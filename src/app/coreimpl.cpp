@@ -28,19 +28,12 @@
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
+    m_state(ICore::NormalState),
+    m_oldState(ICore::NormalState),
     m_fileSystemModel(new QFileSystemModel(this))
 {
 
-    //state machine:
-    QStateMachine *machine = new QStateMachine(this);
-    normalState = new QState(machine);
-    insertState = new QState(machine);
-    deleteState = new QState(machine);
-    previewState = new QState(machine);
-    machine->setInitialState(normalState);
-    machine->setGlobalRestorePolicy(QStateMachine::RestoreProperties);
-    machine->start();
-
+//    qRegisterMetaType<ICore::CoreState>("CoreState");
 
     //create models:
     QStringList filters;
@@ -52,97 +45,63 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 
     m_modelList.append(m_fileSystemModel);
 
-
     startTimer(1000);
 }
 
-CoreImpl::~CoreImpl()
-{
 
+ICore::CoreState CoreImpl::state() const
+{
+    return m_state;
 }
 
-//void CoreImpl::setInsertState(bool set)
-//{
-//    set ? emit enterInsertState() : emit enterNormalState();
-//}
+void CoreImpl::setNormalState()
+{
+    if (m_state == ICore::NormalState) return;
+    toggleState(ICore::NormalState, ICore::NormalState);
+}
 
-//void CoreImpl::setPreviewState(bool set)
-//{
-//    set ? emit enterPreviewState() : emit enterNormalState();
-//}
+void CoreImpl::toggleInsertState()
+{
+    if (m_state == ICore::NormalState or m_state == ICore::InsertState) toggleState(ICore::InsertState, ICore::NormalState);
+}
 
-//void CoreImpl::setDeleteState(bool set)
-//{
-//    set ? emit enterDeleteState() : emit enterNormalState();
-//}
+void CoreImpl::toggleDeleteState()
+{
+    toggleState(ICore::DeleteState, ICore::NormalState);
+}
 
+void CoreImpl::togglePreviewState()
+{
+    toggleState(ICore::PreviewState, ICore::NormalState);
+}
 
-//ICore::State CoreImpl::state() const
-//{
-//    return m_state;
-//}
+void CoreImpl::toggleState(ICore::CoreState stateOne, ICore::CoreState stateTwo)
+{
+    m_oldState = m_state;
+    m_state == stateOne ? m_state = stateTwo : m_state = stateOne;
+    emit stateChanged(m_state);
+    emitStateChangeSignals(m_oldState, false);
+    emitStateChangeSignals(m_state, true);
+}
 
-//void CoreImpl::setInsertState(bool set)
-//{
-//    if (m_state == NormalState)
-//    {
-//        setState(InsertState, set);
-//    }
-//}
-
-//void CoreImpl::setPreviewState(bool set)
-//{
-//    setState(PreviewState, set);
-//}
-
-//void CoreImpl::setDeleteState(bool set)
-//{
-//   setState(DeleteState, set);
-//}
-
-//void CoreImpl::setState(ICore::State astate, bool set)
-//{
-//    if (m_state == astate && set) return;
-
-//    emitStateChangeSignals(set);
-
-//    set ? m_state = astate : m_state = NormalState;
-//    emitStateChangeSignals(true);
-
-
-//    if (set)
-//    {
-//        if (m_state == astate) return;
-//        emitStateChangeSignals(true);
-//        m_state = astate;
-
-//    }
-//    else
-//    {
-//        if (m_state != astate) return;
-//        emitStateChangeSignals(false);
-//        m_state = NormalState;
-//    }
-
-
-
-//}
-
-//void CoreImpl::emitStateChangeSignals(bool set)
-//{
-//    switch (m_state)
-//    {
-//        case InsertState:
-//            emit normalStateChanged(set);
-//            break;
-//        case PreviewState:
-//            emit previewStateChanged(set);
-//            break;
-//        case DeleteState:
-//            emit deleteStateChanged(set);
-//            break;
-//    }
-//}
+void CoreImpl::emitStateChangeSignals(ICore::CoreState state, bool set)
+{
+    switch (state)
+    {
+        case ICore::NormalState:
+            emit normalStateChanged(set);
+            break;
+        case ICore::InsertState:
+            emit insertStateChanged(set);
+            break;
+        case ICore::PreviewState:
+            emit previewStateChanged(set);
+            break;
+        case ICore::DeleteState:
+            emit deleteStateChanged(set);
+            break;
+    }
+}
 
 
 QList<QAbstractItemModel *> CoreImpl::modelList() const
@@ -160,6 +119,13 @@ void CoreImpl::getHello(const QString &str)
 {
     m_mainwindow->setWindowTitle(str);
 }
+
+CoreImpl::~CoreImpl()
+{
+
+}
+
+
 
 
 

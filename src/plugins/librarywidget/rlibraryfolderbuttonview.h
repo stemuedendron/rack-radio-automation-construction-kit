@@ -39,6 +39,7 @@ class RLibraryFolderButtonView : public QWidget
 public:
 
     explicit RLibraryFolderButtonView(ICore *api, QWidget *parent = 0);
+    ~RLibraryFolderButtonView();
 
     void setModel (QAbstractItemModel *model);
     QAbstractItemModel *model() const;

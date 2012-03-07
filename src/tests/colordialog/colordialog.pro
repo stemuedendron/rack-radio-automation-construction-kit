@@ -23,12 +23,14 @@
 TARGET = colordialog
 
 INCLUDEPATH += \
-    ../../shared
+    ../../shared \
+    ../../app
 
 HEADERS +=\
      mainwindow.h \
     ../../shared/rcolordialog.h \
-    ../../shared/rpushbutton.h
+    ../../shared/rpushbutton.h \
+    ../../app/icore.h
 
 SOURCES += \
     main.cpp \

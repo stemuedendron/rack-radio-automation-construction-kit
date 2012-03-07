@@ -35,7 +35,9 @@ class RBlinkButton : public RPushButton
 public:
 
     explicit RBlinkButton(const QString &text, QWidget *parent = 0);
+
     int blinking() const {return m_blinking;}
+
     int interval() const {return m_timer->interval();}
     void setInterval(int interval) {m_timer->setInterval(interval);}
 

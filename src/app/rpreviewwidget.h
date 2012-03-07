@@ -39,8 +39,7 @@ signals:
     
 public slots:
 
-    void fadeIn();
-    void fadeOut();
+    void fade(bool in);
 
 protected:
 

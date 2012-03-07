@@ -695,9 +695,28 @@ QPushButton:pressed {
     background-color: rgba(0,0,255,30%);
 }
 
-[previewState="true"]#rackHotkeyButton {
-    background-image: url(:/images/pfl-small.png);
+/* CoreStates:
+0 NormalState,
+1 InsertState,
+2 PreviewState,
+3 DeleteState
+*/
+
+[state="1"]#rackHotkeyButton {
+    background-color: blue;
 }
+
+[state="2"]#rackHotkeyButton {
+    background-image: url(:/images/pfl-small.png);
+    background-repeat: none;
+    background-origin: content;
+}
+
+[state="3"]#rackHotkeyButton {
+    color: red;
+}
+
+
 
 /*
 [playingOrPaused="true"]#rackHotkeyButton {
@@ -714,14 +733,23 @@ QPushButton:pressed {
 
 /*Library Widget*/
 
-/*
-[isFolder="false"]#rackLibraryViewButton {
+[state="1"]#rackLibraryViewButton {
+    background-color: blue;
+}
+
+[state="2"]#rackLibraryViewButton {
     background-image: url(:/images/pfl-small.png);
     background-repeat: none;
     background-origin: content;
-    padding: 4px
 }
-*/
+
+[state="3"]#rackLibraryViewButton {
+    color: red;
+}
+
+
+
+
 
 [isFolder="true"]#rackLibraryViewButton {
     background-image: url(:/images/folder.png);
