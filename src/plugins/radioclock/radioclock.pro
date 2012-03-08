@@ -31,7 +31,8 @@ HEADERS = \
     rradioclockplugin.h \
     rradioclock.h \
     ../../shared/rcolordialog.h \
-    ../../shared/rpushbutton.h
+    ../../shared/rpushbutton.h \
+    ../../shared/rack.h
 
 SOURCES = \
     rradioclockplugin.cpp \

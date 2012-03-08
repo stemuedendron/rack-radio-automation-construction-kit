@@ -43,7 +43,8 @@ HEADERS += \
     ../shared/rpushbutton.h \
     ../shared/rblinkbutton.h \
     rsortfilterproxymodel.h \
-    rpreviewwidget.h
+    rpreviewwidget.h \
+    ../shared/rack.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

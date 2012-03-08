@@ -194,9 +194,9 @@ void RLibraryFolderButtonView::setButtonData()
         RLibraryButton *button = qobject_cast<RLibraryButton *>(m_buttons->layout()->itemAt(i)->widget());
 
         button->setProperty("isFolder", false);
-        button->setState(ICore::NormalState);
+        button->setState(Rack::NormalState);
         QObject::disconnect(button, SIGNAL(clicked()), m_core, SIGNAL(toggleInsertState()));
-        QObject::disconnect(m_core, SIGNAL(stateChanged(ICore::CoreState)), button, SLOT(setState(ICore::CoreState)));
+        QObject::disconnect(m_core, SIGNAL(stateChanged(Rack::CoreState)), button, SLOT(setState(Rack::CoreState)));
 
         if (m_model->hasIndex(i + indexOffset, 0, m_root))
         {
@@ -209,7 +209,7 @@ void RLibraryFolderButtonView::setButtonData()
             else
             {
                 button->setState(m_core->state());
-                QObject::connect(m_core, SIGNAL(stateChanged(ICore::CoreState)), button, SLOT(setState(ICore::CoreState)));
+                QObject::connect(m_core, SIGNAL(stateChanged(Rack::CoreState)), button, SLOT(setState(Rack::CoreState)));
                 QObject::connect(button, SIGNAL(clicked()), m_core, SLOT(toggleInsertState()));
             }
         }

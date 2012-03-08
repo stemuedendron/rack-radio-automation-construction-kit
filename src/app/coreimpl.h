@@ -37,7 +37,7 @@ public:
     CoreImpl(RackWindow *mainwindow);
     ~CoreImpl();
 
-    ICore::CoreState state() const;
+    Rack::CoreState state() const;
 
     QList<QAbstractItemModel *> modelList() const;
 
@@ -54,10 +54,10 @@ private:
 
     RackWindow *m_mainwindow;
 
-    ICore::CoreState m_state;
-    ICore::CoreState m_oldState;
-    void toggleState(ICore::CoreState stateOne, ICore::CoreState stateTwo);
-    void emitStateChangeSignals(ICore::CoreState state, bool set);
+    Rack::CoreState m_state;
+    Rack::CoreState m_oldState;
+    void toggleState(Rack::CoreState stateOne, Rack::CoreState stateTwo);
+    void emitStateChangeSignals(Rack::CoreState state, bool set);
 
     QList<QAbstractItemModel *> m_modelList;
 

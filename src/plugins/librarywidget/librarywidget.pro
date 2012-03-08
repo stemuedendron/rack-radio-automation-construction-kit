@@ -31,7 +31,8 @@ HEADERS = \
     rlibrarywidgetplugin.h \
     ../../shared/rpushbutton.h \
     rlibraryfolderbuttonview.h \
-    rlibrarybutton.h
+    rlibrarybutton.h \
+    ../../shared/rack.h
 
 SOURCES = \
     rlibrarywidget.cpp \

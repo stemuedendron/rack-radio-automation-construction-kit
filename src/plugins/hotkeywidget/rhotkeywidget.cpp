@@ -152,7 +152,7 @@ void RHotKeyWidget::createHotkeyPage(QString title, int rows, int cols)
         {
             RButton *hkb = new RButton(RButton::bkHotKey);
             hkb->setObjectName("rackHotkeyButton");
-            QObject::connect(m_core, SIGNAL(stateChanged(ICore::CoreState)), hkb, SLOT(setState(ICore::CoreState)));
+            QObject::connect(m_core, SIGNAL(stateChanged(Rack::CoreState)), hkb, SLOT(setState(Rack::CoreState)));
 
 
             //we pass initialy 'this' as parent to avoid flicker

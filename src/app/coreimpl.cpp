@@ -28,8 +28,8 @@
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
-    m_state(ICore::NormalState),
-    m_oldState(ICore::NormalState),
+    m_state(Rack::NormalState),
+    m_oldState(Rack::NormalState),
     m_fileSystemModel(new QFileSystemModel(this))
 {
 
@@ -47,33 +47,36 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 }
 
 
-ICore::CoreState CoreImpl::state() const
+Rack::CoreState CoreImpl::state() const
 {
     return m_state;
 }
 
 void CoreImpl::setNormalState()
 {
-    if (m_state == ICore::NormalState) return;
-    toggleState(ICore::NormalState, ICore::NormalState);
+    if (m_state == Rack::NormalState) return;
+    toggleState(Rack::NormalState, Rack::NormalState);
 }
 
 void CoreImpl::toggleInsertState()
 {
-    if (m_state == ICore::NormalState or m_state == ICore::InsertState) toggleState(ICore::InsertState, ICore::NormalState);
+    if (m_state == Rack::NormalState or m_state == Rack::InsertState)
+    {
+        toggleState(Rack::InsertState, Rack::NormalState);
+    }
 }
 
 void CoreImpl::toggleDeleteState()
 {
-    toggleState(ICore::DeleteState, ICore::NormalState);
+    toggleState(Rack::DeleteState, Rack::NormalState);
 }
 
 void CoreImpl::togglePreviewState()
 {
-    toggleState(ICore::PreviewState, ICore::NormalState);
+    toggleState(Rack::PreviewState, Rack::NormalState);
 }
 
-void CoreImpl::toggleState(ICore::CoreState stateOne, ICore::CoreState stateTwo)
+void CoreImpl::toggleState(Rack::CoreState stateOne, Rack::CoreState stateTwo)
 {
     m_oldState = m_state;
     m_state == stateOne ? m_state = stateTwo : m_state = stateOne;
@@ -82,20 +85,20 @@ void CoreImpl::toggleState(ICore::CoreState stateOne, ICore::CoreState stateTwo)
     emitStateChangeSignals(m_state, true);
 }
 
-void CoreImpl::emitStateChangeSignals(ICore::CoreState state, bool set)
+void CoreImpl::emitStateChangeSignals(Rack::CoreState state, bool set)
 {
     switch (state)
     {
-        case ICore::NormalState:
+        case Rack::NormalState:
             emit normalStateChanged(set);
             break;
-        case ICore::InsertState:
+        case Rack::InsertState:
             emit insertStateChanged(set);
             break;
-        case ICore::PreviewState:
+        case Rack::PreviewState:
             emit previewStateChanged(set);
             break;
-        case ICore::DeleteState:
+        case Rack::DeleteState:
             emit deleteStateChanged(set);
             break;
     }

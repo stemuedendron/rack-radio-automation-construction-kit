@@ -30,6 +30,7 @@ HEADERS +=\
      mainwindow.h \
     ../../shared/rcolordialog.h \
     ../../shared/rpushbutton.h \
+    ../../shared/rack.h \
     ../../app/icore.h
 
 SOURCES += \

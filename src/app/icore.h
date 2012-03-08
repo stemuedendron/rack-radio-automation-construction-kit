@@ -23,8 +23,8 @@
 #ifndef ICORE_H
 #define ICORE_H
 
+#include "rack.h"
 #include <QObject>
-#include <QMetaType>
 
 class QAbstractItemModel;
 //class QItemSelection;
@@ -33,22 +33,14 @@ class QAbstractItemModel;
 class ICore : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(CoreState)
 
 public:
 
     ICore() {}
     virtual ~ICore() {}
 
-    enum CoreState
-    {
-        NormalState,
-        InsertState,
-        PreviewState,
-        DeleteState
-    };
 
-    virtual CoreState state() const = 0;
+    virtual Rack::CoreState state() const = 0;
 
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
@@ -70,7 +62,7 @@ public slots:
 
 signals:
 
-    void stateChanged(ICore::CoreState);
+    void stateChanged(Rack::CoreState);
     void normalStateChanged(bool);
     void insertStateChanged(bool);
     void deleteStateChanged(bool);

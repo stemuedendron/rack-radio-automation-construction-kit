@@ -35,7 +35,8 @@ HEADERS = \
     rpageedit.h \
     rindexbutton.h \
     rhotkeywidget.h \
-    rhotkeywidgetplugin.h
+    rhotkeywidgetplugin.h \
+    ../../shared/rack.h
 
 SOURCES = \
     ../../shared/rplayer.cpp \

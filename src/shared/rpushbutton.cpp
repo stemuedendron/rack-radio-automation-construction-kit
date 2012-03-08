@@ -26,19 +26,19 @@
 
 RPushButton::RPushButton(QWidget *parent) :
     QPushButton(parent),
-    m_state(ICore::NormalState)
+    m_state(Rack::NormalState)
 {
     setFocusPolicy(Qt::NoFocus);
 }
 
 RPushButton::RPushButton(const QString &text, QWidget *parent) :
     QPushButton(text, parent),
-    m_state(ICore::NormalState)
+    m_state(Rack::NormalState)
 {
     setFocusPolicy(Qt::NoFocus);
 }
 
-void RPushButton::setState(ICore::CoreState state)
+void RPushButton::setState(Rack::CoreState state)
 {
     m_state = state;
     style()->unpolish(this);

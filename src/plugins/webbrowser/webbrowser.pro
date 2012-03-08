@@ -30,7 +30,8 @@ CONFIG += plugin
 HEADERS = \
     rwebbrowserplugin.h \
     rwebbrowser.h \
-    ../../shared/rpushbutton.h
+    ../../shared/rpushbutton.h \
+    ../../shared/rack.h
 
 SOURCES = \
     rwebbrowserplugin.cpp \
