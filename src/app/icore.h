@@ -81,6 +81,5 @@ signals:
 
 };
 
-//Q_DECLARE_METATYPE(ICore::CoreState)
 
 #endif // ICORE_H

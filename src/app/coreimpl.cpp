@@ -33,8 +33,6 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_fileSystemModel(new QFileSystemModel(this))
 {
 
-//    qRegisterMetaType<ICore::CoreState>("CoreState");
-
     //create models:
     QStringList filters;
     filters << "*.wav" << "*.ogg" << "*.aiff" << "*.mp3" << "*.mp2" << "*.mp1" << "*.mus";
