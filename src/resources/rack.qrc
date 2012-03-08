@@ -45,5 +45,7 @@
         <file>images/hotkeys-hover.png</file>
         <file>images/hotkeys.png</file>
         <file>images/folder.png</file>
+        <file>images/stop.png</file>
+        <file>images/previewslider.png</file>
     </qresource>
 </RCC>

@@ -68,13 +68,115 @@ QToolButton#RHotKeyWidgetToolButton:hover {
     image: url(:/images/hotkeys-hover.png);
 }
 
-#rackPreviewWidget {
-    min-width: 480px;
-    min-height: 160px;
+
+/* Preview Widget */
+
+#rackPreviewWidget,
+#rackPreviewWidgetBox,
+#rackPreviewWidgetTimeBox {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #202020, stop: 1 #000000);
+}
+
+#rackPreviewWidget {
+    min-width: 520px;
+    min-height: 175px;
     border: 4px solid red;
     border-radius: 4px;
 }
+
+#rackPreviewWidgetBox,
+#rackPreviewWidgetTimeBox {
+    border: 2px solid #202020;
+    border-radius: 6px;
+}
+
+#rackPreviewWidgetLabel,
+#rackPreviewWidgetTimeLabel,
+#rackPreviewWidgetMSLabel,
+#rackPreviewWidgetStatusLabel,
+#rackPreviewWidgetJumpLabel,
+#rackPreviewWidgetSliderLabels {
+    color: #FFFFFF;
+}
+
+#rackPreviewWidgetLabel {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#rackPreviewWidgetTimeLabel {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+#rackPreviewWidgetMSLabel,
+#rackPreviewWidgetStatusLabel {
+    font-size: 11px;
+    font-weight: bold;
+    color: #A0A0A0;
+}
+
+#rackPreviewWidgetJumpLabel,
+#rackPreviewWidgetSliderLabels {
+    font-size: 16px;
+}
+
+#rackPreviewWidgetPlay,
+#rackPreviewWidgetStop {
+    min-width: 50px;
+    min-height: 50px;
+    icon-size: 35px;
+}
+
+#rackPreviewWidgetPlay:pressed,
+#rackPreviewWidgetStop:pressed {
+    border-color:#FFFFFF;
+}
+
+#rackPreviewWidgetPlay {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #009900, stop: 0.49 #007000, stop: 0.5 #006600);
+    border-color: #006600;
+    qproperty-icon: url(:/images/play.png);
+}
+
+#rackPreviewWidgetPlay:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #0DAC13, stop: 0.49 #0D8313, stop: 0.5 #0D7913);
+}
+
+#rackPreviewWidgetStop {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F00000, stop: 0.49 #C00000, stop: 0.5 #B00000);
+    border-color: #B00000;
+    qproperty-icon: url(:/images/stop.png)
+}
+
+#rackPreviewWidgetStop:hover {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FD1313, stop: 0.49 #CD1313, stop: 0.5 #BD1313);
+}
+
+#rackPreviewWidgetSlider {
+    height: 33px;
+}
+
+#rackPreviewWidgetSlider::groove:horizontal {
+    border-radius: 5px;
+    height: 14px;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #00C000, stop: 0.49 #008000, stop: 0.5 #007000);
+    margin-left: 9px;
+    margin-right: 9px;
+}
+
+#rackPreviewWidgetSlider::handle:horizontal {
+    image: url(:/images/previewslider.png);
+    margin: -9px;
+}
+
+#rackPreviewWidgetJumpButton {
+    min-height: 40px;
+    max-height: 40px;
+}
+
+
+
 
 #rackMainSplitter {
     margin: 2px;

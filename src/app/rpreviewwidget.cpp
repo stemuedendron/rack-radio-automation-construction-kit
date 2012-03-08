@@ -34,10 +34,64 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
     qApp->installEventFilter(this);
     m_ani->setDuration(50);
 
-    RPushButton *play = new RPushButton(tr("Play"));
 
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->addWidget(play);
+    QLabel *label = new QLabel("Song, Band");
+    label->setObjectName("rackPreviewWidgetLabel");
+
+    QWidget *boxLeft = new QWidget;
+    boxLeft->setObjectName("rackPreviewWidgetBox");
+    QHBoxLayout *boxLeftLayout = new QHBoxLayout(boxLeft);
+    QWidget *timeBox = new QWidget;
+    timeBox->setObjectName("rackPreviewWidgetTimeBox");
+    QGridLayout *timeBoxLayout = new QGridLayout(timeBox);
+    QLabel *timeLabel = new QLabel("00:03:52");
+    timeLabel->setObjectName("rackPreviewWidgetTimeLabel");
+    QLabel *msLabel = new QLabel("300");
+    msLabel->setObjectName("rackPreviewWidgetMSLabel");
+    QLabel *statusLabel = new QLabel("PREVIEWING");
+    statusLabel->setObjectName("rackPreviewWidgetStatusLabel");
+    timeBoxLayout->addWidget(timeLabel, 0,0);
+    timeBoxLayout->addWidget(msLabel,   0,1, Qt::AlignBottom);
+    timeBoxLayout->addWidget(statusLabel, 1,0,1,2, Qt::AlignHCenter);
+    RPushButton *play = new RPushButton;
+    play->setObjectName("rackPreviewWidgetPlay");
+    RPushButton *stop = new RPushButton;
+    stop->setObjectName("rackPreviewWidgetStop");
+    boxLeftLayout->addWidget(timeBox);
+    boxLeftLayout->addWidget(play);
+    boxLeftLayout->addWidget(stop);
+
+    QWidget *boxRight = new QWidget;
+    boxRight->setObjectName("rackPreviewWidgetBox");
+    QGridLayout *boxRightLayout = new QGridLayout(boxRight);
+    QLabel *jumpLabel = new QLabel(tr("Jump To"));
+    jumpLabel->setObjectName("rackPreviewWidgetJumpLabel");
+    RPushButton *startButton = new RPushButton(tr("Start"));
+    startButton->setObjectName("rackPreviewWidgetJumpButton");
+    RPushButton *secondsButton = new RPushButton(tr("Last 10s"));
+    secondsButton->setObjectName("rackPreviewWidgetJumpButton");
+    boxRightLayout->addWidget(jumpLabel,     0,0,1,2, Qt::AlignHCenter);
+    boxRightLayout->addWidget(startButton,   1,0);
+    boxRightLayout->addWidget(secondsButton, 1,1);
+
+    QLabel *startLabel = new QLabel(tr("00:00"));
+    startLabel->setObjectName("rackPreviewWidgetSliderLabels");
+    QSlider *slider = new QSlider(Qt::Horizontal);
+    slider->setObjectName("rackPreviewWidgetSlider");
+    QLabel *endLabel = new QLabel(tr("04:04"));
+    endLabel->setObjectName("rackPreviewWidgetSliderLabels");
+    QHBoxLayout *sliderLayout = new QHBoxLayout;
+    sliderLayout->addWidget(startLabel);
+    sliderLayout->addWidget(slider);
+    sliderLayout->addWidget(endLabel);
+
+    QGridLayout *layout = new QGridLayout;
+    layout->setContentsMargins(18,18,18,18);
+    layout->addWidget(label,        0,0,1,2);
+    layout->addWidget(boxLeft,      1,0);
+    layout->addWidget(boxRight,     1,1);
+    layout->addLayout(sliderLayout, 2,0,1,2);
+
 
     setLayout(layout);
 
