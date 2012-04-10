@@ -53,6 +53,7 @@ public:
 
 public slots:
 
+    //state slots:
     virtual void setNormalState() = 0;
     virtual void toggleInsertState() = 0;
     virtual void toggleDeleteState() = 0;
@@ -62,6 +63,7 @@ public slots:
 
 signals:
 
+    //state signals:
     void stateChanged(Rack::CoreState);
     void normalStateChanged(bool);
     void insertStateChanged(bool);

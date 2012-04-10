@@ -35,6 +35,8 @@
 
 //TODO: only one qpluginloader per plugin (use member e.g. QList pluginLibs)
 // create many pluginwidgets form this loader
+//QList plugin widget pointers, connect destroyed signals to remove from list
+//and check if we can unload the plugin
 
 //BUG: if we load many plugins each in one pluginhost (splitter) then we have many toolbars
 //that make the window width grown
@@ -339,7 +341,7 @@ void RackWindow::createPluginHost(int position)
 
 //FIXME: keep loaded plugins in own plugin manager and
 //unload plugins to let load new version without
-//the need of restarting the application
+//the need to restart the application
 void RackWindow::loadPlugin(QWidget *pluginHost)
 {
     QDir pluginsDir(qApp->applicationDirPath());
