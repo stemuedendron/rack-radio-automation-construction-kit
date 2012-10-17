@@ -25,7 +25,7 @@
 
 /* todo: use variables and implement own stylesheet loader to parse the sheet
 
-rack colors gradients 1-9 over colordialog buttons properties
+rack colors gradients 1-9 via colordialog buttons properties
 
 
 */
