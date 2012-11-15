@@ -54,11 +54,60 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     m_webView->load(QUrl("http://www.radiofrei.de/"));
     setCentralWidget(m_webView);
 
+    ///test zoom
+
+    QSpinBox *sbox = new QSpinBox;
+    sbox->setValue(100);
+    sbox->setRange(30,200);
+    sbox->setSingleStep(1);
+    QObject::connect(sbox, SIGNAL(valueChanged(int)), SLOT(setZoom(int)));
+    toolBar->addWidget(sbox);
+
+
+    ///
+
 }
 
 void RWebBrowser::adjustLocation()
 {
     m_locationEdit->setText(m_webView->url().toString());
+
+    QWebFrame* frame = m_webView->page()->currentFrame();
+    if (frame!=NULL)
+    {
+        QWebElementCollection collection = frame->findAllElements("a");
+        foreach (QWebElement element, collection)
+        {
+            QStringList attributesList = element.attributeNames();
+            foreach (QString attributeName, attributesList)
+            {
+
+                if (attributeName != "href") break;
+                if (element.attribute(attributeName).contains(".mp1", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".mp2", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".mp3", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".mpg", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".mpa", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".wav", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".ogg", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".m3u", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".pls", Qt::CaseInsensitive) or
+                    element.attribute(attributeName).contains(".xspf", Qt::CaseInsensitive))
+                {
+
+                    QUrl baseUrl(m_webView->url());
+                    QUrl relativeUrl = QUrl::fromEncoded(element.attribute(attributeName).toUtf8(), QUrl::StrictMode);
+                    QString streamName = baseUrl.resolved(relativeUrl).toString();
+
+                    qDebug() << streamName;
+
+
+                }
+            }
+        }
+
+    }
+
 }
 
 void RWebBrowser::changeLocation()
@@ -85,5 +134,12 @@ void RWebBrowser::setProgress(int p)
 void RWebBrowser::finishLoading(bool)
 {
 //    m_progress = 100;
-//    adjustTitle();
+    //    adjustTitle();
+}
+
+void RWebBrowser::setZoom(int z)
+{
+    qreal f = z / 100.0;
+    m_webView->setZoomFactor(f);
+    qDebug() << f;
 }

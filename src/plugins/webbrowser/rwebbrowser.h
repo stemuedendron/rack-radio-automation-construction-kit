@@ -45,6 +45,8 @@ protected slots:
     void setProgress(int p);
     void finishLoading(bool);
 
+    void setZoom(int z);
+
 private:
 
     ICore* m_core;
