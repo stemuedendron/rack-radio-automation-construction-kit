@@ -9,3 +9,6 @@ rechten mausklick abschaffen (touch screen)
 
 
 
+- drag and drop in settings to reorder widgets
+- auto sort of buttons in 'taskbar'
+- show widget in own window
