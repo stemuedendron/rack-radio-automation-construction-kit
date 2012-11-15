@@ -66,6 +66,16 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
 
     ///
 
+    ////test overlay button
+
+//    QWidget *testButton = new QWidget(m_webView);
+//    testButton->setPalette(QPalette(QColor(0,0,0,160)));
+//    testButton->setAutoFillBackground(true);
+//    testButton->setGeometry(10,10,80,40);
+
+
+    ///
+
 }
 
 void RWebBrowser::adjustLocation()
@@ -112,7 +122,8 @@ void RWebBrowser::adjustLocation()
 
 void RWebBrowser::changeLocation()
 {
-    QUrl url = QUrl(m_locationEdit->text());
+    QUrl baseUrl("http://");
+    QUrl url = baseUrl.resolved(QUrl(m_locationEdit->text()));
     m_webView->load(url);
     m_webView->setFocus();
 }
