@@ -26,7 +26,7 @@
 #include <QtWebKit>
 
 RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
-    : QMainWindow(parent),
+    : QWidget(parent),
       m_core(api),
       m_webView(new QWebView),
       m_locationEdit(new QLineEdit),
@@ -38,7 +38,8 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     //m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
 
-    QToolBar *toolBar = addToolBar(tr("Navigation"));
+    QToolBar *toolBar = new QToolBar;
+
     toolBar->addAction(m_webView->pageAction(QWebPage::Back));
     toolBar->addAction(m_webView->pageAction(QWebPage::Forward));
     toolBar->addAction(m_webView->pageAction(QWebPage::Reload));
@@ -52,7 +53,7 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     QObject::connect(m_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
 
     m_webView->load(QUrl("http://www.radiofrei.de/"));
-    setCentralWidget(m_webView);
+
 
     ///test zoom
 
@@ -66,15 +67,18 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
 
     ///
 
-    ////test overlay button
-
-//    QWidget *testButton = new QWidget(m_webView);
-//    testButton->setPalette(QPalette(QColor(0,0,0,160)));
-//    testButton->setAutoFillBackground(true);
-//    testButton->setGeometry(10,10,80,40);
 
 
-    ///
+    //create main layout:
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(3);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(toolBar);
+    layout->addWidget(m_webView);
+    setLayout(layout);
+
+
+
 
 }
 
@@ -82,27 +86,19 @@ void RWebBrowser::adjustLocation()
 {
     m_locationEdit->setText(m_webView->url().toString());
 
-    QWebFrame* frame = m_webView->page()->currentFrame();
+    QWebFrame* frame = m_webView->page()->mainFrame();
     if (frame!=NULL)
     {
-        QWebElementCollection collection = frame->findAllElements("a");
-        foreach (QWebElement element, collection)
+        QWebElementCollection elements = frame->findAllElements("a");
+        foreach (QWebElement element, elements)
         {
             QStringList attributesList = element.attributeNames();
             foreach (QString attributeName, attributesList)
             {
-
                 if (attributeName != "href") break;
-                if (element.attribute(attributeName).contains(".mp1", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".mp2", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".mp3", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".mpg", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".mpa", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".wav", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".ogg", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".m3u", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".pls", Qt::CaseInsensitive) or
-                    element.attribute(attributeName).contains(".xspf", Qt::CaseInsensitive))
+                QRegExp rx(".*.mp1$|.*.mp2$|.*.mp3$|.*.mp4$|.*.mpg$|.*.mpa$|.*.wav$|.*.ogg$|.*.m3u$|.*.pls$|.*.xspf$");
+                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                if (element.attribute(attributeName).contains(rx))
                 {
 
                     QUrl baseUrl(m_webView->url());
@@ -110,6 +106,15 @@ void RWebBrowser::adjustLocation()
                     QString streamName = baseUrl.resolved(relativeUrl).toString();
 
                     qDebug() << streamName;
+
+                    ////test overlay button
+
+//                    QWidget *testButton = new QWidget(this);
+//                    testButton->setPalette(QPalette(QColor(0,0,0,160)));
+//                    testButton->setAutoFillBackground(true);
+//                    testButton->setGeometry(10,10,80,40);
+
+                    //
 
 
                 }

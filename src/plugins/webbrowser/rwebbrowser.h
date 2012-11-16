@@ -23,13 +23,13 @@
 #ifndef RWEBBROWSER_H
 #define RWEBBROWSER_H
 
-#include <QMainWindow>
+#include <QWidget>
 
 class ICore;
 class QWebView;
 class QLineEdit;
 
-class RWebBrowser : public QMainWindow
+class RWebBrowser : public QWidget
 {
     Q_OBJECT
 
