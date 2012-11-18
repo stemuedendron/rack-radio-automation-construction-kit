@@ -26,6 +26,7 @@
 #include <QWidget>
 
 class ICore;
+class QVBoxLayout;
 class QWebView;
 class QLineEdit;
 
@@ -52,6 +53,7 @@ private:
     ICore* m_core;
     QWebView *m_webView;
     QLineEdit *m_locationEdit;
+    QVBoxLayout *m_buttonLayout;
     int m_progress;
 };
 

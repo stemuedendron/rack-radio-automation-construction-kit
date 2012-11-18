@@ -30,12 +30,13 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
       m_core(api),
       m_webView(new QWebView),
       m_locationEdit(new QLineEdit),
+      m_buttonLayout(new QVBoxLayout),
       m_progress(0)
 {
 
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-    //m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
 
     QToolBar *toolBar = new QToolBar;
@@ -52,7 +53,7 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     QObject::connect(m_webView, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     QObject::connect(m_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
 
-    m_webView->load(QUrl("http://www.radiofrei.de/"));
+    //m_webView->load(QUrl("http://www.radiofrei.de/"));
 
 
     ///test zoom
@@ -68,13 +69,20 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     ///
 
 
+    //create webView layout:
+    QVBoxLayout *webLayout = new QVBoxLayout;
+    webLayout->setSpacing(3);
+    webLayout->setContentsMargins(0,0,0,0);
+    webLayout->addWidget(toolBar);
+    webLayout->addWidget(m_webView);
 
     //create main layout:
-    QVBoxLayout *layout = new QVBoxLayout;
+    QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(3);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(toolBar);
-    layout->addWidget(m_webView);
+    layout->addLayout(webLayout);
+    layout->addLayout(m_buttonLayout);
+
     setLayout(layout);
 
 
@@ -85,44 +93,6 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
 void RWebBrowser::adjustLocation()
 {
     m_locationEdit->setText(m_webView->url().toString());
-
-    QWebFrame* frame = m_webView->page()->mainFrame();
-    if (frame!=NULL)
-    {
-        QWebElementCollection elements = frame->findAllElements("a");
-        foreach (QWebElement element, elements)
-        {
-            QStringList attributesList = element.attributeNames();
-            foreach (QString attributeName, attributesList)
-            {
-                if (attributeName != "href") break;
-                QRegExp rx(".*.mp1$|.*.mp2$|.*.mp3$|.*.mp4$|.*.mpg$|.*.mpa$|.*.wav$|.*.ogg$|.*.m3u$|.*.pls$|.*.xspf$");
-                rx.setCaseSensitivity(Qt::CaseInsensitive);
-                if (element.attribute(attributeName).contains(rx))
-                {
-
-                    QUrl baseUrl(m_webView->url());
-                    QUrl relativeUrl = QUrl::fromEncoded(element.attribute(attributeName).toUtf8(), QUrl::StrictMode);
-                    QString streamName = baseUrl.resolved(relativeUrl).toString();
-
-                    qDebug() << streamName;
-
-                    ////test overlay button
-
-//                    QWidget *testButton = new QWidget(this);
-//                    testButton->setPalette(QPalette(QColor(0,0,0,160)));
-//                    testButton->setAutoFillBackground(true);
-//                    testButton->setGeometry(10,10,80,40);
-
-                    //
-
-
-                }
-            }
-        }
-
-    }
-
 }
 
 void RWebBrowser::changeLocation()
@@ -151,6 +121,41 @@ void RWebBrowser::finishLoading(bool)
 {
 //    m_progress = 100;
     //    adjustTitle();
+
+    QWebFrame* frame = m_webView->page()->mainFrame();
+    if (frame!=NULL)
+    {
+        QWebElementCollection elements = frame->findAllElements("a");
+        foreach (QWebElement element, elements)
+        {
+            QStringList attributesList = element.attributeNames();
+            foreach (QString attributeName, attributesList)
+            {
+                if (attributeName != "href") break;
+                QRegExp rx(".*.mp1$|.*.mp2$|.*.mp3$|.*.mp4$|.*.mpg$|.*.mpa$|.*.wav$|.*.ogg$|.*.m3u$|.*.pls$|.*.xspf$");
+                rx.setCaseSensitivity(Qt::CaseInsensitive);
+                if (element.attribute(attributeName).contains(rx))
+                {
+
+                    QUrl baseUrl(m_webView->url());
+                    QUrl relativeUrl = QUrl::fromEncoded(element.attribute(attributeName).toUtf8(), QUrl::StrictMode);
+                    QString streamName = baseUrl.resolved(relativeUrl).toString();
+
+                    qDebug() << streamName;
+
+                    //test button
+
+                    QPushButton *testButton = new QPushButton(streamName);
+                    m_buttonLayout->addWidget(testButton);
+
+                    //
+
+
+                }
+            }
+        }
+
+    }
 }
 
 void RWebBrowser::setZoom(int z)
