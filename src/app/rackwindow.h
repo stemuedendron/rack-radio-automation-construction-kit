@@ -55,6 +55,12 @@ private slots:
 
     void toggleFullscreen();
 
+    ////test show/hide plugin widget
+
+//    void showHidePluginWidget(QWidget *pluginWidget);
+
+    /////
+
 signals:
 
     void enterSettingsMode();

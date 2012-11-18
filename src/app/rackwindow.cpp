@@ -262,6 +262,15 @@ void RackWindow::createPluginHost(int position)
     mapperSwitchPlugin->setObjectName("rackPluginSwitchMapper");
     QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(QWidget *)), pluginStack, SLOT(setCurrentWidget(QWidget *)));
 
+
+    ////test show/hide plugin widget
+
+    ////QObject::connect(mapperSwitchPlugin, SIGNAL(mapped(QWidget *)), this, SLOT(showHidePluginWidget(QWidget*)));
+
+
+    //////
+
+
     //create plugin toolbar for mainwindow
     QToolBar *pluginToolBar = new QToolBar;
     pluginToolBar->setObjectName("rackPluginToolBar");
@@ -797,6 +806,17 @@ void RackWindow::toggleFullscreen()
 {
     setWindowState(windowState() ^ Qt::WindowFullScreen);
 }
+
+
+////test show/hide plugin widget
+
+//void RackWindow::showHidePluginWidget(QWidget *pluginWidget)
+//{
+//    pluginWidget->isVisible() ? pluginWidget->hide() : pluginWidget->show();
+//}
+
+////
+
 
 RackWindow::~RackWindow()
 {
