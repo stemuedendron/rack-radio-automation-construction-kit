@@ -35,8 +35,8 @@ void RSplitterHandle::paintEvent(QPaintEvent *event)
 {
     if (isEnabled())
     {
-    QPainter painter(this);
-    painter.fillRect(event->rect(), m_handleColor);
+        QPainter painter(this);
+        painter.fillRect(event->rect(), m_handleColor);
     }
 }
 
