@@ -26,21 +26,25 @@
 RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) :
     RPushButton(text, parent),
     m_blinking(false),
-    m_timer(new QTimer(this))
+    m_interval(300)
 {
-    m_timer->setInterval(300);
-    QObject::connect(m_timer,SIGNAL(timeout()),this,SLOT(timeOut()));
+}
+
+void RBlinkButton::setInterval(int interval)
+{
+    m_interval = interval;
+    if (m_timer.isActive()) m_timer.start(m_interval, this);
 }
 
 void RBlinkButton::startBlinking()
 {
     toggleBlinking(true);
-    m_timer->start();
+    m_timer.start(m_interval, this);
 }
 
 void RBlinkButton::stopBlinking()
 {
-    m_timer->stop();
+    m_timer.stop();
     toggleBlinking(false);
 }
 
@@ -49,9 +53,9 @@ void RBlinkButton::setBlinking(bool blink)
     blink ? startBlinking() : stopBlinking();
 }
 
-void RBlinkButton::timeOut()
+void RBlinkButton::timerEvent(QTimerEvent *)
 {
-   toggleBlinking(!m_blinking);
+    toggleBlinking(!m_blinking);
 }
 
 void RBlinkButton::toggleBlinking(bool blink)

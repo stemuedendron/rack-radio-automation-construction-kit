@@ -24,7 +24,7 @@
 #define RBLINKBUTTON_H
 
 #include "rpushbutton.h"
-#include <QTimer>
+#include <QBasicTimer>
 
 class RBlinkButton : public RPushButton
 {
@@ -37,9 +37,8 @@ public:
     explicit RBlinkButton(const QString &text, QWidget *parent = 0);
 
     int blinking() const {return m_blinking;}
-
-    int interval() const {return m_timer->interval();}
-    void setInterval(int interval) {m_timer->setInterval(interval);}
+    int interval() const {return m_interval;}
+    void setInterval(int interval);
 
 public slots:
 
@@ -47,15 +46,15 @@ public slots:
     void stopBlinking();
     void setBlinking(bool blink);
 
+protected:
 
-protected slots:
-
-    void timeOut();
+    void timerEvent(QTimerEvent *);
 
 private:
 
     bool m_blinking;
-    QTimer *m_timer;
+    int m_interval;
+    QBasicTimer m_timer;
     void toggleBlinking(bool blink);
 
 };

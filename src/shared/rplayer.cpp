@@ -145,7 +145,6 @@ RPlayer::RPlayer(QObject *parent, int device)
     m_fadeInTime(2000),
     m_fadeOutTime(2000),
     m_isFadingOut(false)
-
 {
     emit stateChanged();
 }
@@ -311,5 +310,5 @@ void RPlayer::fadeInFadeOut()
 void RPlayer::timerEvent(QTimerEvent *)
 {
     emit position(qint64(BASS_ChannelBytes2Seconds(m_stream, BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE))*1000));
-    if (!BASS_ChannelIsActive(m_stream)==BASS_ACTIVE_PLAYING) m_timer.stop();
+    if (!BASS_ChannelIsActive(m_stream) == BASS_ACTIVE_PLAYING) m_timer.stop();
 }
