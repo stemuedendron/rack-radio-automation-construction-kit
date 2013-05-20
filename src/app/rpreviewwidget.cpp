@@ -23,7 +23,7 @@
 #include "rpreviewwidget.h"
 #include "rpushbutton.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 RPreviewWidget::RPreviewWidget(QWidget *parent) :
     QWidget(parent),

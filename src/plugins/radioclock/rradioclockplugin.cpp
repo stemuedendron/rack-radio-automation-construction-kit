@@ -22,7 +22,7 @@
 
 #include "rradioclockplugin.h"
 #include "rradioclock.h"
-#include <QtGui>
+#include <QtWidgets>
 
 QWidget *RRadioClockPlugin::createRWidget(ICore *api, QWidget *parent)
  {
@@ -31,6 +31,4 @@ QWidget *RRadioClockPlugin::createRWidget(ICore *api, QWidget *parent)
 
  }
 
-
-Q_EXPORT_PLUGIN2(rradioclockplugin, RRadioClockPlugin)
 

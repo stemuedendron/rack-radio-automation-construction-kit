@@ -22,7 +22,7 @@
 
 #include "rbutton.h"
 #include <qmath.h>
-#include <QtGui>
+#include <QtWidgets>
 
 
 //methoden verdecken (z.B. settext wenn qpushbutton ?????
@@ -129,7 +129,8 @@ void RButton::drawClock(QPainter *painter)
     qint64 roundedLength = ceil(m_length/1000);
     qint64 roundedPosition = floor(m_position/1000);
 
-    QTime time = QTime().addSecs(roundedLength - roundedPosition);
+    QTime time(0,0,0);
+    time = time.addSecs(roundedLength - roundedPosition);
 
     //the same:
 //    QTime totalTime = QTime().addMSecs(m_length);

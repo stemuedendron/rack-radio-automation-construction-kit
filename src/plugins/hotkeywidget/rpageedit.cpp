@@ -22,7 +22,7 @@
 
 #include "rpageedit.h"
 #include "rpushbutton.h"
-#include <QtGui>
+#include <QtWidgets>
 
 RPageEdit::RPageEdit(QWidget *parent) : QDialog(parent)
 {

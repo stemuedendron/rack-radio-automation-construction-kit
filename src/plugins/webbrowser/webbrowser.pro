@@ -22,7 +22,7 @@
 
 include(../../libs/extensionsystem/plugins.pri)
 
-QT      +=  webkit network
+QT      +=  widgets webkitwidgets network
 
 TEMPLATE = lib
 CONFIG += plugin

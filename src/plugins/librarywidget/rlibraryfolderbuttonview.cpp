@@ -24,8 +24,7 @@
 #include "icore.h"
 #include "rpushbutton.h"
 #include "rlibrarybutton.h"
-#include <QtGui>
-
+#include <QtWidgets>
 
 /* TODO
 

@@ -21,8 +21,8 @@
 */
 
 #include "rsplitter.h"
-#include <QtGui>
 
+#include <QtWidgets>
 
 //TODO: change this to use style sheet
 RSplitterHandle::RSplitterHandle(Qt::Orientation orientation, RSplitter *parent) :

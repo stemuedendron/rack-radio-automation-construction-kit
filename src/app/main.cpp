@@ -22,14 +22,14 @@
 
 #include "rackwindow.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 int main(int argc, char *argv[])
 {
 
     //TODO: read carefully QApplication and Qt Namespace docs!!!!
 
-    QApplication::setStyle(new QWindowsStyle);
+    QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
     QApplication app(argc, argv);
     app.setOrganizationName("Radio F.R.E.I.");
     app.setApplicationName("r.a.c.k. - Radio Automation Construction Kit");

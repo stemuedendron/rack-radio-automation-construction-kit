@@ -22,7 +22,7 @@
 
 #include "rlibrarywidgetplugin.h"
 #include "rlibrarywidget.h"
-#include <QtGui>
+#include <QtWidgets>
 
 
 QWidget *RLibraryWidgetPlugin::createRWidget(ICore *api, QWidget *parent)
@@ -32,5 +32,3 @@ QWidget *RLibraryWidgetPlugin::createRWidget(ICore *api, QWidget *parent)
 
 }
 
-
-Q_EXPORT_PLUGIN2(rlibrarywidgetplugin, RLibraryWidgetPlugin)

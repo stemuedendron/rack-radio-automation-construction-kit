@@ -23,7 +23,7 @@
 #include "coreimpl.h"
 #include "rackwindow.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :

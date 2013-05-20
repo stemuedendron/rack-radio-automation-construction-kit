@@ -24,7 +24,7 @@
 #include "rlibrarywidget.h"
 #include "rlibraryfolderbuttonview.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 RLibraryWidget::RLibraryWidget(ICore *api, QWidget *parent) :
     QWidget(parent),

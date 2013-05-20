@@ -23,7 +23,7 @@
 #include "icore.h"
 #include "rdigitalclock.h"
 #include "rcolordialog.h"
-#include <QtGui>
+#include <QtWidgets>
 
 
 RDigitalClock::RDigitalClock(ICore *api, QWidget *parent)

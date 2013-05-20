@@ -29,7 +29,8 @@
 #include "rselectplugindialog.h"
 #include "rpreviewwidget.h"
 
-#include <QtGui>
+#include <QtWidgets>
+
 
 //TODO: method: delete one plugin
 
@@ -430,7 +431,7 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
                 //get pointers from pluginhost:
                 QStackedWidget *pluginStack = pluginHost->findChild<QStackedWidget *>("rackPluginStack");
                 QToolBar *pluginHostToolBar = pluginHost->findChild<QToolBar *>("rackPluginHostToolBar");
-                QToolBar *pluginToolBar = (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+                QToolBar *pluginToolBar = pluginHost->property("pluginToolBar").value<QToolBar *>();
                 QSignalMapper *sm = pluginHost->findChild<QSignalMapper *>("rackPluginSwitchMapper");
                 QActionGroup *ag = pluginHostToolBar->findChild<QActionGroup *>();
 
@@ -538,14 +539,14 @@ void RackWindow::closePluginHost(QWidget *pluginHost)
             widgetsizes.replace(senderpos, widgetsizes.at(senderpos) + widgetsizes.at(senderpos+1));
             widgetsizes.removeAt(senderpos + 1);
         }
-        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+        delete pluginHost->property("pluginToolBar").value<QToolBar *>();
         pluginHost->setProperty("pluginToolBar", 0);
         delete pluginHost;
         pluginHost = 0;
         splitter->setSizes(widgetsizes);
     }
     else {
-        delete (QToolBar *)qVariantValue<QWidget *>(pluginHost->property("pluginToolBar"));
+        delete pluginHost->property("pluginToolBar").value<QToolBar *>();
         pluginHost->setProperty("pluginToolBar", 0);
         delete pluginHost;
         pluginHost = 0;

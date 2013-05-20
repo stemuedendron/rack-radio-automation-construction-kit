@@ -22,8 +22,8 @@
 
 #include "icore.h"
 #include "rwebbrowser.h"
-#include <QtGui>
-#include <QtWebKit>
+#include <QtWidgets>
+#include <QtWebKitWidgets>
 
 RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     : QWidget(parent),

@@ -23,7 +23,7 @@
 #include "icore.h"
 #include "rradioclock.h"
 #include "rcolordialog.h"
-#include <QtGui>
+#include <QtWidgets>
 
 
 //todo: wenn gradbutton toggeln kann, im paintevent status auswerten !!!

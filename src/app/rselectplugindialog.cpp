@@ -23,7 +23,7 @@
 #include "rselectplugindialog.h"
 #include "rpushbutton.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 //dialog usage:
 //    bool ok;

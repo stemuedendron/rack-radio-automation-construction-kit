@@ -22,8 +22,6 @@
 
 #include "rdigitalclockplugin.h"
 #include "rdigitalclock.h"
-#include <QtGui>
-
 
 QWidget *RDigitalClockPlugin::createRWidget(ICore *api, QWidget *parent)
 {
@@ -31,7 +29,4 @@ QWidget *RDigitalClockPlugin::createRWidget(ICore *api, QWidget *parent)
     return new RDigitalClock(api, parent);
 
 }
-
-
-Q_EXPORT_PLUGIN2(rdigitalclockplugin, RDigitalClockPlugin)
 

@@ -22,7 +22,8 @@
 
 #include "rpushbutton.h"
 #include "icore.h"
-#include <QtGui>
+
+#include <QtWidgets>
 
 RPushButton::RPushButton(QWidget *parent) :
     QPushButton(parent),

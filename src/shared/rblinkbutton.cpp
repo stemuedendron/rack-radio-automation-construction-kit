@@ -21,7 +21,8 @@
 */
 
 #include "rblinkbutton.h"
-#include <QtGui>
+
+#include <QtWidgets>
 
 RBlinkButton::RBlinkButton(const QString &text, QWidget *parent) :
     RPushButton(text, parent),

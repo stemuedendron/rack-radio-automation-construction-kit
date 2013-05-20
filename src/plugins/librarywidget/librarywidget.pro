@@ -23,6 +23,7 @@
 
 include(../../libs/extensionsystem/plugins.pri)
 
+QT += widgets
 TEMPLATE = lib
 CONFIG += plugin
 

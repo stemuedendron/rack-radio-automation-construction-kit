@@ -26,7 +26,7 @@
 #include "rpageedit.h"
 #include "rindexbutton.h"
 #include "rpushbutton.h"
-#include <QtGui>
+#include <QtWidgets>
 
 ///THIS IS BROKEN UNTIL WE USE THE BRAND NEW STATE MACHINE!!!!!!!!!!!!!
 

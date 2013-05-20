@@ -20,6 +20,8 @@
 #    Author: Steffen Müller
 #
 
+QT += widgets
+
 TARGET = colordialog
 
 INCLUDEPATH += \

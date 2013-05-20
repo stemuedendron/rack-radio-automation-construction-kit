@@ -23,7 +23,7 @@
 #include "rhotkeywidgetplugin.h"
 #include "rhotkeywidget.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 QWidget *RHotKeyWidgetPlugin::createRWidget(ICore *api, QWidget *parent)
  {
@@ -32,5 +32,4 @@ QWidget *RHotKeyWidgetPlugin::createRWidget(ICore *api, QWidget *parent)
  }
 
 
-Q_EXPORT_PLUGIN2(rhotkeywidgetplugin, RHotKeyWidgetPlugin)
 

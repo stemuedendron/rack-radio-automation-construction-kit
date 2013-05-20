@@ -23,7 +23,7 @@
 #include "rcolordialog.h"
 #include "rpushbutton.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 
 RColorDialog::RColorDialog(QWidget *parent) :

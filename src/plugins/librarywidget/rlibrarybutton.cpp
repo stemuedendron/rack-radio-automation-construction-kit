@@ -21,7 +21,7 @@
 */
 
 #include "rlibrarybutton.h"
-#include <QtGui>
+#include <QtWidgets>
 
 void RLibraryButton::paintEvent(QPaintEvent *)
 {

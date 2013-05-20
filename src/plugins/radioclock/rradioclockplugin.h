@@ -30,6 +30,7 @@
 class RRadioClockPlugin : public QObject, IWidgetPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.rack.IWidgetPlugin/1.0")
     Q_INTERFACES(IWidgetPlugin)
 
 public:

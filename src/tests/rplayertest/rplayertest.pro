@@ -20,6 +20,7 @@
 #    Author: Steffen Müller
 #
 
+QT += widgets
 
 TEMPLATE = app
 TARGET = rplayertest

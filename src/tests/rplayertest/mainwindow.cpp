@@ -21,7 +21,7 @@
 */
 
 #include "mainwindow.h"
-#include <QtGui>
+#include <QtWidgets>
 
 #include "rplayer.h"
 

@@ -21,7 +21,7 @@
 */
 
 #include "rindexbutton.h"
-#include <QtGui>
+#include <QtWidgets>
 
 RIndexButton::RIndexButton(const QString &title, int keys, QWidget *parent) :
     RPushButton(parent)

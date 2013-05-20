@@ -22,7 +22,7 @@
 
 #include "rwebbrowserplugin.h"
 #include "rwebbrowser.h"
-#include <QtGui>
+#include <QtWidgets>
 
 
 QWidget *RWebBrowserPlugin::createRWidget(ICore *api, QWidget *parent)
@@ -32,7 +32,5 @@ QWidget *RWebBrowserPlugin::createRWidget(ICore *api, QWidget *parent)
 
  }
 
-
-Q_EXPORT_PLUGIN2(rwebbrowserkplugin, RWebBrowserPlugin)
 
 
