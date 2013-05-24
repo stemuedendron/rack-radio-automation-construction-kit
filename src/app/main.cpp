@@ -23,6 +23,7 @@
 #include "rackwindow.h"
 
 #include <QtWidgets>
+#include <QtSql>
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,23 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setOrganizationName("Radio F.R.E.I.");
     app.setApplicationName("r.a.c.k. - Radio Automation Construction Kit");
+
+
+    //connect to database:
+    //TODO: settings from config
+    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("rack");
+    db.setUserName("rack");
+    db.setPassword("rack");
+    if (!db.open())
+    {
+        QMessageBox::critical(0, qApp->tr("Cannot open database"),
+                              qApp->tr("Unable to establish a database connection.\n"
+                                       "Click Cancel to exit."), QMessageBox::Cancel);
+        return 1;
+    }
+
 
     RackWindow mainWindow;
 

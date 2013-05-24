@@ -24,16 +24,19 @@
 #include "rackwindow.h"
 
 #include <QtWidgets>
+#include <QtSql>
 
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
     m_state(Rack::NormalState),
     m_oldState(Rack::NormalState),
-    m_fileSystemModel(new QFileSystemModel(this))
+    m_fileSystemModel(new QFileSystemModel(this)),
+    m_sqlQueryModel(new QSqlQueryModel(this))
 {
 
-    //create models:
+    //models:
+    //filesystem:
     QStringList filters;
     filters << "*.wav" << "*.ogg" << "*.aiff" << "*.mp3" << "*.mp2" << "*.mp1" << "*.mus";
     m_fileSystemModel->setRootPath("/");
@@ -42,6 +45,11 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_fileSystemModel->sort(Qt::AscendingOrder);
 
     m_modelList.append(m_fileSystemModel);
+
+    //sql
+    m_sqlQueryModel->setQuery("SELECT artist, title FROM audio ORDER BY artist");
+
+    m_modelList.append(m_sqlQueryModel);
 
     startTimer(1000);
 }

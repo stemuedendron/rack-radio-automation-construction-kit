@@ -27,6 +27,7 @@
 
 class RackWindow;
 class QFileSystemModel;
+class QSqlQueryModel;
 
 class CoreImpl : public ICore
 {
@@ -63,6 +64,7 @@ private:
 
     //core implemented models to be used in plugin widgets
     QFileSystemModel *m_fileSystemModel;
+    QSqlQueryModel *m_sqlQueryModel;
 
     //maybe we need this?
     //friend class RackWindow;
