@@ -1,5 +1,5 @@
 #
-#    Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
+#    Copyright (C) 2013, Steffen Müller and the r.a.c.k. team.
 #    All rights reserved.
 #
 #    This file is part of r.a.c.k. radio automation construction kit
@@ -19,18 +19,23 @@
 #
 #    Author: Steffen Müller
 #
+QT       += network
+TARGET    = rackd
+CONFIG   += console
+CONFIG   -= app_bundle
 
-TEMPLATE    = subdirs
-SUBDIRS     = app \
-              plugins/digitalclock \
-              plugins/hotkeywidget \
-              plugins/librarywidget \
-              plugins/radioclock \
-              plugins/webbrowser \
-              tests/rplayertest \
-              tests/colordialog \
-    rackd
+TEMPLATE = app
 
 
+SOURCES += main.cpp \
+    rackd.cpp
 
+HEADERS += \
+    rackd.h
+
+# bass library:
+unix:!macx: LIBS += -L$$PWD/../libs/3rdparty/bass/x64/ -lbass
+LIBS += -L$$PWD/../libs/3rdparty/bass/ -lbass
+INCLUDEPATH += $$PWD/../libs/3rdparty/bass
+DEPENDPATH += $$PWD/../libs/3rdparty/bass
 
