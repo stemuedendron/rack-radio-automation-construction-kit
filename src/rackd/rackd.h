@@ -26,6 +26,7 @@
 #include <QTcpServer>
 #include "bass.h"
 
+
 class Rackd : public QTcpServer
 {
     Q_OBJECT
@@ -69,6 +70,7 @@ private:
     QString m_repositoryPath;
 
     QHash<QTcpSocket *, bool> m_auth;
+    QList<int> m_devices;
 
 };
 

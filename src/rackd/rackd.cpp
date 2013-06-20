@@ -34,6 +34,7 @@
 //TODO: qsettings
 //loglevels?
 
+
 void SigHandler(int signum)
 {
   switch(signum)
@@ -60,6 +61,21 @@ Rackd::Rackd(QObject *parent) : QTcpServer(parent),
     signal(SIGTERM,SigHandler);
 
     //audio devices:
+    BASS_DEVICEINFO info;
+    for (int i = 1; BASS_GetDeviceInfo(i, &info); i++) if (info.flags&BASS_DEVICE_ENABLED)
+    {
+        if (QString::compare(info.name,"Default") == 0) continue;
+
+        qDebug() << i << "audio device name:" << info.name;
+        qDebug() << "audio device driver:" << info.driver;
+        if (BASS_Init(i,44100,0,0,NULL))
+        {
+            qDebug() << info.driver << "initialized";
+            m_devices.append(i);
+        }
+    }
+
+
 
 
     if (!listen(QHostAddress::Any, 1234))
@@ -244,15 +260,57 @@ void Rackd::handleRequest()
     if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
     {
 
-        echoCommand(client, command.append("+"));
+        //testcode:
+
+        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
+
+        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(commandList[2]), 0, 0, 0);
+
+        command.append(' ');
+        command.append(QByteArray::number(stream));
+        command.append(' ');
+        command.append(QByteArray::number(stream));
+        echoCommand(client, command.append('+'));
         return;
     }
 
 
+
+
+
 //    UP <conn-handle>!
 //    PP <conn-handle> <position>!
+
+
 //    PY <conn-handle> <length> <speed> <pitch-flag>!
+    if (!qstrcmp(commandList[0], "PY") && commandList.size() == 5)
+    {
+
+        //testcode:
+        if (BASS_ChannelPlay(commandList[1].toULong(), false))
+        {
+            qDebug() << "play ok" << commandList[1].toULong();
+        }
+        else
+        {
+            qDebug() << "play not ok" << commandList[1].toULong() << BASS_ErrorGetCode();
+
+        }
+
+
+
+        return;
+    }
+
+
+
 //    SP <conn-handle>!
+    if (!qstrcmp(commandList[0], "SP") && commandList.size() == 2)
+    {
+        BASS_ChannelPause(commandList[1].toULong());
+    }
+
+
 //    TS <card-num>!
 //    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
 //    UR <card-num> <stream-num>!
@@ -366,6 +424,15 @@ void Rackd::doCleanUp()
     qDebug() << "clean up called";
     qDebug() << "stop listen for incoming connections";
     close();
+
+    foreach (int i, m_devices)
+        if (BASS_SetDevice(i))
+        {
+            BASS_DEVICEINFO info;
+            BASS_GetDeviceInfo(i, &info);
+            if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
+        }
+
 }
 
 

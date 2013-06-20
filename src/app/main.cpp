@@ -41,15 +41,24 @@ int main(int argc, char *argv[])
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName("localhost");
     db.setDatabaseName("rack");
-    db.setUserName("rack");
-    db.setPassword("rack");
+    db.setUserName("postgres");
+    db.setPassword("");
     if (!db.open())
     {
-        QMessageBox::critical(0, qApp->tr("Cannot open database"),
-                              qApp->tr("Unable to establish a database connection.\n"
-                                       "Click Cancel to exit."), QMessageBox::Cancel);
-        return 1;
+//        QMessageBox::critical(0, qApp->tr("Cannot open database"),
+//                              qApp->tr("Unable to establish a database connection.\n"
+//                                       "Click Cancel to exit."), QMessageBox::Cancel);
+//        return 1;
+        qDebug() << "no database connection";
+        qDebug() << db.lastError();
     }
+
+    QStringList driverList;
+    driverList = QSqlDatabase::drivers();
+    foreach (QString driver, driverList) {
+        qDebug() << driver;
+    }
+
 
 
     RackWindow mainWindow;
