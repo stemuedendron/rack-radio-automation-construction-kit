@@ -34,6 +34,7 @@
 //TODO: qsettings
 //loglevels?
 
+//find file without known extension: QDir::entryList
 
 void SigHandler(int signum)
 {
@@ -52,13 +53,15 @@ void SigHandler(int signum)
 Rackd::Rackd(QObject *parent) : QTcpServer(parent),
       m_maxConnections(30),
       m_maxCommandLenght(40),
-      m_repositoryPath("/var/snd")
+      m_repositoryPath("/media/oldhome/rf/0-rack")
 {
     qDebug() << "Hello from rack daemon!";
 
     signal(SIGHUP,SigHandler);
     signal(SIGINT,SigHandler);
     signal(SIGTERM,SigHandler);
+
+    //validate repository path!!!
 
     //audio devices:
     BASS_DEVICEINFO info;
@@ -205,7 +208,7 @@ void Rackd::handleRequest()
     */
     if (!qstrcmp(commandList[0], "PW") && commandList.size() == 2)
     {
-        if (!qstrcmp(commandList[1], "letmein"))
+        if (!qstrcmp(commandList[1], "pass"))
         {
             //log
             m_auth[client] = true;
@@ -237,7 +240,7 @@ void Rackd::handleRequest()
     */
     if (!m_auth[client])
     {
-        qDebug() << "ERROR: authentication required or command not exist!";
+        qDebug() << "ERROR: authentication required!";
         echoCommand(client, command.append("-"));
         return;
     }
@@ -260,11 +263,46 @@ void Rackd::handleRequest()
     if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
     {
 
+        if (commandList[2].toULongLong() > 9999999999)
+        {
+            qDebug() << "audio file id out of range";
+            return;
+        }
+
+        QString audioIDStr = commandList[2].rightJustified(10, '0');
+        QString absFileName = QDir::cleanPath(m_repositoryPath);
+
+        absFileName.append("/");
+        absFileName.append(audioIDStr.mid(0,2));
+        absFileName.append("/");
+        absFileName.append(audioIDStr.mid(2,2));
+        absFileName.append("/");
+        absFileName.append(audioIDStr.mid(4,2));
+        absFileName.append("/");
+        absFileName.append(audioIDStr.mid(6,2));
+
+        QDir dir(absFileName);
+        QStringList filter;
+        filter << audioIDStr + ".*";
+        dir.setNameFilters(filter);
+        QStringList sl = dir.entryList(QDir::Files);
+
+        if (sl.isEmpty())
+        {
+            qDebug() << "ERROR: audio file with id" << audioIDStr << "not found";
+            return;
+        }
+
+        absFileName = dir.absoluteFilePath(sl.first());
+
+
         //testcode:
 
         if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
 
-        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(commandList[2]), 0, 0, 0);
+        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
+
+        qDebug() << absFileName;
 
         command.append(' ');
         command.append(QByteArray::number(stream));
