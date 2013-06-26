@@ -29,12 +29,10 @@
 
 #include "rackd.h"
 
-
+//TODO: own rack protokoll instead of caed
 //TODO: if connections count is null go to auto modus ???
 //TODO: qsettings
 //loglevels?
-
-//find file without known extension: QDir::entryList
 
 void SigHandler(int signum)
 {
