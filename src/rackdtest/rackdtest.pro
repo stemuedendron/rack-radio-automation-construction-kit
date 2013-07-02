@@ -19,25 +19,13 @@
 #
 #    Author: Steffen Müller
 #
+
+QT       += widgets
 QT       += network
-TARGET    = rackd
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TEMPLATE = app
-
-
-SOURCES += main.cpp \
-    rackd.cpp \
-    rackdsocket.cpp
 
 HEADERS += \
-    rackd.h \
-    rackdsocket.h
+    mainwindow.h
 
-# bass library:
-unix:!macx: LIBS += -L$$PWD/../libs/3rdparty/bass/x64/ -lbass
-LIBS += -L$$PWD/../libs/3rdparty/bass/ -lbass
-INCLUDEPATH += $$PWD/../libs/3rdparty/bass
-DEPENDPATH += $$PWD/../libs/3rdparty/bass
-
+SOURCES += \
+    mainwindow.cpp \
+    main.cpp

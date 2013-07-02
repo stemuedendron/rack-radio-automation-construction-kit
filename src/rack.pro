@@ -29,7 +29,8 @@ SUBDIRS     = app \
               plugins/webbrowser \
               tests/rplayertest \
               tests/colordialog \
-    rackd
+    rackd \
+    rackdtest
 
 
 

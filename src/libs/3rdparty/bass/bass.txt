@@ -1,5 +1,5 @@
 BASS 2.4
-Copyright (c) 1999-2011 Un4seen Developments Ltd. All rights reserved.
+Copyright (c) 1999-2013 Un4seen Developments Ltd. All rights reserved.
 
 Files that you should have found in the BASS package
 ====================================================
@@ -13,82 +13,101 @@ MP3-FREE
 C\              C/C++ API and examples...
   BASS.H          BASS C/C++ header file
   BASS.LIB        BASS import library
-  BASS.DSW        Visual C++ workspace for examples
+  BASS.DSW        Visual C++ 6 workspace for examples
+  BASS.SLN        Visual C++ 2005 (and above) solution for examples
   MAKEFILE        Makefile for all examples
   MAKEFILE.IN     Makefile helper macros
+  SAFESEH\
+    BASS.LIB        SAFESEH compatible BASS import library
   3DTEST\         3D/EAX example
     3DTEST.C
     3DTEST.RC
     3DTEST.DSP
+    3DTEST.VCPROJ
     MAKEFILE
   BASSTEST\       Simple playback example
     BASSTEST.C
     BASSTEST.RC
     BASSTEST.DSP
+    BASSTEST.VCPROJ
     MAKEFILE
   CONTEST\        Console example
     CONTEST.C
     CONTEST.DSP
+    CONTEST.VCPROJ
     MAKEFILE
   CUSTLOOP\       Custom looping example
     CUSTLOOP.C
     CUSTLOOP.DSP
+    CUSTLOOP.VCPROJ
     MAKEFILE
   DSPTEST\        DSP example
     DSPTEST.C
     DSPTEST.RC
     DSPTEST.DSP
+    DSPTEST.VCPROJ
     MAKEFILE
   FXTEST\         DX8 effect example
     FXTEST.C
     FXTEST.RC
     FXTEST.DSP
+    FXTEST.VCPROJ
     MAKEFILE
   LIVEFX\         Full-duplex example
     LIVEFX.C
     LIVEFX.RC
     LIVEFX.DSP
+    LIVEFX.VCPROJ
     MAKEFILE
   LIVESPEC\       "Live" version of spectrum analyser example
     LIVESPEC.C
     LIVESPEC.DSP
+    LIVESPEC.VCPROJ
     MAKEFILE
   MULTI\          Multiple device example
     MULTI.C
     MULTI.RC
     MULTI.DSP
+    MULTI.VCPROJ
     MAKEFILE
   NETRADIO\       Internet streaming example
     NETRADIO.C
     NETRADIO.RC
     NETRADIO.DSP
+    NETRADIO.VCPROJ
     MAKEFILE
   PLUGINS\        Plugins example
     PLUGINS.C
     PLUGINS.RC
     PLUGINS.DSP
+    PLUGINS.VCPROJ
     MAKEFILE
   RECTEST\        Recording example
     RECTEST.C
     RECTEST.RC
     RECTEST.DSP
+    RECTEST.VCPROJ
     MAKEFILE
   SPEAKERS\       Multi-speaker example
     SPEAKERS.C
     SPEAKERS.RC
     SPEAKERS.DSP
+    SPEAKERS.VCPROJ
     MAKEFILE
   SPECTRUM\       Spectrum analyser example
     SPECTRUM.C
     SPECTRUM.DSP
+    SPECTRUM.VCPROJ
     MAKEFILE
   SYNTH\          Low latency custom streaming example
     SYNTH.C
     SYNTH.DSP
+    SYNTH.VCPROJ
     MAKEFILE
   WRITEWAV\       WAVE writer example
     WRITEWAV.C
     WRITEWAV.DSP
+    WRITEWAV.VCPROJ
     MAKEFILE
   BIN\            Precompiled examples
     3DTEST.EXE
@@ -452,7 +471,7 @@ MacOSX version
 --------------
 BASS uses CoreAudio for playback/recording, so there are no special
 library/driver requirements. 32-bit (i386 & ppc) and 64-bit (x86_64)
-architectures are supported in a single universal library. OSX 10.3 or
+architectures are supported in a single universal library. OSX 10.4 or
 above is recommended.
 
 Linux version
@@ -587,6 +606,9 @@ any BASS add-ons placed in the same directory. Type "make ppc", "make i386"
 or "make x86_64" to extract a particular architecture. "make intel" can
 be used to extract the i386 and x86_64 architectures together.
 
+NOTE: Apple's App Store does not support the ppc architecture, so that will
+      need to be removed from the BASS binary before submitting apps.
+
 Linux version
 -------------
 The LIBBASS.SO file needs to be in the OS's library search path for it to
@@ -701,6 +723,73 @@ These are the major (and not so major) changes at each version stage.
 There are of course bug fixes and other little improvements made along
 the way too! To make upgrading simpler, all functions affected by a
 change to the BASS interface are listed.
+
+2.4.10 - 16/2/2013
+------------------
+* Asynchronous file reading/buffering
+	BASS_ASYNCFILE (BASS_StreamCreateFile/User flag)
+	BASS_CONFIG_ASYNCFILE_BUFFER (BASS_SetConfig option)
+* Support for chained OGG files (multiple logical bitstreams)
+	BASS_StreamCreateFile/User
+	BASS_CONFIG_OGG_PRESCAN (BASS_SetConfig option)
+	BASS_POS_OGG (BASS_ChannelSetPosition/ChannelGetLength mode)
+* OGG logical bitstream syncs are no longer automatically "mixtime"
+	BASS_SYNC_OGG_CHANGE (BASS_ChannelSetSync type)
+* Support for Soundtracker MOD files
+	BASS_MusicLoad
+* Complex FFT data
+	BASS_DATA_FFT_COMPLEX (BASS_ChannelGetData flag)
+* Volume levels above 1.0 for decoding channels
+	BASS_ATTRIB_VOL (BASS_ChannelSetAttribute option)
+* Recording device channel count retrieval on Windows/OSX/iOS
+	BASS_RECORDINFO (formats member)
+* Minimum recording period reduced to 5ms
+	BASS_RecordStart
+* Recording device period adjustment on OSX
+	BASS_RecordStart
+* Device UID retrieval on OSX
+	BASS_DEVICEINFO (driver member)
+* The desktop window handle is used when none is provided
+	BASS_Init
+
+2.4.9 - 3/5/2012
+----------------
+* Improved and adjustable sample rate conversion quality
+	BASS_ATTRIB_SRC (BASS_ChannelSetAttribute option)
+	BASS_CONFIG_SRC/_SAMPLE (BASS_SetConfig options)
+* Support for buffered file & internet streams with CoreAudio codecs on OSX/iOS
+	BASS_StreamCreateURL
+	BASS_StreamCreateUser
+* Data and level retrieval from sample channels
+	BASS_ChannelGetData
+	BASS_ChannelGetLevel
+* Oldest sample channel will be overridden when there are multiple candidates
+	BASS_SampleGetChannel
+* Use of the device's output rate with MODs
+	BASS_MusicLoad
+* Optional device output rate setting on OSX/iOS
+	BASS_DEVICE_FREQ (BASS_Init flag)
+* UTF-8 device information on Windows
+	BASS_CONFIG_UNICODE (BASS_SetConfig option)
+* Speaker assignment with panning/balance control on Windows Vista/7
+	BASS_CONFIG_VISTA_SPEAKERS (BASS_SetConfig option)
+	BASS_ATTRIB_PAN (BASS_ChannelGet/Set/SlideAttribute option)
+* Push stream queue level can be checked after using BASS_STREAMPROC_END
+	BASS_StreamPutData
+* Support for ALSA subdevices on Linux
+	BASS_Init
+	BASS_GetDeviceInfo
+	BASS_RecordInit
+	BASS_RecordGetDeviceInfo
+* Device list fix on 64-bit OSX
+	BASS_GetDeviceInfo
+	BASS_RecordGetDeviceInfo
+* BASS_UNICODE support fix on Linux
+	BASS_PluginLoad
+* Internet streaming tweaks/fixes on Windows
+* SYNTH example updated to use device output rate
+* RECTEST example updated (C version) for better Windows Vista/7 support
+* Documentation updated with platform-specific info for Android
 
 2.4.8 - 29/8/2011
 -----------------

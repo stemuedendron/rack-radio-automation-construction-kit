@@ -23,7 +23,6 @@
 
 #include <QCoreApplication>
 #include <QTcpSocket>
-#include <QImage>
 #include <QDir>
 #include <signal.h>
 
@@ -50,8 +49,8 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent) : QTcpServer(parent),
       m_maxConnections(30),
-      m_maxCommandLenght(40),
-      m_repositoryPath("/media/oldhome/rf/0-rack")
+      m_nextBlockSize(0),
+      m_outStream(&m_blockToSend, QIODevice::WriteOnly)
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -59,7 +58,6 @@ Rackd::Rackd(QObject *parent) : QTcpServer(parent),
     signal(SIGINT,SigHandler);
     signal(SIGTERM,SigHandler);
 
-    //validate repository path!!!
 
     //audio devices:
     BASS_DEVICEINFO info;
@@ -91,6 +89,8 @@ Rackd::Rackd(QObject *parent) : QTcpServer(parent),
         qDebug() << "waiting for incoming connections..." << serverAddress().toString() << serverPort();
     }
 
+    m_outStream.setVersion(QDataStream::Qt_5_0);
+    m_outStream << quint16(0);
     connect(this, SIGNAL(newConnection()), this, SLOT(clientConnected()));
 
 }
@@ -98,38 +98,73 @@ Rackd::Rackd(QObject *parent) : QTcpServer(parent),
 
 void Rackd::clientConnected()
 {
+
     while (hasPendingConnections())
     {
         QTcpSocket *client = nextPendingConnection();
 
-        if (m_auth.count() == m_maxConnections)
+        if (m_clients.count() == m_maxConnections)
         {
-            qDebug() << "max connections (" << m_auth.count() << ") reached";
+            qDebug() << "max connections (" << m_clients.count() << ") reached";
             qDebug() << "reject client" << client->peerAddress().toString() << client->peerPort();
             client->disconnectFromHost();
             return;
         }
 
-        m_auth.insert(client, false);
+        ClientData data;
+        data.isAuth = false;
+
+        m_clients.insert(client, data);
+
         connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
         connect(client, SIGNAL(readyRead()), this, SLOT(handleRequest()));
         connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
 
         qDebug() << "new client connected from" << client->peerAddress().toString() << client->peerPort();
-        qDebug() << "we have now" << m_auth.count() << "connections";
+        qDebug() << "we have now" << m_clients.count() << "connections";
+
     }
+
+    foreach (QTcpSocket *cl, m_clients.keys())
+    {
+        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
+    }
+
+
 }
 
 
 void Rackd::clientDisconnected()
 {
+
     QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());
     if (!client) return;
-    m_auth.remove(client);
+
+    //clients have to free resources (unload stream) before disconnect
+    //if we have resources here we asume a client crash. so lets play until end of song
+    //an then autofree stream:
+
+
+    //wrong: rackd has no stream handle anymore!!!!!
+    foreach (HSTREAM stream, m_clients[client].handleList)
+    {
+        BASS_ChannelIsActive(stream) == BASS_ACTIVE_PLAYING ? BASS_ChannelFlags(stream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE) : BASS_StreamFree(stream);
+    }
+
+    foreach (QTcpSocket *cl, m_clients.keys())
+    {
+        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
+    }
+
+
+
+    m_clients.remove(client);
     client->deleteLater();
 
+
     qDebug() << "client disconnected" << client->peerAddress().toString() << client->peerPort();
-    qDebug() << "we have now" << m_auth.count() << "connections";
+    qDebug() << "we have now" << m_clients.count() << "connections";
+
 }
 
 
@@ -146,169 +181,142 @@ void Rackd::handleRequest()
 
     qDebug() << "request received from" << client->peerAddress().toString() << client->peerPort();
 
-    //read the next available command:
-    QByteArray command;
-    if (client->canReadLine()) command.append(client->readLine());
-    command = command.trimmed();
+    //read the next available block:
+    QDataStream in(client);
+    in.setVersion(QDataStream::Qt_5_0);
+
+    if (m_nextBlockSize == 0)
+    {
+        if (client->bytesAvailable() < sizeof(quint16)) return;
+        in >> m_nextBlockSize;
+    }
+
+    if (client->bytesAvailable() < m_nextBlockSize) return;
+
+
+    QString command;
+    in >> command;
 
     qDebug() << "command is:" << command;
 
-
-    if (command.size() > m_maxCommandLenght)
+    if (command == "PW")
     {
-        qDebug() << "ERROR: command to long!";
-        return;
-    }
-
-    if (command.size() < 3)
-    {
-        qDebug() << "ERROR: command to short!";
-        return;
-    }
-
-
-    if (command.endsWith("!")) command.chop(1);
-    else
-    {
-        qDebug() << "ERROR: no valid command!";
-        return;
-    }
-
-    QList<QByteArray> commandList = command.split(' ');
-
-    /*!
-    Commands have the following general syntax:
-
-      <cmd-code> [<arg>] [...]!
-
-    where:
-
-        <cmd-code> A two letter command code, describing the generic action to be performed
-        <arg>      Zero or more arguments, delimited by spaces or, if the last argument, by ! (see below).
-        !          The ASCII character 33, indicating the end of the command sequence.
-
-    Unless otherwise specified, the engine will echo back the command with a + or - before the !, to indicate
-    the success or failure of the command execution.
-
-
-    Commands without Authentication:
-
-    PASSWORD: PW <password>!
-
-    Pass a password to the server for authentication.
-
-    where:
-
-        <password> A password to be supplied before granting the client access.
-
-    Returns: PW +! to indicate success
-             PW -! to indicate failure
-    */
-    if (!qstrcmp(commandList[0], "PW") && commandList.size() == 2)
-    {
-        if (!qstrcmp(commandList[1], "pass"))
+        QString pw;
+        in >> pw;
+        if (pw == "pass") //TODO: read from settings
         {
-            //log
-            m_auth[client] = true;
-            echoCommand(client, "PW +");
-            return;
+            m_clients[client].isAuth = true;
+            m_outStream << command << true;
         }
         else
         {
-            //log
-            m_auth[client] = false;
-            echoCommand(client, "PW -");
-            return;
+            m_clients[client].isAuth = false;
+            m_outStream << command << false;
         }
-    }
-
-    /*!
-    DROP CONNECTION: DC!
-    Drop the TCP connection and end the session.
-    */
-    if (!qstrcmp(commandList[0], "DC")&& commandList.size() == 1)
-    {
-        //log
-        client->disconnectFromHost();
+        echoCommand(client);
         return;
     }
 
-    /*!
-    Commands without Authentication:
-    */
-    if (!m_auth[client])
-    {
-        qDebug() << "ERROR: authentication required!";
-        echoCommand(client, command.append("-"));
-        return;
-    }
-
-    /*!
-    LOAD PLAYBACK: LP <card-num> <name>!
-    Prepare an audio interface to play an audio file.
-    where:
-        <card-num> The number of the audio adapter to use.
-        <name> The base name of an existing file in the audio storage filesystem.
-
-    Returns: LP <card-num> <name> <stream-num> <conn-handle>!
-    Where:
-        <stream-num> The stream number selected to be used, or a -1 in case of error. This is relative
-            to the audio adapter selected.
-        <conn-handle> The connection handle. This will be used to refer to the playback event in all
-             subsequent calls to rackd.
-
-     */
-    if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
-    {
-
-        if (commandList[2].toULongLong() > 9999999999)
-        {
-            qDebug() << "audio file id out of range";
-            return;
-        }
-
-        QString audioIDStr = commandList[2].rightJustified(10, '0');
-        QString absFileName = QDir::cleanPath(m_repositoryPath);
-
-        absFileName.append("/");
-        absFileName.append(audioIDStr.mid(0,2));
-        absFileName.append("/");
-        absFileName.append(audioIDStr.mid(2,2));
-        absFileName.append("/");
-        absFileName.append(audioIDStr.mid(4,2));
-        absFileName.append("/");
-        absFileName.append(audioIDStr.mid(6,2));
-
-        QDir dir(absFileName);
-        QStringList filter;
-        filter << audioIDStr + ".*";
-        dir.setNameFilters(filter);
-        QStringList sl = dir.entryList(QDir::Files);
-
-        if (sl.isEmpty())
-        {
-            qDebug() << "ERROR: audio file with id" << audioIDStr << "not found";
-            return;
-        }
-
-        absFileName = dir.absoluteFilePath(sl.first());
+    //    if (command == "DC")
+    //    {
+    //        emit dropConnection();
+    //        return;
+    //    }
 
 
-        //testcode:
+    //    if (!m_isAuth)
+    //    {
+    //        qDebug() << "ERROR: authentication required!";
+    //        //todo reply
+    //        //echoCommand(client, command.append("-"));
+    //        return;
+    //    }
 
-        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
 
-        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
 
-        qDebug() << absFileName;
+    //    if (command == "LS")
+    //    {
+    //        quint8 device;
+    //        QString uri;
+    //        in >> device >>uri;
+    //        emit loadStream(device, uri);
+    //        return;
+    //    }
 
-        command.append(' ');
-        command.append(QByteArray::number(stream));
-        command.append(' ');
-        command.append(QByteArray::number(stream));
-        echoCommand(client, command.append('+'));
-        return;
-    }
+    //    if (command == "PP")
+    //    {
+    //        quint32 handle;
+    //        quint32 position;
+    //        in >> handle >> position;
+    //        emit playPosition(handle, position);
+    //        return;
+    //    }
+
+    //    if (command == "PY")
+    //    {
+    //        quint32 handle;
+    //        quint32 length;
+    //        quint16 speed;
+    //        bool pitch;
+    //        in >> handle >> length >> speed >> pitch;
+    //        emit play(handle, length, speed, pitch);
+    //        return;
+    //    }
+
+    //    if (command == "SP")
+    //    {
+    //        quint32 handle;
+    //        in >> handle;
+    //        emit stop(handle);
+    //        return;
+    //    }
+
+
+
+
+//    if (!qstrcmp(commandList[0], "DC")&& commandList.size() == 1)
+//    {
+//        //log
+//        client->disconnectFromHost();
+//        return;
+//    }
+
+//    if (!m_clients[client].isAuth)
+//    {
+//        qDebug() << "ERROR: authentication required!";
+//        echoCommand(client, command.append("-"));
+//        return;
+//    }
+
+//    if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
+//    {
+
+//        //test filename as uri
+//        //usage: LP <card num> <uri>!
+//        QString absFileName = QDir::cleanPath(commandList[2]);
+
+//        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
+
+//        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
+
+//        if (stream)
+//        {
+//            m_clients[client].handleList.append(stream);
+//            qDebug() << "client streams:" << m_clients[client].handleList;
+
+//        }
+
+//        qDebug() << absFileName;
+
+//        command.append(' ');
+//        command.append(QByteArray::number(stream));
+//        command.append(' ');
+//        command.append(QByteArray::number(stream));
+//        echoCommand(client, command.append('+'));
+//        return;
+
+
+//    }
 
 
 
@@ -319,33 +327,41 @@ void Rackd::handleRequest()
 
 
 //    PY <conn-handle> <length> <speed> <pitch-flag>!
-    if (!qstrcmp(commandList[0], "PY") && commandList.size() == 5)
-    {
+//    if (!qstrcmp(commandList[0], "PY") && commandList.size() == 5)
+//    {
 
-        //testcode:
-        if (BASS_ChannelPlay(commandList[1].toULong(), false))
-        {
-            qDebug() << "play ok" << commandList[1].toULong();
-        }
-        else
-        {
-            qDebug() << "play not ok" << commandList[1].toULong() << BASS_ErrorGetCode();
+//        //testcode:
+//        if (BASS_ChannelPlay(commandList[1].toULong(), false))
+//        {
+//            qDebug() << "play ok" << commandList[1].toULong();
+//        }
+//        else
+//        {
+//            qDebug() << "play not ok" << commandList[1].toULong() << BASS_ErrorGetCode();
 
-        }
-
-
-
-        return;
-    }
+//        }
 
 
 
-//    SP <conn-handle>!
-    if (!qstrcmp(commandList[0], "SP") && commandList.size() == 2)
-    {
-        BASS_ChannelPause(commandList[1].toULong());
-    }
+//        return;
+//    }
 
+
+
+////    SP <conn-handle>!
+//    if (!qstrcmp(commandList[0], "SP") && commandList.size() == 2)
+//    {
+//        BASS_ChannelPause(commandList[1].toULong());
+//        return;
+//    }
+
+
+//    //EI
+//    if (!qstrcmp(commandList[0], "EI") && commandList.size() == 2)
+//    {
+//        qDebug() << BASS_GetConfig(BASS_CONFIG_HANDLES);
+//        return;
+//    }
 
 //    TS <card-num>!
 //    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
@@ -373,18 +389,23 @@ void Rackd::handleRequest()
 //    MP <card-num> <stream-num> <pos>!
 //    MS <card-num> <port-num> <stream-num> <status>!
 
+    qDebug() << "command not valid" << command;
+            //todo reply
 
+    m_nextBlockSize = 0;
 }
 
-
-void Rackd::echoCommand(QTcpSocket *client, QByteArray command)
+void Rackd::echoCommand(QTcpSocket *client)
 {
     if (client->state() == QAbstractSocket::ConnectedState)
     {
-        command.append("!\n");
-        client->write(command);
+        m_outStream.device()->seek(0);
+        m_outStream << quint16(m_blockToSend.size() - sizeof(quint16));
+        client->write(m_blockToSend);
     }
+    m_blockToSend.clear();
 }
+
 
 
 ////api slots:

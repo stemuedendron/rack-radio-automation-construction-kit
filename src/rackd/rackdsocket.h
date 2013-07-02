@@ -20,70 +20,53 @@
     Author: Steffen Müller
 */
 
-#ifndef RACKD_H
-#define RACKD_H
 
-#include <QTcpServer>
+#ifndef RACKDSOCKET_H
+#define RACKDSOCKET_H
+
+#include <QTcpSocket>
 #include <QDataStream>
-#include "bass.h"
 
 
-class Rackd : public QTcpServer
+class RackdSocket : public QTcpSocket
 {
+
     Q_OBJECT
 
 public:
 
-    explicit Rackd(QObject *parent = 0);
-    ~Rackd();
-    
+    explicit RackdSocket(QObject *parent = 0);
+    bool isAuth() const {return m_isAuth;}
+    void setAuth(bool ok) {m_isAuth = ok;}
+
+
+
 public slots:
 
-    void doCleanUp();
+    void passWord(const QString &password, bool ok);
+//    void dropConnection();
+    void loadStream(quint8 device, const QString &uri, quint32 handle, bool ok);
 
-protected slots:
+signals:
 
-    //connection handling:
-    void clientConnected();
-    void clientDisconnected();
-    void displayError(QAbstractSocket::SocketError);
-
-    //api handling:
-    void handleRequest();
-    void echoCommand(QTcpSocket *client);
+    void onPassWord(const QString &password, bool ok);
+//    void onDropConnection();
+//    void onLoadStream(quint8 device, const QString &uri, quint32 handle, bool ok);
 
 
 private slots:
 
-signals:
-
+    void readData();
 
 private:
 
-    struct ClientData
-    {
-        bool isAuth;
-        QList<quint32> handleList;
-    };
-
-
-
-    //tcp transmission stuff:
-    quint16 m_maxConnections;
+    void sendBlock();
+    RSocketType m_socketType;
     quint16 m_nextBlockSize;
     QByteArray m_blockToSend;
     QDataStream m_outStream;
-
-    QList<int> m_devices;
-
-    //    QHash<QTcpSocket *, bool> m_auth;
-
-        //test hash with struct:
-        QHash<QTcpSocket *, ClientData> m_clients;
-
-//    QHash<QTcpSocket *, QList<HSTREAM> m_clients;
-
+    bool m_isAuth;
 
 };
 
-#endif // RACKD_H
+#endif // RACKDSOCKET_H
