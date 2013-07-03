@@ -24,8 +24,10 @@ QT       += widgets
 QT       += network
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    ../shared/rackdsocket.h
 
 SOURCES += \
     mainwindow.cpp \
-    main.cpp
+    main.cpp \
+    ../shared/rackdsocket.cpp

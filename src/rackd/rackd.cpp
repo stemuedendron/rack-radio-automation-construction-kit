@@ -404,6 +404,19 @@ void Rackd::echoCommand(QTcpSocket *client)
         client->write(m_blockToSend);
     }
     m_blockToSend.clear();
+
+    //
+    //test this, block is QByteArray and 2nd parameter of this function
+    //
+//    if (client->state() == QAbstractSocket::ConnectedState)
+//    {
+//        QDataStream outStream(&block, QIODevice::WriteOnly);
+//        outStream.device()->seek(0);
+//        outStream << quint16(block.size() - sizeof(quint16));
+//        client->write(block);
+//    }
+
+
 }
 
 

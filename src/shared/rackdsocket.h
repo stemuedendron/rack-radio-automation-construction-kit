@@ -36,37 +36,33 @@ class RackdSocket : public QTcpSocket
 public:
 
     explicit RackdSocket(QObject *parent = 0);
-    bool isAuth() const {return m_isAuth;}
-    void setAuth(bool ok) {m_isAuth = ok;}
-
 
 
 public slots:
 
-    void passWord(const QString &password, bool ok);
+    void passWord(const QString &password);
 //    void dropConnection();
-    void loadStream(quint8 device, const QString &uri, quint32 handle, bool ok);
+    void loadStream(quint8 device, const QString &uri);
 
 signals:
 
-    void onPassWord(const QString &password, bool ok);
-//    void onDropConnection();
-//    void onLoadStream(quint8 device, const QString &uri, quint32 handle, bool ok);
+    void passWord(bool ok);
+//    void loadedStream(quint8 device, const QString &uri, quint32 handle, bool ok);
 
 
 private slots:
 
-    void readData();
+    void handleResponse();
 
 private:
 
-    void sendBlock();
-    RSocketType m_socketType;
+    void sendCommand();
     quint16 m_nextBlockSize;
     QByteArray m_blockToSend;
     QDataStream m_outStream;
-    bool m_isAuth;
+
 
 };
 
 #endif // RACKDSOCKET_H
+

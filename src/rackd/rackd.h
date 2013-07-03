@@ -50,7 +50,7 @@ protected slots:
 
     //api handling:
     void handleRequest();
-    void echoCommand(QTcpSocket *client);
+
 
 
 private slots:
@@ -66,7 +66,7 @@ private:
         QList<quint32> handleList;
     };
 
-
+    void echoCommand(QTcpSocket *client);
 
     //tcp transmission stuff:
     quint16 m_maxConnections;

@@ -33,7 +33,8 @@ SOURCES += \
     ../shared/rpushbutton.cpp \
     ../shared/rblinkbutton.cpp \
     rsortfilterproxymodel.cpp \
-    rpreviewwidget.cpp
+    rpreviewwidget.cpp \
+    ../shared/rackdsocket.cpp
 
 HEADERS += \
     coreimpl.h \
@@ -46,7 +47,8 @@ HEADERS += \
     ../shared/rblinkbutton.h \
     rsortfilterproxymodel.h \
     rpreviewwidget.h \
-    ../shared/rack.h
+    ../shared/rack.h \
+    ../shared/rackdsocket.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

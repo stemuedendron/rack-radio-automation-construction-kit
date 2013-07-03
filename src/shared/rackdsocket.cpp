@@ -1,3 +1,4 @@
+
 /*
     Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
     All rights reserved.
@@ -26,20 +27,39 @@
 
 RackdSocket::RackdSocket(QObject *parent)
     : QTcpSocket(parent),
-      m_socketType(socketType),
       m_nextBlockSize(0),
-      m_outStream(&m_blockToSend, QIODevice::WriteOnly),
-      m_isAuth(false)
+      m_outStream(&m_blockToSend, QIODevice::WriteOnly)
 {
-
     m_outStream.setVersion(QDataStream::Qt_5_0);
     m_outStream << quint16(0);
-
-    connect(this, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(this, SIGNAL(readyRead()), this, SLOT(handleResponse()));
 }
 
 
-void RackdSocket::readData()
+void RackdSocket::passWord(const QString &password)
+{
+    m_outStream << QString("PW") << password;
+    sendCommand();
+}
+
+
+void RackdSocket::loadStream(quint8 device, const QString &uri)
+{
+
+}
+
+void RackdSocket::sendCommand()
+{
+    if (state() == QAbstractSocket::ConnectedState)
+    {
+        m_outStream.device()->seek(0);
+        m_outStream << quint16(m_blockToSend.size() - sizeof(quint16));
+        write(m_blockToSend);
+    }
+    m_blockToSend.clear();
+}
+
+void RackdSocket::handleResponse()
 {
 
     QDataStream in(this);
@@ -58,20 +78,9 @@ void RackdSocket::readData()
 
     if (command == "PW")
     {
-        QString pw;
         bool ok;
-
-        if (m_socketType == ClientSocket)
-        {
-            in >> ok;
-        }
-
-        if (m_socketType == ServerSocket)
-        {
-            in >> pw;
-        }
-
-        emit passWord(pw, ok);
+        in >> ok;
+        emit passWord(ok);
         return;
     }
 
@@ -129,83 +138,11 @@ void RackdSocket::readData()
 //        return;
 //    }
 
-    qDebug() << "command not valid" << command;
-    //todo reply
-
     m_nextBlockSize = 0;
 
 }
 
-void RackdSocket::passWord(const QString &password, bool ok)
-{
-    m_outStream << QString("PW");
-
-    if (m_socketType == ClientSocket)
-    {
-        m_outStream << password;
-    }
-
-    if (m_socketType == ServerSocket)
-    {
-        m_outStream << ok;
-    }
-
-    sendBlock();
-
-//    QByteArray block;
-//    QDataStream out(&block, QIODevice::WriteOnly);
-//    out.setVersion(QDataStream::Qt_5_0);
-//    out << quint16(0);
 
 
-//    out << quint16("PW");
-
-//    if (m_socketType == ClientSocket)
-//    {
-//        out << password;
-//    }
-
-//    if (m_socketType == ServerSocket)
-//    {
-//        out << ok;
-//    }
-
-//    out.device()->seek(0);
-//    out << quint16(block.size() - sizeof(quint16));
-//    write(block);
-
-}
 
 
-void RackdSocket::loadStream(quint8 device, const QString &uri, quint32 handle, bool ok)
-{
-//    QByteArray block;
-//    QDataStream out(&block, QIODevice::WriteOnly);
-//    out.setVersion(QDataStream::Qt_5_0);
-//    out << quint16(0);
-
-
-//    out << quint16("LS") << device << uri;
-
-//    if (m_socketType == ClientSocket)
-//    {
-
-//    }
-
-//    if (m_socketType == ServerSocket)
-//    {
-//        out << handle << ok;
-//    }
-
-//    out.device()->seek(0);
-//    out << quint16(block.size() - sizeof(quint16));
-//    write(block);
-}
-
-void RackdSocket::sendBlock()
-{
-    m_outStream.device()->seek(0);
-    m_outStream << quint16(m_blockToSend.size() - sizeof(quint16));
-    write(m_blockToSend);
-    m_blockToSend.clear();
-}
