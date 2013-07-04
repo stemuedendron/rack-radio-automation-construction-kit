@@ -37,25 +37,21 @@ public:
     explicit Rackd(QObject *parent = 0);
     ~Rackd();
     
+
 public slots:
 
     void doCleanUp();
 
-protected slots:
+
+private slots:
 
     //connection handling:
     void clientConnected();
     void clientDisconnected();
-    void displayError(QAbstractSocket::SocketError);
+    void handleError(QAbstractSocket::SocketError);
 
     //api handling:
     void handleRequest();
-
-
-
-private slots:
-
-signals:
 
 
 private:

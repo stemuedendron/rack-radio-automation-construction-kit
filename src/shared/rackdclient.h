@@ -21,48 +21,72 @@
 */
 
 
-#ifndef RACKDSOCKET_H
-#define RACKDSOCKET_H
+#ifndef RACKDCLIENT_H
+#define RACKDCLIENT_H
 
 #include <QTcpSocket>
 #include <QDataStream>
 
 
-class RackdSocket : public QTcpSocket
+class RackdClient : public QObject
 {
 
     Q_OBJECT
 
 public:
 
-    explicit RackdSocket(QObject *parent = 0);
+    explicit RackdClient(QObject *parent = 0);
 
 
 public slots:
 
+    //connection handling:
+    void connectToRackd(const QHostAddress & address, quint16 port);
+    void disconnectFromRackd();
+
+    //rackd protocoll implementation, requests:
     void passWord(const QString &password);
     void dropConnection();
+
     void loadStream(quint8 device, const QString &uri);
+    void unloadStream(quint32 handle);
+    void positionPlay(quint32 handle, quint32 pos);
+    void play(quint32 handle);
+    void stop(quint32 handle);
+
 
 signals:
 
+    //connection handling:
+    void connected();
+    void disconnected();
+
+    //rackd protocoll implementation, responses:
     void passWordOK(bool ok);
-//    void loadedStream(quint8 device, const QString &uri, quint32 handle, bool ok);
+
+    void streamLoaded(quint32 handle);
+    void streamUnloaded(quint32 handle);
+    void playPositioned(quint32 handle, quint32 pos);
+    void playing(quint32 handle);
+    void stopped(quint32 handle);
 
 
 private slots:
 
+    //connection handling:
+    void handleError(QAbstractSocket::SocketError socketError);
     void handleResponse();
+
 
 private:
 
-    void sendBlock();
+    QTcpSocket *m_tcpSocket;
     QVariantList m_request;
-
     quint16 m_nextBlockSize;
 
+    void sendBlock();
 
 };
 
-#endif // RACKDSOCKET_H
+#endif // RACKDCLIENT_H
 

@@ -34,7 +34,7 @@ SOURCES += \
     ../shared/rblinkbutton.cpp \
     rsortfilterproxymodel.cpp \
     rpreviewwidget.cpp \
-    ../shared/rackdsocket.cpp
+    ../shared/rackdclient.cpp
 
 HEADERS += \
     coreimpl.h \
@@ -48,7 +48,7 @@ HEADERS += \
     rsortfilterproxymodel.h \
     rpreviewwidget.h \
     ../shared/rack.h \
-    ../shared/rackdsocket.h
+    ../shared/rackdclient.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

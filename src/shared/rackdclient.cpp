@@ -21,69 +21,95 @@
 */
 
 
-#include "rackdsocket.h"
+#include "rackdclient.h"
 
 
-RackdSocket::RackdSocket(QObject *parent)
-    : QTcpSocket(parent),
+RackdClient::RackdClient(QObject *parent)
+    : QObject(parent),
       m_nextBlockSize(0)
-
 {
-    connect(this, SIGNAL(readyRead()), this, SLOT(handleResponse()));
+    m_tcpSocket = new QTcpSocket(this);
+    connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(m_tcpSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+    connect(m_tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
+    connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(handleResponse()));
+
 }
 
-void RackdSocket::sendBlock()
-{
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0);
+//connection handling:
 
-    foreach (const QVariant &value, m_request)
+void RackdClient::connectToRackd(const QHostAddress &address, quint16 port)
+{
+    m_tcpSocket->connectToHost(address, port);
+}
+
+void RackdClient::disconnectFromRackd()
+{
+    m_tcpSocket->disconnectFromHost();
+}
+
+//TODO:
+void RackdClient::handleError(QAbstractSocket::SocketError socketError)
+{
+    qDebug() << socketError;
+}
+
+
+void RackdClient::sendBlock()
+{
+    if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
     {
-        switch (value.type())
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_0);
+        out << quint16(0);
+
+        foreach (const QVariant &value, m_request)
         {
+            switch (value.type())
+            {
             case QMetaType::QString: out << value.toString(); break;
             case QMetaType::Bool: out << value.toBool(); break;
             case QMetaType::Int: out << value.toInt();  break;
             case QMetaType::UInt: out << value.toUInt(); break;
             case QMetaType::ULongLong: out << value.toULongLong(); break;
             default: out << value;
+            }
         }
+
+        out.device()->seek(0);
+        out << quint16(block.size() - sizeof(quint16));
+
+        //debug:
+        qDebug() << "send request:";
+        foreach (const QVariant &value, m_request)
+        {
+            qDebug() << value;
+        }
+        qDebug() << "request block:" << block.toHex() << "size (Bytes):" << block.size();
+
+        m_tcpSocket->write(block);
     }
-
-    out.device()->seek(0);
-    out << quint16(block.size() - sizeof(quint16));
-
-    //debug:
-    qDebug() << "send request:";
-    foreach (const QVariant &value, m_request)
-    {
-        qDebug() << value;
-    }
-    qDebug() << "request block:" << block.toHex() << "size (Bytes):" << block.size();
-
-    write(block);
     m_request.clear();
 }
 
 
 //rackd protocoll implementation, requests:
 
-void RackdSocket::passWord(const QString &password)
+void RackdClient::passWord(const QString &password)
 {
     m_request.append(QString("PW"));
     m_request.append(password);
     sendBlock();
 }
 
-void RackdSocket::dropConnection()
+void RackdClient::dropConnection()
 {
     m_request.append(QString("DC"));
     sendBlock();
 }
 
-void RackdSocket::loadStream(quint8 device, const QString &uri)
+void RackdClient::loadStream(quint8 device, const QString &uri)
 {
     m_request.append(QString("LS"));
     m_request.append(device);
@@ -91,23 +117,52 @@ void RackdSocket::loadStream(quint8 device, const QString &uri)
     sendBlock();
 }
 
+void RackdClient::unloadStream(quint32 handle)
+{
+    m_request.append(QString("US"));
+    m_request.append(handle);
+    sendBlock();
+}
+
+void RackdClient::positionPlay(quint32 handle, quint32 pos)
+{
+    m_request.append(QString("PP"));
+    m_request.append(handle);
+    m_request.append(pos);
+    sendBlock();
+}
+
+void RackdClient::play(quint32 handle)
+{
+    m_request.append(QString("PY"));
+    m_request.append(handle);
+    sendBlock();
+}
+
+void RackdClient::stop(quint32 handle)
+{
+    m_request.append(QString("SP"));
+    m_request.append(handle);
+    sendBlock();
+}
+
 
 
 
 //rackd protocoll implementation, response:
-void RackdSocket::handleResponse()
+void RackdClient::handleResponse()
 {
 
     qDebug() << "got response from server";
 
-    QDataStream in(this);
+    QDataStream in(m_tcpSocket);
     in.setVersion(QDataStream::Qt_5_0);
     if (m_nextBlockSize == 0)
     {
-        if (bytesAvailable() < sizeof(quint16)) return;
+        if (m_tcpSocket->bytesAvailable() < sizeof(quint16)) return;
         in >> m_nextBlockSize;
     }
-    if (bytesAvailable() < m_nextBlockSize) return;
+    if (m_tcpSocket->bytesAvailable() < m_nextBlockSize) return;
     QString command;
     in >> command;
 
@@ -123,6 +178,8 @@ void RackdSocket::handleResponse()
         return;
     }
 
+    qDebug() << "ERROR: unknown response" << command;
+    m_nextBlockSize = 0;
 
 //    if (command == "DC")
 //    {
@@ -180,6 +237,9 @@ void RackdSocket::handleResponse()
 
 
 }
+
+
+
 
 
 

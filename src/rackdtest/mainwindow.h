@@ -25,7 +25,7 @@
 
 #include <QWidget>
 
-class RackdSocket;
+class RackdClient;
 class QLineEdit;
 class QTextEdit;
 
@@ -49,7 +49,7 @@ private slots:
     
 private:
 
-    RackdSocket *m_rackdSocket;
+    RackdClient *m_rackdClient;
     QLineEdit *m_le;
     QTextEdit *m_log;
     

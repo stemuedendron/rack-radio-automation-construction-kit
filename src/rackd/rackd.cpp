@@ -48,7 +48,8 @@ void SigHandler(int signum)
 }
 
 
-Rackd::Rackd(QObject *parent) : QTcpServer(parent),
+Rackd::Rackd(QObject *parent)
+    : QTcpServer(parent),
       m_maxConnections(30),
       m_nextBlockSize(0)
 {
@@ -117,7 +118,7 @@ void Rackd::clientConnected()
 
         connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
         connect(client, SIGNAL(readyRead()), this, SLOT(handleRequest()));
-        connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(displayError(QAbstractSocket::SocketError)));
+        connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
 
         qDebug() << "new client connected from" << client->peerAddress().toString() << client->peerPort();
         qDebug() << "we have now" << m_clients.count() << "connections";
@@ -139,7 +140,7 @@ void Rackd::clientDisconnected()
     QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());
     if (!client) return;
 
-    //clients have to free resources (unload stream) before disconnect
+    //clients have to free resources (unload streams) before disconnect
     //if we have resources here we asume a client crash. so lets play until end of song
     //an then autofree stream:
 
@@ -166,12 +167,29 @@ void Rackd::clientDisconnected()
 
 }
 
-
-void Rackd::displayError(QAbstractSocket::SocketError)
+//TODO:
+void Rackd::handleError(QAbstractSocket::SocketError)
 {
     qDebug() << errorString();
 }
 
+void Rackd::sendBlock(QTcpSocket *client, QByteArray &response)
+{
+    if (client->state() == QAbstractSocket::ConnectedState)
+    {
+        QDataStream out(&response, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_0);
+        out.device()->seek(0);
+        out << quint16(response.size() - sizeof(quint16));
+
+        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
+
+        client->write(response);
+    }
+}
+
+
+//rackd protocoll implementation:
 
 void Rackd::handleRequest()
 {
@@ -221,52 +239,90 @@ void Rackd::handleRequest()
             m_clients[client].isAuth = false;
             out << command << false;
         }
+
+        qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << m_clients[client].isAuth;
+
         sendBlock(client, response);
+        m_nextBlockSize = 0;
         return;
     }
 
     if (command == "DC")
     {
-        //emit dropConnection();
-
+        client->disconnectFromHost();
+        m_nextBlockSize = 0;
         return;
     }
+
+    //the following request needs authentication:
+    if (!m_clients[client].isAuth)
+    {
+
+        qDebug() << "ERROR: authentication required!";
+
+        out << command << false;
+        sendBlock(client, response);
+        m_nextBlockSize = 0;
+        return;
+    }
+
+    if (command == "LS")
+    {
+        quint8 device;
+        QString uri;
+        in >> device >>uri;
+
+
+
+
+        sendBlock(client, response);
+        m_nextBlockSize = 0;
+        return;
+    }
+
+//    if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
+//    {
+
+//        //test filename as uri
+//        //usage: LP <card num> <uri>!
+
+//        QString absFileName = QDir::cleanPath(commandList[2]);
+
+//        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
+
+//        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
+
+//        if (stream)
+//        {
+//            m_clients[client].handleList.append(stream);
+//            qDebug() << "client streams:" << m_clients[client].handleList;
+
+//        }
+
+//        qDebug() << absFileName;
+
+//        command.append(' ');
+//        command.append(QByteArray::number(stream));
+//        command.append(' ');
+//        command.append(QByteArray::number(stream));
+//        echoCommand(client, command.append('+'));
+//        return;
+
+
+//    }
 
 
 
     qDebug() << "ERROR: unknown command" << command;
-    //todo reply
+    out << command << false;
+    sendBlock(client, response);
+    m_nextBlockSize = 0;
 
 
 
 
 
 
-    //    if (command == "DC")
-    //    {
-    //        emit dropConnection();
-    //        return;
-    //    }
-
-
-    //    if (!m_isAuth)
-    //    {
-    //        qDebug() << "ERROR: authentication required!";
-    //        //todo reply
-    //        //echoCommand(client, command.append("-"));
-    //        return;
-    //    }
-
-
-
-    //    if (command == "LS")
-    //    {
-    //        quint8 device;
-    //        QString uri;
-    //        in >> device >>uri;
-    //        emit loadStream(device, uri);
-    //        return;
-    //    }
 
     //    if (command == "PP")
     //    {
@@ -295,55 +351,6 @@ void Rackd::handleRequest()
     //        emit stop(handle);
     //        return;
     //    }
-
-
-
-
-//    if (!qstrcmp(commandList[0], "DC")&& commandList.size() == 1)
-//    {
-//        //log
-//        client->disconnectFromHost();
-//        return;
-//    }
-
-//    if (!m_clients[client].isAuth)
-//    {
-//        qDebug() << "ERROR: authentication required!";
-//        echoCommand(client, command.append("-"));
-//        return;
-//    }
-
-//    if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
-//    {
-
-//        //test filename as uri
-//        //usage: LP <card num> <uri>!
-//        QString absFileName = QDir::cleanPath(commandList[2]);
-
-//        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
-
-//        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
-
-//        if (stream)
-//        {
-//            m_clients[client].handleList.append(stream);
-//            qDebug() << "client streams:" << m_clients[client].handleList;
-
-//        }
-
-//        qDebug() << absFileName;
-
-//        command.append(' ');
-//        command.append(QByteArray::number(stream));
-//        command.append(' ');
-//        command.append(QByteArray::number(stream));
-//        echoCommand(client, command.append('+'));
-//        return;
-
-
-//    }
-
-
 
 
 
@@ -417,39 +424,7 @@ void Rackd::handleRequest()
 
 }
 
-void Rackd::sendBlock(QTcpSocket *client, QByteArray &response)
-{
-    if (client->state() == QAbstractSocket::ConnectedState)
-    {
-        QDataStream out(&response, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_0);
-        out.device()->seek(0);
-        out << quint16(response.size() - sizeof(quint16));
 
-        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
-
-        client->write(response);
-    }
-    m_nextBlockSize = 0;
-}
-
-
-
-////api slots:
-
-//void Rackd::passWord(quint64 id, const QString &passWord)
-//{
-//    if (passWord == "letmein")
-//    {
-//        m_auth[id] = true;
-//        qDebug() << "client number:" << QString::number(id) << "authenticated";
-//    }
-//}
-
-//void Rackd::receiveFileName(quint64 id, const QString &fileName)
-//{
-//    qDebug() << "receive file name:" << fileName << "from" << id;
-//}
 
 
 //void Rackd::getWaveForm(quint64 id, const qulonglong itemID)
@@ -509,13 +484,12 @@ void Rackd::doCleanUp()
     qDebug() << "stop listen for incoming connections";
     close();
 
-    foreach (int i, m_devices)
-        if (BASS_SetDevice(i))
-        {
-            BASS_DEVICEINFO info;
-            BASS_GetDeviceInfo(i, &info);
-            if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
-        }
+    foreach (int i, m_devices) if (BASS_SetDevice(i))
+    {
+        BASS_DEVICEINFO info;
+        BASS_GetDeviceInfo(i, &info);
+        if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
+    }
 
 }
 

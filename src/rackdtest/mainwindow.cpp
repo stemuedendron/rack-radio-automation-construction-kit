@@ -21,7 +21,7 @@
 */
 
 #include "mainwindow.h"
-#include "rackdsocket.h"
+#include "rackdclient.h"
 #include <QtWidgets>
 #include <QHostAddress>
 
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
 
-    m_rackdSocket = new RackdSocket(this);
+    m_rackdClient = new RackdClient(this);
     m_le = new QLineEdit;
     QPushButton *bConn = new QPushButton("connect");
     QPushButton *bPW = new QPushButton("send password");
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
 
-    connect(m_rackdSocket, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
+    connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
 
     QVBoxLayout *l = new QVBoxLayout();
     l->addWidget(m_le);
@@ -60,25 +60,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::connectToServer()
 {
-    m_rackdSocket->connectToHost(QHostAddress::Any, 1234);
+    m_rackdClient->connectToRackd(QHostAddress::Any, 1234);
 }
 
 
 void MainWindow::sendPass()
 {
-    m_rackdSocket->passWord(m_le->text());
+    m_rackdClient->passWord(m_le->text());
 }
 
 
 void MainWindow::loadStream()
 {
-    m_rackdSocket->loadStream(quint8(2), m_le->text());
+    m_rackdClient->loadStream(quint8(2), m_le->text());
 }
 
 
 void MainWindow::dropConnection()
 {
-    m_rackdSocket->dropConnection();
+    m_rackdClient->dropConnection();
 }
 
 
