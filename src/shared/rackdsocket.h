@@ -41,12 +41,12 @@ public:
 public slots:
 
     void passWord(const QString &password);
-//    void dropConnection();
+    void dropConnection();
     void loadStream(quint8 device, const QString &uri);
 
 signals:
 
-    void passWord(bool ok);
+    void passWordOK(bool ok);
 //    void loadedStream(quint8 device, const QString &uri, quint32 handle, bool ok);
 
 
@@ -56,10 +56,10 @@ private slots:
 
 private:
 
-    void sendCommand();
+    void sendBlock();
+    QVariantList m_request;
+
     quint16 m_nextBlockSize;
-    QByteArray m_blockToSend;
-    QDataStream m_outStream;
 
 
 };

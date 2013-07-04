@@ -20,7 +20,7 @@
 #    Author: Steffen Müller
 #
 
-QT += sql widgets
+QT += sql widgets network
 
 TARGET = rack
 

@@ -31,3 +31,5 @@ SOURCES += \
     mainwindow.cpp \
     main.cpp \
     ../shared/rackdsocket.cpp
+
+INCLUDEPATH += ../shared

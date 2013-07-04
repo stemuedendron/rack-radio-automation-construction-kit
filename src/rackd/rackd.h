@@ -66,13 +66,11 @@ private:
         QList<quint32> handleList;
     };
 
-    void echoCommand(QTcpSocket *client);
+    void sendBlock(QTcpSocket *client, QByteArray &response);
 
     //tcp transmission stuff:
     quint16 m_maxConnections;
     quint16 m_nextBlockSize;
-    QByteArray m_blockToSend;
-    QDataStream m_outStream;
 
     QList<int> m_devices;
 

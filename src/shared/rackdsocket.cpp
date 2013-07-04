@@ -1,4 +1,3 @@
-
 /*
     Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
     All rights reserved.
@@ -27,52 +26,88 @@
 
 RackdSocket::RackdSocket(QObject *parent)
     : QTcpSocket(parent),
-      m_nextBlockSize(0),
-      m_outStream(&m_blockToSend, QIODevice::WriteOnly)
+      m_nextBlockSize(0)
+
 {
-    m_outStream.setVersion(QDataStream::Qt_5_0);
-    m_outStream << quint16(0);
     connect(this, SIGNAL(readyRead()), this, SLOT(handleResponse()));
 }
 
+void RackdSocket::sendBlock()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0);
+
+    foreach (const QVariant &value, m_request)
+    {
+        switch (value.type())
+        {
+            case QMetaType::QString: out << value.toString(); break;
+            case QMetaType::Bool: out << value.toBool(); break;
+            case QMetaType::Int: out << value.toInt();  break;
+            case QMetaType::UInt: out << value.toUInt(); break;
+            case QMetaType::ULongLong: out << value.toULongLong(); break;
+            default: out << value;
+        }
+    }
+
+    out.device()->seek(0);
+    out << quint16(block.size() - sizeof(quint16));
+
+    //debug:
+    qDebug() << "send request:";
+    foreach (const QVariant &value, m_request)
+    {
+        qDebug() << value;
+    }
+    qDebug() << "request block:" << block.toHex() << "size (Bytes):" << block.size();
+
+    write(block);
+    m_request.clear();
+}
+
+
+//rackd protocoll implementation, requests:
 
 void RackdSocket::passWord(const QString &password)
 {
-    m_outStream << QString("PW") << password;
-    sendCommand();
+    m_request.append(QString("PW"));
+    m_request.append(password);
+    sendBlock();
 }
 
+void RackdSocket::dropConnection()
+{
+    m_request.append(QString("DC"));
+    sendBlock();
+}
 
 void RackdSocket::loadStream(quint8 device, const QString &uri)
 {
-
+    m_request.append(QString("LS"));
+    m_request.append(device);
+    m_request.append(uri);
+    sendBlock();
 }
 
-void RackdSocket::sendCommand()
-{
-    if (state() == QAbstractSocket::ConnectedState)
-    {
-        m_outStream.device()->seek(0);
-        m_outStream << quint16(m_blockToSend.size() - sizeof(quint16));
-        write(m_blockToSend);
-    }
-    m_blockToSend.clear();
-}
 
+
+
+//rackd protocoll implementation, response:
 void RackdSocket::handleResponse()
 {
 
+    qDebug() << "got response from server";
+
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_5_0);
-
     if (m_nextBlockSize == 0)
     {
         if (bytesAvailable() < sizeof(quint16)) return;
         in >> m_nextBlockSize;
     }
-
     if (bytesAvailable() < m_nextBlockSize) return;
-
     QString command;
     in >> command;
 
@@ -80,9 +115,14 @@ void RackdSocket::handleResponse()
     {
         bool ok;
         in >> ok;
-        emit passWord(ok);
+
+        qDebug() << "authentificated:" << ok;
+
+        emit passWordOK(ok);
+        m_nextBlockSize = 0;
         return;
     }
+
 
 //    if (command == "DC")
 //    {
@@ -138,9 +178,14 @@ void RackdSocket::handleResponse()
 //        return;
 //    }
 
-    m_nextBlockSize = 0;
 
 }
+
+
+
+
+
+
 
 
 

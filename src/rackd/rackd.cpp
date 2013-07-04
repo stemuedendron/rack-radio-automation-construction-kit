@@ -33,6 +33,7 @@
 //TODO: qsettings
 //loglevels?
 
+
 void SigHandler(int signum)
 {
   switch(signum)
@@ -49,8 +50,7 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent) : QTcpServer(parent),
       m_maxConnections(30),
-      m_nextBlockSize(0),
-      m_outStream(&m_blockToSend, QIODevice::WriteOnly)
+      m_nextBlockSize(0)
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -89,8 +89,7 @@ Rackd::Rackd(QObject *parent) : QTcpServer(parent),
         qDebug() << "waiting for incoming connections..." << serverAddress().toString() << serverPort();
     }
 
-    m_outStream.setVersion(QDataStream::Qt_5_0);
-    m_outStream << quint16(0);
+
     connect(this, SIGNAL(newConnection()), this, SLOT(clientConnected()));
 
 }
@@ -190,9 +189,18 @@ void Rackd::handleRequest()
         if (client->bytesAvailable() < sizeof(quint16)) return;
         in >> m_nextBlockSize;
     }
-
     if (client->bytesAvailable() < m_nextBlockSize) return;
 
+    qDebug() << "complete block received";
+    qDebug() << "current block size" << m_nextBlockSize;
+    qDebug() << "bytes available" << client->bytesAvailable();
+
+
+    //prepare response block:
+    QByteArray response;
+    QDataStream out(&response, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0);
 
     QString command;
     in >> command;
@@ -206,16 +214,33 @@ void Rackd::handleRequest()
         if (pw == "pass") //TODO: read from settings
         {
             m_clients[client].isAuth = true;
-            m_outStream << command << true;
+            out << command << true;
         }
         else
         {
             m_clients[client].isAuth = false;
-            m_outStream << command << false;
+            out << command << false;
         }
-        echoCommand(client);
+        sendBlock(client, response);
         return;
     }
+
+    if (command == "DC")
+    {
+        //emit dropConnection();
+
+        return;
+    }
+
+
+
+    qDebug() << "ERROR: unknown command" << command;
+    //todo reply
+
+
+
+
+
 
     //    if (command == "DC")
     //    {
@@ -389,34 +414,23 @@ void Rackd::handleRequest()
 //    MP <card-num> <stream-num> <pos>!
 //    MS <card-num> <port-num> <stream-num> <status>!
 
-    qDebug() << "command not valid" << command;
-            //todo reply
 
-    m_nextBlockSize = 0;
 }
 
-void Rackd::echoCommand(QTcpSocket *client)
+void Rackd::sendBlock(QTcpSocket *client, QByteArray &response)
 {
     if (client->state() == QAbstractSocket::ConnectedState)
     {
-        m_outStream.device()->seek(0);
-        m_outStream << quint16(m_blockToSend.size() - sizeof(quint16));
-        client->write(m_blockToSend);
+        QDataStream out(&response, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_0);
+        out.device()->seek(0);
+        out << quint16(response.size() - sizeof(quint16));
+
+        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
+
+        client->write(response);
     }
-    m_blockToSend.clear();
-
-    //
-    //test this, block is QByteArray and 2nd parameter of this function
-    //
-//    if (client->state() == QAbstractSocket::ConnectedState)
-//    {
-//        QDataStream outStream(&block, QIODevice::WriteOnly);
-//        outStream.device()->seek(0);
-//        outStream << quint16(block.size() - sizeof(quint16));
-//        client->write(block);
-//    }
-
-
+    m_nextBlockSize = 0;
 }
 
 

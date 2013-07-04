@@ -25,8 +25,9 @@
 
 #include <QWidget>
 
+class RackdSocket;
 class QLineEdit;
-class QLabel;
+class QTextEdit;
 
 class MainWindow : public QWidget
 {
@@ -39,11 +40,18 @@ public:
 private slots:
 
     void connectToServer();
+    void sendPass();
+    void loadStream();
+    void dropConnection();
+
+    void passWordOK(bool ok);
 
     
-signals:
-    
-public slots:
+private:
+
+    RackdSocket *m_rackdSocket;
+    QLineEdit *m_le;
+    QTextEdit *m_log;
     
 };
 
