@@ -37,14 +37,18 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
 
+
 private slots:
 
     void connectToServer();
     void sendPass();
     void loadStream();
+    void play();
+    void stop();
     void dropConnection();
 
     void passWordOK(bool ok);
+    void streamLoaded(quint32 handle);
 
     
 private:
@@ -53,6 +57,8 @@ private:
     QLineEdit *m_le;
     QTextEdit *m_log;
     
+    quint32 m_handle;
+
 };
 
 #endif // MAINWINDOW_H

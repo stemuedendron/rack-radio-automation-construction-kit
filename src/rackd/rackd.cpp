@@ -50,8 +50,7 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
-      m_maxConnections(30),
-      m_nextBlockSize(0)
+      m_maxConnections(30)
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -113,6 +112,7 @@ void Rackd::clientConnected()
 
         ClientData data;
         data.isAuth = false;
+        data.nextBlockSize = 0;
 
         m_clients.insert(client, data);
 
@@ -141,11 +141,16 @@ void Rackd::clientDisconnected()
     if (!client) return;
 
     //clients have to free resources (unload streams) before disconnect
-    //if we have resources here we asume a client crash. so lets play until end of song
+    //if we have resources here we asume a client crash or drop connection. so lets play until end of song
     //an then autofree stream:
 
 
     //wrong: rackd has no stream handle anymore!!!!!
+    //change this: handle list must be a rackd member
+
+
+
+
     foreach (HSTREAM stream, m_clients[client].handleList)
     {
         BASS_ChannelIsActive(stream) == BASS_ACTIVE_PLAYING ? BASS_ChannelFlags(stream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE) : BASS_StreamFree(stream);
@@ -173,19 +178,16 @@ void Rackd::handleError(QAbstractSocket::SocketError)
     qDebug() << errorString();
 }
 
-void Rackd::sendBlock(QTcpSocket *client, QByteArray &response)
+void Rackd::sendResponse(QTcpSocket *client)
 {
     if (client->state() == QAbstractSocket::ConnectedState)
     {
-        QDataStream out(&response, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_0);
-        out.device()->seek(0);
-        out << quint16(response.size() - sizeof(quint16));
 
-        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
+        qDebug() << "send response block:" << m_response.toHex() << "size (Bytes):" << m_response.size();
 
-        client->write(response);
+        client->write(m_response);
     }
+    m_response.clear();
 }
 
 
@@ -202,33 +204,49 @@ void Rackd::handleRequest()
     QDataStream in(client);
     in.setVersion(QDataStream::Qt_5_0);
 
-    if (m_nextBlockSize == 0)
+    if (m_clients[client].nextBlockSize == 0)
     {
-        if (client->bytesAvailable() < sizeof(quint16)) return;
-        in >> m_nextBlockSize;
-    }
-    if (client->bytesAvailable() < m_nextBlockSize) return;
+        qDebug() << "bytes available:" << client->bytesAvailable();
 
-    qDebug() << "complete block received";
-    qDebug() << "current block size" << m_nextBlockSize;
+
+        if (client->bytesAvailable() < sizeof(quint16)) return;
+        in >> m_clients[client].nextBlockSize;
+    }
+
+    qDebug() << "next block size for" << client->peerAddress().toString() << client->peerPort() << "is" << m_clients[client].nextBlockSize;
     qDebug() << "bytes available" << client->bytesAvailable();
 
 
+    if (client->bytesAvailable() < m_clients[client].nextBlockSize) return;
+
+    qDebug() << "complete block received";
+    qDebug() << "current block size" << m_clients[client].nextBlockSize;
+    qDebug() << "bytes available" << client->bytesAvailable();
+
+    //read the complete request block for later processing:
+    QByteArray requestBlock = client->read(m_clients[client].nextBlockSize);
+    QDataStream request(&requestBlock, QIODevice::ReadOnly);
+    request.setVersion(QDataStream::Qt_5_0);
+
+    qDebug() << "bytes available after read:" << client->bytesAvailable();
+
+    m_clients[client].nextBlockSize = 0;
+
+
     //prepare response block:
-    QByteArray response;
-    QDataStream out(&response, QIODevice::WriteOnly);
+    QDataStream out(&m_response, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
     out << quint16(0);
 
     QString command;
-    in >> command;
+    request >> command;
 
     qDebug() << "command is:" << command;
 
     if (command == "PW")
     {
         QString pw;
-        in >> pw;
+        request >> pw;
         if (pw == "pass") //TODO: read from settings
         {
             m_clients[client].isAuth = true;
@@ -242,27 +260,28 @@ void Rackd::handleRequest()
 
         qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << m_clients[client].isAuth;
 
-        sendBlock(client, response);
-        m_nextBlockSize = 0;
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
         return;
     }
 
     if (command == "DC")
     {
         client->disconnectFromHost();
-        m_nextBlockSize = 0;
         return;
     }
 
-    //the following request needs authentication:
+    //the following requests needs authentication:
     if (!m_clients[client].isAuth)
     {
 
         qDebug() << "ERROR: authentication required!";
 
-        out << command << false;
-        sendBlock(client, response);
-        m_nextBlockSize = 0;
+        out << QString("ER") << command << QString("request need authentication");
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
         return;
     }
 
@@ -270,57 +289,42 @@ void Rackd::handleRequest()
     {
         quint8 device;
         QString uri;
-        in >> device >>uri;
+        request >> device >> uri;
 
+        qDebug() << uri;
 
+        BASS_SetDevice(device);
+        HSTREAM handle;
+        if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive))
+        {
+            handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
+        }
+        else
+        {
+            QString absFileName = QDir::cleanPath(uri);
+            handle = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
+        }
 
+        if (handle)
+        {
+            m_clients[client].handleList.append(handle);
 
-        sendBlock(client, response);
-        m_nextBlockSize = 0;
+            qDebug() << "load stream:" << uri;
+            qDebug() << "client streams:" << m_clients[client].handleList;
+
+            out << command << device << uri << quint32(handle) << true;
+        }
+        else
+        {
+            qDebug() << "ERROR: load stream failed:" << uri << BASS_ErrorGetCode();
+            out << command << device << uri << quint32(handle) << false;
+        }
+
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
         return;
     }
-
-//    if (!qstrcmp(commandList[0], "LP") && commandList.size() == 3)
-//    {
-
-//        //test filename as uri
-//        //usage: LP <card num> <uri>!
-
-//        QString absFileName = QDir::cleanPath(commandList[2]);
-
-//        if (BASS_SetDevice(commandList[1].toInt())) qDebug() << "set device ok" << commandList[1].toInt();
-
-//        HSTREAM stream = BASS_StreamCreateFile(false, qPrintable(absFileName), 0, 0, 0);
-
-//        if (stream)
-//        {
-//            m_clients[client].handleList.append(stream);
-//            qDebug() << "client streams:" << m_clients[client].handleList;
-
-//        }
-
-//        qDebug() << absFileName;
-
-//        command.append(' ');
-//        command.append(QByteArray::number(stream));
-//        command.append(' ');
-//        command.append(QByteArray::number(stream));
-//        echoCommand(client, command.append('+'));
-//        return;
-
-
-//    }
-
-
-
-    qDebug() << "ERROR: unknown command" << command;
-    out << command << false;
-    sendBlock(client, response);
-    m_nextBlockSize = 0;
-
-
-
-
 
 
 
@@ -333,59 +337,54 @@ void Rackd::handleRequest()
     //        return;
     //    }
 
-    //    if (command == "PY")
-    //    {
-    //        quint32 handle;
-    //        quint32 length;
-    //        quint16 speed;
-    //        bool pitch;
-    //        in >> handle >> length >> speed >> pitch;
-    //        emit play(handle, length, speed, pitch);
-    //        return;
-    //    }
-
-    //    if (command == "SP")
-    //    {
-    //        quint32 handle;
-    //        in >> handle;
-    //        emit stop(handle);
-    //        return;
-    //    }
 
 
+    if (command == "PY")
+    {
+        quint32 handle;
+        //quint32 length;
+        //quint16 speed;
+        //bool pitch;
+        request >> handle;
+        if (BASS_ChannelPlay(handle, false))
+        {
+            qDebug() << "play ok:" << handle;
+            out << command << handle << true;
+        }
+        else
+        {
+            qDebug() << "play not ok:" << handle << BASS_ErrorGetCode();
+            out << command << handle << false;
+        }
 
-//    UP <conn-handle>!
-//    PP <conn-handle> <position>!
-
-
-//    PY <conn-handle> <length> <speed> <pitch-flag>!
-//    if (!qstrcmp(commandList[0], "PY") && commandList.size() == 5)
-//    {
-
-//        //testcode:
-//        if (BASS_ChannelPlay(commandList[1].toULong(), false))
-//        {
-//            qDebug() << "play ok" << commandList[1].toULong();
-//        }
-//        else
-//        {
-//            qDebug() << "play not ok" << commandList[1].toULong() << BASS_ErrorGetCode();
-
-//        }
-
-
-
-//        return;
-//    }
-
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
+        return;
+    }
 
 
-////    SP <conn-handle>!
-//    if (!qstrcmp(commandList[0], "SP") && commandList.size() == 2)
-//    {
-//        BASS_ChannelPause(commandList[1].toULong());
-//        return;
-//    }
+    if (command == "SP")
+    {
+        quint32 handle;
+        request >> handle;
+        if (BASS_ChannelPause(handle))
+        {
+            qDebug() << "stop ok:" << handle;
+            out << command << handle << true;
+        }
+        else
+        {
+            qDebug() << "stop not ok:" << handle << BASS_ErrorGetCode();
+            out << command << handle << false;
+        }
+
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
+        return;
+    }
+
 
 
 //    //EI
@@ -395,6 +394,8 @@ void Rackd::handleRequest()
 //        return;
 //    }
 
+//    UP <conn-handle>!
+//    PP <conn-handle> <position>!
 //    TS <card-num>!
 //    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
 //    UR <card-num> <stream-num>!
@@ -422,6 +423,11 @@ void Rackd::handleRequest()
 //    MS <card-num> <port-num> <stream-num> <status>!
 
 
+        qDebug() << "ERROR: unknown request" << command;
+        out << QString("ER") << command << QString("unknown request");
+        out.device()->seek(0);
+        out << quint16(m_response.size() - sizeof(quint16));
+        sendResponse(client);
 }
 
 

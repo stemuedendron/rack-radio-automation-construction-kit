@@ -81,10 +81,9 @@ private slots:
 private:
 
     QTcpSocket *m_tcpSocket;
-    QVariantList m_request;
+    QByteArray m_request;
     quint16 m_nextBlockSize;
-
-    void sendBlock();
+    void sendRequest();
 
 };
 

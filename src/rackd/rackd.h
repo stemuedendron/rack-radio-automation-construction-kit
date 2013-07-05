@@ -50,33 +50,29 @@ private slots:
     void clientDisconnected();
     void handleError(QAbstractSocket::SocketError);
 
-    //api handling:
+    //protocol handling:
     void handleRequest();
-
 
 private:
 
+    void sendResponse(QTcpSocket *client);
+    quint16 m_maxConnections;
+    QByteArray m_response;
     struct ClientData
     {
         bool isAuth;
+        quint16 nextBlockSize;
         QList<quint32> handleList;
     };
 
-    void sendBlock(QTcpSocket *client, QByteArray &response);
-
-    //tcp transmission stuff:
-    quint16 m_maxConnections;
-    quint16 m_nextBlockSize;
-
-    QList<int> m_devices;
-
     //    QHash<QTcpSocket *, bool> m_auth;
 
-        //test hash with struct:
-        QHash<QTcpSocket *, ClientData> m_clients;
+    //test hash with struct:
+    QHash<QTcpSocket *, ClientData> m_clients;
 
-//    QHash<QTcpSocket *, QList<HSTREAM> m_clients;
+    //    QHash<QTcpSocket *, QList<HSTREAM> m_clients;
 
+    QList<int> m_devices;
 
 };
 

@@ -22,11 +22,11 @@
 
 
 #include "rackdclient.h"
+#include <QBuffer>
 
 
 RackdClient::RackdClient(QObject *parent)
-    : QObject(parent),
-      m_nextBlockSize(0)
+    : QObject(parent)
 {
     m_tcpSocket = new QTcpSocket(this);
     connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
@@ -41,6 +41,7 @@ RackdClient::RackdClient(QObject *parent)
 void RackdClient::connectToRackd(const QHostAddress &address, quint16 port)
 {
     m_tcpSocket->connectToHost(address, port);
+    m_nextBlockSize = 0;
 }
 
 void RackdClient::disconnectFromRackd()
@@ -55,40 +56,13 @@ void RackdClient::handleError(QAbstractSocket::SocketError socketError)
 }
 
 
-void RackdClient::sendBlock()
+void RackdClient::sendRequest()
 {
     if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
     {
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_0);
-        out << quint16(0);
+        qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
 
-        foreach (const QVariant &value, m_request)
-        {
-            switch (value.type())
-            {
-            case QMetaType::QString: out << value.toString(); break;
-            case QMetaType::Bool: out << value.toBool(); break;
-            case QMetaType::Int: out << value.toInt();  break;
-            case QMetaType::UInt: out << value.toUInt(); break;
-            case QMetaType::ULongLong: out << value.toULongLong(); break;
-            default: out << value;
-            }
-        }
-
-        out.device()->seek(0);
-        out << quint16(block.size() - sizeof(quint16));
-
-        //debug:
-        qDebug() << "send request:";
-        foreach (const QVariant &value, m_request)
-        {
-            qDebug() << value;
-        }
-        qDebug() << "request block:" << block.toHex() << "size (Bytes):" << block.size();
-
-        m_tcpSocket->write(block);
+        m_tcpSocket->write(m_request);
     }
     m_request.clear();
 }
@@ -98,56 +72,82 @@ void RackdClient::sendBlock()
 
 void RackdClient::passWord(const QString &password)
 {
-    m_request.append(QString("PW"));
-    m_request.append(password);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("PW") << password;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::dropConnection()
 {
-    m_request.append(QString("DC"));
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("DC");
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::loadStream(quint8 device, const QString &uri)
 {
-    m_request.append(QString("LS"));
-    m_request.append(device);
-    m_request.append(uri);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("LS") << device << uri;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::unloadStream(quint32 handle)
 {
-    m_request.append(QString("US"));
-    m_request.append(handle);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("US") << handle;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::positionPlay(quint32 handle, quint32 pos)
 {
-    m_request.append(QString("PP"));
-    m_request.append(handle);
-    m_request.append(pos);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("PP") << handle << pos;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::play(quint32 handle)
 {
-    m_request.append(QString("PY"));
-    m_request.append(handle);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("PY") << handle;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 void RackdClient::stop(quint32 handle)
 {
-    m_request.append(QString("SP"));
-    m_request.append(handle);
-    sendBlock();
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0) << QString("SP") << handle;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
 }
 
 
 
+
+//TODO: see tripplanner forever loop for 'bytes avalaible' problem
+
+
+//TODO: check if we got a complete response (end response marker field)
+//      and if not report error ????
 
 //rackd protocoll implementation, response:
 void RackdClient::handleResponse()
@@ -163,78 +163,110 @@ void RackdClient::handleResponse()
         in >> m_nextBlockSize;
     }
     if (m_tcpSocket->bytesAvailable() < m_nextBlockSize) return;
+
+    qDebug() << "complete block received";
+    qDebug() << "current block size" << m_nextBlockSize;
+    qDebug() << "bytes available" << m_tcpSocket->bytesAvailable();
+
+
+    //read the complete response block for later processing:
+    QByteArray responseBlock = m_tcpSocket->read(m_nextBlockSize);
+    QDataStream response(&responseBlock, QIODevice::ReadOnly);
+    response.setVersion(QDataStream::Qt_5_0);
+
+    qDebug() << "bytes available after read:" << m_tcpSocket->bytesAvailable();
+
+    m_nextBlockSize = 0;
+
+
     QString command;
-    in >> command;
+    response >> command;
+
+    if (command == "ER")
+    {
+        QString request;
+        QString message;
+        response >> request >> message;
+
+        qDebug() << "ERROR:" << request << message;
+
+        return;
+    }
+
 
     if (command == "PW")
     {
         bool ok;
-        in >> ok;
+        response >> ok;
 
         qDebug() << "authentificated:" << ok;
 
         emit passWordOK(ok);
-        m_nextBlockSize = 0;
         return;
     }
 
-    qDebug() << "ERROR: unknown response" << command;
-    m_nextBlockSize = 0;
 
-//    if (command == "DC")
-//    {
-//        emit dropConnection();
-//        return;
-//    }
+    if (command == "DC")
+    {
 
+        qDebug() << "connection dropped";
 
-//    if (!m_isAuth)
-//    {
-//        qDebug() << "ERROR: authentication required!";
-//        //todo reply
-//        //echoCommand(client, command.append("-"));
-//        return;
-//    }
+        emit dropConnection();
+        return;
+    }
 
 
+    if (command == "LS")
+    {
+        quint8 device;
+        QString uri;
+        quint32 handle;
+        bool ok;
+        response >> device >> uri >> handle >> ok;
 
-//    if (command == "LS")
-//    {
-//        quint8 device;
-//        QString uri;
-//        in >> device >>uri;
-//        emit loadStream(device, uri);
-//        return;
-//    }
+        qDebug() << "load stream:" << device << uri << handle << ok;
+
+        if (ok) emit streamLoaded(handle);
+        return;
+    }
 
 //    if (command == "PP")
 //    {
 //        quint32 handle;
 //        quint32 position;
-//        in >> handle >> position;
+//        response >> handle >> position;
 //        emit playPosition(handle, position);
 //        return;
 //    }
 
-//    if (command == "PY")
-//    {
-//        quint32 handle;
-//        quint32 length;
-//        quint16 speed;
-//        bool pitch;
-//        in >> handle >> length >> speed >> pitch;
-//        emit play(handle, length, speed, pitch);
-//        return;
-//    }
+    if (command == "PY")
+    {
+        quint32 handle;
+        //quint32 length;
+        //quint16 speed;
+        //bool pitch;
+        bool ok;
+        response >> handle >> ok;
 
-//    if (command == "SP")
-//    {
-//        quint32 handle;
-//        in >> handle;
-//        emit stop(handle);
-//        return;
-//    }
+        qDebug() << "play:" << handle << ok;
 
+        emit playing(handle);
+        return;
+    }
+
+    if (command == "SP")
+    {
+        quint32 handle;
+        bool ok;
+        response >> handle >> ok;
+
+        qDebug() << "stop:" << handle << ok;
+
+        emit stopped(handle);
+        return;
+    }
+
+    qDebug() << "ERROR: unknown response" << command;
 
 }
 

@@ -26,7 +26,8 @@
 #include <QHostAddress>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_handle(0)
 {
 
     m_rackdClient = new RackdClient(this);
@@ -34,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *bConn = new QPushButton("connect");
     QPushButton *bPW = new QPushButton("send password");
     QPushButton *bLS = new QPushButton("load stream");
+    QPushButton *bPY = new QPushButton("play");
+    QPushButton *bSP = new QPushButton("stop");
     QPushButton *bDC = new QPushButton("drop connection");
 
     m_log = new QTextEdit;
@@ -41,16 +44,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
     connect(bLS, SIGNAL(clicked()), this, SLOT(loadStream()));
+    connect(bPY, SIGNAL(clicked()), this, SLOT(play()));
+    connect(bSP, SIGNAL(clicked()), this, SLOT(stop()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
 
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
+    connect(m_rackdClient, SIGNAL(streamLoaded(quint32)), this, SLOT(streamLoaded(quint32)));
 
     QVBoxLayout *l = new QVBoxLayout();
     l->addWidget(m_le);
     l->addWidget(bConn);
     l->addWidget(bPW);
     l->addWidget(bLS);
+    l->addWidget(bPY);
+    l->addWidget(bSP);
     l->addWidget(bDC);
     l->addWidget(m_log);
 
@@ -67,6 +75,7 @@ void MainWindow::connectToServer()
 void MainWindow::sendPass()
 {
     m_rackdClient->passWord(m_le->text());
+    m_le->clear();
 }
 
 
@@ -76,13 +85,32 @@ void MainWindow::loadStream()
 }
 
 
+void MainWindow::play()
+{
+    m_rackdClient->play(m_handle);
+}
+
+
+void MainWindow::stop()
+{
+    m_rackdClient->stop(m_handle);
+}
+
+
 void MainWindow::dropConnection()
 {
     m_rackdClient->dropConnection();
 }
 
 
+//connected to signals from rackdclient:
 void MainWindow::passWordOK(bool ok)
 {
     ok ? m_log->append("password ok") : m_log->append("password not ok");
 }
+
+void MainWindow::streamLoaded(quint32 handle)
+{
+    m_handle = handle;
+}
+
