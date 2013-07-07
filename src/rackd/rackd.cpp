@@ -22,13 +22,12 @@
 
 
 #include <QCoreApplication>
-#include <QTcpSocket>
 #include <QDir>
 #include <signal.h>
 
 #include "rackd.h"
+#include "rackdclientsocket.h"
 
-//TODO: own rack protokoll instead of caed
 //TODO: if connections count is null go to auto modus ???
 //TODO: qsettings
 //loglevels?
@@ -89,47 +88,32 @@ Rackd::Rackd(QObject *parent)
         qDebug() << "waiting for incoming connections..." << serverAddress().toString() << serverPort();
     }
 
-
-    connect(this, SIGNAL(newConnection()), this, SLOT(clientConnected()));
-
 }
 
 
-void Rackd::clientConnected()
+void Rackd::incomingConnection(qintptr socketId)
 {
 
-    while (hasPendingConnections())
+    qDebug() << "new incomming connection";
+
+    if (m_clients.count() == m_maxConnections)
     {
-        QTcpSocket *client = nextPendingConnection();
-
-        if (m_clients.count() == m_maxConnections)
-        {
-            qDebug() << "max connections (" << m_clients.count() << ") reached";
-            qDebug() << "reject client" << client->peerAddress().toString() << client->peerPort();
-            client->disconnectFromHost();
-            return;
-        }
-
-        ClientData data;
-        data.isAuth = false;
-        data.nextBlockSize = 0;
-
-        m_clients.insert(client, data);
-
-        connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
-        connect(client, SIGNAL(readyRead()), this, SLOT(handleRequest()));
-        connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
-
-        qDebug() << "new client connected from" << client->peerAddress().toString() << client->peerPort();
-        qDebug() << "we have now" << m_clients.count() << "connections";
-
+        qDebug() << "max connections (" << m_clients.count() << ") reached";
+        qDebug() << "reject client";
+        return;
     }
 
-    foreach (QTcpSocket *cl, m_clients.keys())
-    {
-        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
-    }
+    RackdClientSocket *client = new RackdClientSocket(this);
+    client->setSocketDescriptor(socketId);
 
+    m_clients.append(client);
+
+    connect(client, SIGNAL(newBlock(QByteArray)), this, SLOT(handleRequest(QByteArray)));
+    connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+    connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
+
+    qDebug() << "new client connected from" << client->peerAddress().toString() << client->peerPort();
+    qDebug() << "we have now" << m_clients.count() << "connections";
 
 }
 
@@ -137,7 +121,7 @@ void Rackd::clientConnected()
 void Rackd::clientDisconnected()
 {
 
-    QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());
+    RackdClientSocket *client = qobject_cast<RackdClientSocket *>(sender());
     if (!client) return;
 
     //clients have to free resources (unload streams) before disconnect
@@ -149,23 +133,18 @@ void Rackd::clientDisconnected()
     //change this: handle list must be a rackd member
 
 
+//    foreach (HSTREAM stream, m_clients[client].handleList)
+//    {
+//        BASS_ChannelIsActive(stream) == BASS_ACTIVE_PLAYING ? BASS_ChannelFlags(stream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE) : BASS_StreamFree(stream);
+//    }
 
+//    foreach (QTcpSocket *cl, m_clients.keys())
+//    {
+//        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
+//    }
 
-    foreach (HSTREAM stream, m_clients[client].handleList)
-    {
-        BASS_ChannelIsActive(stream) == BASS_ACTIVE_PLAYING ? BASS_ChannelFlags(stream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE) : BASS_StreamFree(stream);
-    }
-
-    foreach (QTcpSocket *cl, m_clients.keys())
-    {
-        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
-    }
-
-
-
-    m_clients.remove(client);
+    m_clients.removeAll(client);
     client->deleteLater();
-
 
     qDebug() << "client disconnected" << client->peerAddress().toString() << client->peerPort();
     qDebug() << "we have now" << m_clients.count() << "connections";
@@ -178,60 +157,17 @@ void Rackd::handleError(QAbstractSocket::SocketError)
     qDebug() << errorString();
 }
 
-void Rackd::sendResponse(QTcpSocket *client)
-{
-    if (client->state() == QAbstractSocket::ConnectedState)
-    {
-
-        qDebug() << "send response block:" << m_response.toHex() << "size (Bytes):" << m_response.size();
-
-        client->write(m_response);
-    }
-    m_response.clear();
-}
-
 
 //rackd protocoll implementation:
 
-void Rackd::handleRequest()
+void Rackd::handleRequest(const QByteArray &requestBlock)
 {
-    QTcpSocket *client = qobject_cast<QTcpSocket *>(sender());
+
+    RackdClientSocket *client = qobject_cast<RackdClientSocket *>(sender());
     if (!client) return;
 
-    qDebug() << "request received from" << client->peerAddress().toString() << client->peerPort();
-
-    //read the next available block:
-    QDataStream in(client);
-    in.setVersion(QDataStream::Qt_5_0);
-
-    if (m_clients[client].nextBlockSize == 0)
-    {
-        qDebug() << "bytes available:" << client->bytesAvailable();
-
-
-        if (client->bytesAvailable() < sizeof(quint16)) return;
-        in >> m_clients[client].nextBlockSize;
-    }
-
-    qDebug() << "next block size for" << client->peerAddress().toString() << client->peerPort() << "is" << m_clients[client].nextBlockSize;
-    qDebug() << "bytes available" << client->bytesAvailable();
-
-
-    if (client->bytesAvailable() < m_clients[client].nextBlockSize) return;
-
-    qDebug() << "complete block received";
-    qDebug() << "current block size" << m_clients[client].nextBlockSize;
-    qDebug() << "bytes available" << client->bytesAvailable();
-
-    //read the complete request block for later processing:
-    QByteArray requestBlock = client->read(m_clients[client].nextBlockSize);
-    QDataStream request(&requestBlock, QIODevice::ReadOnly);
+    QDataStream request(requestBlock);
     request.setVersion(QDataStream::Qt_5_0);
-
-    qDebug() << "bytes available after read:" << client->bytesAvailable();
-
-    m_clients[client].nextBlockSize = 0;
-
 
     //prepare response block:
     QDataStream out(&m_response, QIODevice::WriteOnly);
@@ -249,16 +185,16 @@ void Rackd::handleRequest()
         request >> pw;
         if (pw == "pass") //TODO: read from settings
         {
-            m_clients[client].isAuth = true;
+            client->setAuth(true);
             out << command << true;
         }
         else
         {
-            m_clients[client].isAuth = false;
+            client->setAuth(false);
             out << command << false;
         }
 
-        qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << m_clients[client].isAuth;
+        qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << client->isAuth();
 
         out.device()->seek(0);
         out << quint16(m_response.size() - sizeof(quint16));
@@ -272,8 +208,10 @@ void Rackd::handleRequest()
         return;
     }
 
+
     //the following requests needs authentication:
-    if (!m_clients[client].isAuth)
+
+    if (!client->isAuth())
     {
 
         qDebug() << "ERROR: authentication required!";
@@ -297,6 +235,10 @@ void Rackd::handleRequest()
         HSTREAM handle;
         if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive))
         {
+            //fast creation of net stream:
+            BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
+            BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 600);
+
             handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
         }
         else
@@ -307,10 +249,16 @@ void Rackd::handleRequest()
 
         if (handle)
         {
-            m_clients[client].handleList.append(handle);
+
+
+            //////////////////////////////////////////
+
+            //m_clients[client].handleList.append(handle);
+
 
             qDebug() << "load stream:" << uri;
-            qDebug() << "client streams:" << m_clients[client].handleList;
+
+            //qDebug() << "client streams:" << m_clients[client].handleList;
 
             out << command << device << uri << quint32(handle) << true;
         }
@@ -387,51 +335,62 @@ void Rackd::handleRequest()
 
 
 
-//    //EI
-//    if (!qstrcmp(commandList[0], "EI") && commandList.size() == 2)
-//    {
-//        qDebug() << BASS_GetConfig(BASS_CONFIG_HANDLES);
-//        return;
-//    }
+    //    //EI
+    //    if (!qstrcmp(commandList[0], "EI") && commandList.size() == 2)
+    //    {
+    //        qDebug() << BASS_GetConfig(BASS_CONFIG_HANDLES);
+    //        return;
+    //    }
 
-//    UP <conn-handle>!
-//    PP <conn-handle> <position>!
-//    TS <card-num>!
-//    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
-//    UR <card-num> <stream-num>!
-//    RD <card-num> <stream-num> <length> <threshold>!
-//    RS <card-num> <stream-num>!
-//    SR <card-num> <stream-num>!
-//    IV <card-num> <stream-num> <level>!
-//    OV <card-num> <stream-num> <port-num> <level>!
-//    FV <card-num> <stream-num> <port-num> <level> <length>!
-//    IL <card-num> <port-num> <level>!
-//    OL <card-num> <port-num> <level>!
-//    IM <card-num> <stream-num> <mode>!
-//    OM <card-num> <stream-num> <model>!
-//    IX <card-num> <stream-num> <level>!
-//    IT <card-num> <port-num> <type>!
-//    IS <card-num> <port-num>!
-//    AL <card-num> <input-num> <output-num> <level>!
-//    CO <card-num> <port-num> <udp-port> <samp-rate> <chans>!
-//    JC <output_name> | <input_name>!
-//    JD <output_name> | <input_name>!
-//    ME <udp-port>!
-//    ML <type> <card-num> <port-num> <left-lvl> <right-lvl>!
-//    MO <card-num> <stream-num> <left-lvl> <right-lvl>!
-//    MP <card-num> <stream-num> <pos>!
-//    MS <card-num> <port-num> <stream-num> <status>!
+    //    UP <conn-handle>!
+    //    PP <conn-handle> <position>!
+    //    TS <card-num>!
+    //    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
+    //    UR <card-num> <stream-num>!
+    //    RD <card-num> <stream-num> <length> <threshold>!
+    //    RS <card-num> <stream-num>!
+    //    SR <card-num> <stream-num>!
+    //    IV <card-num> <stream-num> <level>!
+    //    OV <card-num> <stream-num> <port-num> <level>!
+    //    FV <card-num> <stream-num> <port-num> <level> <length>!
+    //    IL <card-num> <port-num> <level>!
+    //    OL <card-num> <port-num> <level>!
+    //    IM <card-num> <stream-num> <mode>!
+    //    OM <card-num> <stream-num> <model>!
+    //    IX <card-num> <stream-num> <level>!
+    //    IT <card-num> <port-num> <type>!
+    //    IS <card-num> <port-num>!
+    //    AL <card-num> <input-num> <output-num> <level>!
+    //    CO <card-num> <port-num> <udp-port> <samp-rate> <chans>!
+    //    JC <output_name> | <input_name>!
+    //    JD <output_name> | <input_name>!
+    //    ME <udp-port>!
+    //    ML <type> <card-num> <port-num> <left-lvl> <right-lvl>!
+    //    MO <card-num> <stream-num> <left-lvl> <right-lvl>!
+    //    MP <card-num> <stream-num> <pos>!
+    //    MS <card-num> <port-num> <stream-num> <status>!
 
 
-        qDebug() << "ERROR: unknown request" << command;
-        out << QString("ER") << command << QString("unknown request");
-        out.device()->seek(0);
-        out << quint16(m_response.size() - sizeof(quint16));
-        sendResponse(client);
+    qDebug() << "ERROR: unknown request" << command;
+    out << QString("ER") << command << QString("unknown request");
+    out.device()->seek(0);
+    out << quint16(m_response.size() - sizeof(quint16));
+    sendResponse(client);
+
 }
 
 
+void Rackd::sendResponse(RackdClientSocket *client)
+{
+    if (client->state() == QAbstractSocket::ConnectedState)
+    {
 
+        qDebug() << "send response block:" << m_response.toHex() << "size (Bytes):" << m_response.size();
+
+        client->write(m_response);
+    }
+    m_response.clear();
+}
 
 //void Rackd::getWaveForm(quint64 id, const qulonglong itemID)
 //{

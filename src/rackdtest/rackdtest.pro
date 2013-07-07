@@ -25,11 +25,13 @@ QT       += network
 
 HEADERS += \
     mainwindow.h \
-    ../shared/rackdclient.h
+    ../shared/rackdclient.h \
+    ../shared/rackdclientsocket.h
 
 SOURCES += \
     mainwindow.cpp \
     main.cpp \
-    ../shared/rackdclient.cpp
+    ../shared/rackdclient.cpp \
+    ../shared/rackdclientsocket.cpp
 
 INCLUDEPATH += ../shared

@@ -22,31 +22,30 @@
 
 
 #include "rackdclient.h"
-#include <QBuffer>
+#include "rackdclientsocket.h"
+#include <QDataStream>
 
 
 RackdClient::RackdClient(QObject *parent)
     : QObject(parent)
 {
-    m_tcpSocket = new QTcpSocket(this);
-    connect(m_tcpSocket, SIGNAL(connected()), this, SIGNAL(connected()));
-    connect(m_tcpSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(m_tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
-    connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(handleResponse()));
-
+    m_socket = new RackdClientSocket(this);
+    connect(m_socket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+    connect(m_socket, SIGNAL(newBlock(QByteArray)), this, SLOT(handleResponse(QByteArray)));
+    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
 }
 
 //connection handling:
 
 void RackdClient::connectToRackd(const QHostAddress &address, quint16 port)
-{
-    m_tcpSocket->connectToHost(address, port);
-    m_nextBlockSize = 0;
+{    
+    m_socket->connectToHost(address, port);
 }
 
 void RackdClient::disconnectFromRackd()
 {
-    m_tcpSocket->disconnectFromHost();
+    m_socket->disconnectFromHost();
 }
 
 //TODO:
@@ -58,11 +57,11 @@ void RackdClient::handleError(QAbstractSocket::SocketError socketError)
 
 void RackdClient::sendRequest()
 {
-    if (m_tcpSocket->state() == QAbstractSocket::ConnectedState)
+    if (m_socket->state() == QAbstractSocket::ConnectedState)
     {
         qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
 
-        m_tcpSocket->write(m_request);
+        m_socket->write(m_request);
     }
     m_request.clear();
 }
@@ -142,42 +141,15 @@ void RackdClient::stop(quint32 handle)
 
 
 
-
-//TODO: see tripplanner forever loop for 'bytes avalaible' problem
-
-
 //TODO: check if we got a complete response (end response marker field)
 //      and if not report error ????
 
 //rackd protocoll implementation, response:
-void RackdClient::handleResponse()
+
+void RackdClient::handleResponse(const QByteArray &responseBlock)
 {
-
-    qDebug() << "got response from server";
-
-    QDataStream in(m_tcpSocket);
-    in.setVersion(QDataStream::Qt_5_0);
-    if (m_nextBlockSize == 0)
-    {
-        if (m_tcpSocket->bytesAvailable() < sizeof(quint16)) return;
-        in >> m_nextBlockSize;
-    }
-    if (m_tcpSocket->bytesAvailable() < m_nextBlockSize) return;
-
-    qDebug() << "complete block received";
-    qDebug() << "current block size" << m_nextBlockSize;
-    qDebug() << "bytes available" << m_tcpSocket->bytesAvailable();
-
-
-    //read the complete response block for later processing:
-    QByteArray responseBlock = m_tcpSocket->read(m_nextBlockSize);
-    QDataStream response(&responseBlock, QIODevice::ReadOnly);
+    QDataStream response(responseBlock);
     response.setVersion(QDataStream::Qt_5_0);
-
-    qDebug() << "bytes available after read:" << m_tcpSocket->bytesAvailable();
-
-    m_nextBlockSize = 0;
-
 
     QString command;
     response >> command;
@@ -230,14 +202,14 @@ void RackdClient::handleResponse()
         return;
     }
 
-//    if (command == "PP")
-//    {
-//        quint32 handle;
-//        quint32 position;
-//        response >> handle >> position;
-//        emit playPosition(handle, position);
-//        return;
-//    }
+    //    if (command == "PP")
+    //    {
+    //        quint32 handle;
+    //        quint32 position;
+    //        response >> handle >> position;
+    //        emit playPosition(handle, position);
+    //        return;
+    //    }
 
     if (command == "PY")
     {

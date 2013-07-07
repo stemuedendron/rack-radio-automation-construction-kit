@@ -20,59 +20,38 @@
     Author: Steffen Müller
 */
 
-#ifndef RACKD_H
-#define RACKD_H
+#ifndef RACKDCLIENTSOCKET_H
+#define RACKDCLIENTSOCKET_H
 
-#include <QTcpServer>
-#include "bass.h"
+#include <QTcpSocket>
 
 
-class RackdClientSocket;
-
-class Rackd : public QTcpServer
+class RackdClientSocket : public QTcpSocket
 {
+
     Q_OBJECT
 
 public:
 
-    explicit Rackd(QObject *parent = 0);
-    ~Rackd();
-    
+    explicit RackdClientSocket(QObject *parent = 0);
+    bool isAuth() const {return m_isAuth;}
+    void setAuth(bool ok) {m_isAuth = ok;}
+
+signals:
+
+    void newBlock(const QByteArray &block);
+
 
 public slots:
 
-    void doCleanUp();
-
-
-protected:
-
-    void incomingConnection(qintptr socketId);
-
-private slots:
-
-    //connection handling:
-    void clientDisconnected();
-    void handleError(QAbstractSocket::SocketError);
-
-    //protocol handling:
-    void handleRequest(const QByteArray &requestBlock);
+    void readyData();
 
 
 private:
 
-    //protocol handling:
-    void sendResponse(RackdClientSocket *client);
-
-    quint16 m_maxConnections;
-
-
-    // delete: ?????
-    QByteArray m_response;
-
-    QList<RackdClientSocket *> m_clients;
-
-    QList<int> m_devices;
+    quint16 m_nextBlockSize;
+    bool m_isAuth;
 
 };
 
-#endif // RACKD_H
+#endif // RACKDCLIENTSOCKET_H

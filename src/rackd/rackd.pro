@@ -28,10 +28,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    rackd.cpp
+    rackd.cpp \
+    ../shared/rackdclientsocket.cpp
 
 HEADERS += \
-    rackd.h
+    rackd.h \
+    ../shared/rackdclientsocket.h
 
 # bass library:
 unix:!macx: LIBS += -L$$PWD/../libs/3rdparty/bass/x64/ -lbass

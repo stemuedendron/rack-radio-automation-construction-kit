@@ -24,9 +24,10 @@
 #ifndef RACKDCLIENT_H
 #define RACKDCLIENT_H
 
-#include <QTcpSocket>
-#include <QDataStream>
+#include <QObject>
+#include <QHostAddress>
 
+class RackdClientSocket;
 
 class RackdClient : public QObject
 {
@@ -44,7 +45,7 @@ public slots:
     void connectToRackd(const QHostAddress & address, quint16 port);
     void disconnectFromRackd();
 
-    //rackd protocoll implementation, requests:
+    //protocoll implementation, requests:
     void passWord(const QString &password);
     void dropConnection();
 
@@ -55,13 +56,22 @@ public slots:
     void stop(quint32 handle);
 
 
+private slots:
+
+    //connection handling:
+    void handleError(QAbstractSocket::SocketError socketError);
+
+    //protocol handling:
+    void handleResponse(const QByteArray &responseBlock);
+
+
 signals:
 
     //connection handling:
     void connected();
     void disconnected();
 
-    //rackd protocoll implementation, responses:
+    //protocoll implementation, responses:
     void passWordOK(bool ok);
 
     void streamLoaded(quint32 handle);
@@ -71,18 +81,10 @@ signals:
     void stopped(quint32 handle);
 
 
-private slots:
-
-    //connection handling:
-    void handleError(QAbstractSocket::SocketError socketError);
-    void handleResponse();
-
-
 private:
 
-    QTcpSocket *m_tcpSocket;
+    RackdClientSocket *m_socket;
     QByteArray m_request;
-    quint16 m_nextBlockSize;
     void sendRequest();
 
 };
