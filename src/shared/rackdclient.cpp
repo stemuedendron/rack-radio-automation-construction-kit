@@ -197,12 +197,14 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
         quint8 device;
         QString uri;
         quint32 handle;
+        quint32 time;
         bool ok;
-        response >> device >> uri >> handle >> ok;
+        response >> device >> uri >> handle >> time >> ok;
 
-        qDebug() << "load stream:" << device << uri << handle << ok;
+        qDebug() << "load stream:" << device << uri << handle << time << ok;
 
         if (ok) emit streamLoaded(handle);
+        if (ok) emit streamTime(time);
         return;
     }
 

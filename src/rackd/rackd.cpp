@@ -33,6 +33,8 @@
 //loglevels?
 
 
+//TODO: BassStreamCreateURL from another thread
+
 void SigHandler(int signum)
 {
   switch(signum)
@@ -253,12 +255,14 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
 
             //qDebug() << "client streams:" << m_clients[client].handleList;
 
-            out << command << device << uri << quint32(handle) << true;
+            //get the play time:
+            quint32 time = quint32(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+            out << command << device << uri << quint32(handle) << time << true;
         }
         else
         {
             qDebug() << "ERROR: load stream failed:" << uri << BASS_ErrorGetCode();
-            out << command << device << uri << quint32(handle) << false;
+            out << command << device << uri << quint32(handle) << quint32(0) << false;
         }
 
         out.device()->seek(0);
@@ -267,7 +271,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
         return;
     }
 
-
+    //    UP <conn-handle>!
 
     //    if (command == "PP")
     //    {
@@ -327,6 +331,12 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
     }
 
 
+    if (command == "SL")
+    {
+        quint32 handle;
+        request >> handle;
+
+    }
 
     //    //EI
     //    if (!qstrcmp(commandList[0], "EI") && commandList.size() == 2)
@@ -335,8 +345,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
     //        return;
     //    }
 
-    //    UP <conn-handle>!
-    //    PP <conn-handle> <position>!
+
+
     //    TS <card-num>!
     //    LR <card-num> <port-num> <coding> <channels> <samp-rate> <bit-rate>
     //    UR <card-num> <stream-num>!

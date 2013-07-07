@@ -80,6 +80,8 @@ signals:
     void playing(quint32 handle);
     void stopped(quint32 handle);
 
+    void streamTime(quint32 time);
+
 
 private:
 

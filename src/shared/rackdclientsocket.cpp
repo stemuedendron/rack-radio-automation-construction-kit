@@ -26,6 +26,10 @@
 #include <QDataStream>
 
 
+//TODO: protect against bad clients (use some protokoll header, magic string and drop everything else)
+//look in qt docs QDataStream
+
+
 RackdClientSocket::RackdClientSocket(QObject *parent) :
     QTcpSocket(parent),
     m_nextBlockSize(0),
