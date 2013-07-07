@@ -51,11 +51,11 @@ protected:
 private slots:
 
     //connection handling:
-    void clientDisconnected();
+    void clientDisconnected(RackdClientSocket *client);
     void handleError(QAbstractSocket::SocketError);
 
     //protocol handling:
-    void handleRequest(const QByteArray &requestBlock);
+    void handleRequest(RackdClientSocket *client, const QByteArray &requestBlock);
 
 
 private:

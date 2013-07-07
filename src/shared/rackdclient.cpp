@@ -32,9 +32,10 @@ RackdClient::RackdClient(QObject *parent)
     m_socket = new RackdClientSocket(this);
     connect(m_socket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(m_socket, SIGNAL(newBlock(QByteArray)), this, SLOT(handleResponse(QByteArray)));
+    connect(m_socket, SIGNAL(newBlock(RackdClientSocket*, QByteArray)), this, SLOT(handleResponse(RackdClientSocket*, QByteArray)));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
 }
+
 
 //connection handling:
 
@@ -43,10 +44,12 @@ void RackdClient::connectToRackd(const QHostAddress &address, quint16 port)
     m_socket->connectToHost(address, port);
 }
 
+
 void RackdClient::disconnectFromRackd()
 {
     m_socket->disconnectFromHost();
 }
+
 
 //TODO:
 void RackdClient::handleError(QAbstractSocket::SocketError socketError)
@@ -146,8 +149,9 @@ void RackdClient::stop(quint32 handle)
 
 //rackd protocoll implementation, response:
 
-void RackdClient::handleResponse(const QByteArray &responseBlock)
+void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &responseBlock)
 {
+    Q_UNUSED(client);
     QDataStream response(responseBlock);
     response.setVersion(QDataStream::Qt_5_0);
 

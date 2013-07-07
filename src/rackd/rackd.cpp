@@ -49,7 +49,7 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
-      m_maxConnections(30)
+      m_maxConnections(3)
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -100,6 +100,10 @@ void Rackd::incomingConnection(qintptr socketId)
     {
         qDebug() << "max connections (" << m_clients.count() << ") reached";
         qDebug() << "reject client";
+        RackdClientSocket *dropClient = new RackdClientSocket(this);
+        dropClient->setSocketDescriptor(socketId);
+        connect(dropClient, SIGNAL(disconnected()), dropClient, SLOT(deleteLater()));
+        dropClient->disconnectFromHost();
         return;
     }
 
@@ -108,8 +112,8 @@ void Rackd::incomingConnection(qintptr socketId)
 
     m_clients.append(client);
 
-    connect(client, SIGNAL(newBlock(QByteArray)), this, SLOT(handleRequest(QByteArray)));
-    connect(client, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+    connect(client, SIGNAL(newBlock(RackdClientSocket*,QByteArray)), this, SLOT(handleRequest(RackdClientSocket*,QByteArray)));
+    connect(client, SIGNAL(disconnectedClient(RackdClientSocket*)), this, SLOT(clientDisconnected(RackdClientSocket*)));
     connect(client, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
 
     qDebug() << "new client connected from" << client->peerAddress().toString() << client->peerPort();
@@ -118,12 +122,8 @@ void Rackd::incomingConnection(qintptr socketId)
 }
 
 
-void Rackd::clientDisconnected()
+void Rackd::clientDisconnected(RackdClientSocket *client)
 {
-
-    RackdClientSocket *client = qobject_cast<RackdClientSocket *>(sender());
-    if (!client) return;
-
     //clients have to free resources (unload streams) before disconnect
     //if we have resources here we asume a client crash or drop connection. so lets play until end of song
     //an then autofree stream:
@@ -160,11 +160,8 @@ void Rackd::handleError(QAbstractSocket::SocketError)
 
 //rackd protocoll implementation:
 
-void Rackd::handleRequest(const QByteArray &requestBlock)
+void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBlock)
 {
-
-    RackdClientSocket *client = qobject_cast<RackdClientSocket *>(sender());
-    if (!client) return;
 
     QDataStream request(requestBlock);
     request.setVersion(QDataStream::Qt_5_0);
@@ -235,10 +232,6 @@ void Rackd::handleRequest(const QByteArray &requestBlock)
         HSTREAM handle;
         if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive))
         {
-            //fast creation of net stream:
-            BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
-            BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 600);
-
             handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
         }
         else

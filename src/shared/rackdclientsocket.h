@@ -37,9 +37,16 @@ public:
     bool isAuth() const {return m_isAuth;}
     void setAuth(bool ok) {m_isAuth = ok;}
 
+
 signals:
 
-    void newBlock(const QByteArray &block);
+    void newBlock(RackdClientSocket *client, const QByteArray &block);
+    void disconnectedClient(RackdClientSocket *client);
+
+
+private slots:
+
+    void disconnectedID();
 
 
 public slots:

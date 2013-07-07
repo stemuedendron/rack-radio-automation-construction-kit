@@ -25,14 +25,15 @@
 #include <QHostAddress>
 #include <QDataStream>
 
+
 RackdClientSocket::RackdClientSocket(QObject *parent) :
     QTcpSocket(parent),
     m_nextBlockSize(0),
     m_isAuth(false)
 {
     connect(this, SIGNAL(readyRead()), this, SLOT(readyData()));
+    connect(this, SIGNAL(disconnected()), this, SLOT(disconnectedID()));
 }
-
 
 
 void RackdClientSocket::readyData()
@@ -70,7 +71,14 @@ void RackdClientSocket::readyData()
         qDebug() << "bytes available after read:" << bytesAvailable();
 
         //parse block:
-        emit newBlock(block);
+        emit newBlock(this, block);
         m_nextBlockSize = 0;
     }
 }
+
+
+void RackdClientSocket::disconnectedID()
+{
+    emit disconnectedClient(this);
+}
+

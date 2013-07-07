@@ -62,7 +62,7 @@ private slots:
     void handleError(QAbstractSocket::SocketError socketError);
 
     //protocol handling:
-    void handleResponse(const QByteArray &responseBlock);
+    void handleResponse(RackdClientSocket* client, const QByteArray &responseBlock);
 
 
 signals:

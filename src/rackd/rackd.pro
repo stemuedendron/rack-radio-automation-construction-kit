@@ -35,6 +35,8 @@ HEADERS += \
     rackd.h \
     ../shared/rackdclientsocket.h
 
+INCLUDEPATH += ../shared
+
 # bass library:
 unix:!macx: LIBS += -L$$PWD/../libs/3rdparty/bass/x64/ -lbass
 LIBS += -L$$PWD/../libs/3rdparty/bass/ -lbass
