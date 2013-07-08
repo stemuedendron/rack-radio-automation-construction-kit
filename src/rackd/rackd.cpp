@@ -34,6 +34,10 @@
 
 
 //TODO: BassStreamCreateURL from another thread
+//TODO: abstraction for sound stuff (make it possible to use other sound frameworks like gstreamer or ecasound)
+
+//TODO: meterupdate timer should remove autofree streams from m_streams vs use bass syncproc
+
 
 void SigHandler(int signum)
 {
@@ -127,22 +131,48 @@ void Rackd::incomingConnection(qintptr socketId)
 void Rackd::clientDisconnected(RackdClientSocket *client)
 {
     //clients have to free resources (unload streams) before disconnect
-    //if we have resources here we asume a client crash or drop connection. so lets play until end of song
-    //an then autofree stream:
+    //if we have resources here we asume a client crash or drop connection without
+    //unload streams. unload all client streams except currently playing, which
+    //we switch to autofree.
 
-
-    //wrong: rackd has no stream handle anymore!!!!!
-    //change this: handle list must be a rackd member
-
-
-//    foreach (HSTREAM stream, m_clients[client].handleList)
+//    for (int i = 0; i < m_streams.size(); ++i)
 //    {
-//        BASS_ChannelIsActive(stream) == BASS_ACTIVE_PLAYING ? BASS_ChannelFlags(stream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE) : BASS_StreamFree(stream);
+//        if (m_streams.at(i).client == client)
+//        {
+//            if (BASS_ChannelIsActive(m_streams.at(i).handle) == BASS_ACTIVE_PLAYING)
+//            {
+//                BASS_ChannelFlags(m_streams.at(i).handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+//                m_streams[i].client = 0;
+//            }
+//            else
+//            {
+//                BASS_StreamFree(m_streams.at(i).handle);
+//                m_streams.removeAt(i);
+//            }
+//        }
 //    }
 
-//    foreach (QTcpSocket *cl, m_clients.keys())
+//    foreach (RStreamData streamData, m_streams)
 //    {
-//        qDebug() << "active streams of" << cl << "are:"  << m_clients[cl].handleList;
+//        if (streamData.client == client)
+//        {
+//            if (BASS_ChannelIsActive(streamData.handle) == BASS_ACTIVE_PLAYING)
+//            {
+//                BASS_ChannelFlags(streamData.handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+//                streamData.client = 0;
+//            }
+//            else
+//            {
+//                BASS_StreamFree(streamData.handle);
+//                m_streams.removeOne(streamData);
+//            }
+//        }
+//    }
+
+
+//    foreach (RStreamData streamData, m_streams)
+//    {
+//        qDebug() << "active streams of" << streamData.client << "are:"  << streamData.handle;
 //    }
 
     m_clients.removeAll(client);
@@ -244,12 +274,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
 
         if (handle)
         {
-
-
-            //////////////////////////////////////////
-
-            //m_clients[client].handleList.append(handle);
-
+//            RStreamData streamData = {handle, client, device};
+//            m_streams.append(streamData);
 
             qDebug() << "load stream:" << uri;
 
@@ -330,7 +356,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
         return;
     }
 
-
+    //stream lenght
     if (command == "SL")
     {
         quint32 handle;

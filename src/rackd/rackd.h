@@ -71,7 +71,18 @@ private:
 
     QList<RackdClientSocket *> m_clients;
 
-    QList<int> m_devices;
+    QList<quint8> m_devices;
+
+
+//    struct RStreamData
+//    {
+//        HSTREAM handle;
+//        RackdClientSocket *client;
+//        quint8 device;
+//    };
+//    QList<RStreamData> m_streams;
+
+
 
 };
 
