@@ -23,6 +23,7 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QtConcurrent/QtConcurrent>
 #include <signal.h>
 
 #include "rackd.h"
@@ -55,13 +56,17 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
-      m_maxConnections(3)
+      m_maxConnections(3),
+      //m_watcher(new QFutureWatcher<QHash<RackdClientSocket *, QByteArray> >(this))
+      m_watcher(new QFutureWatcher<RMessage>(this))
 {
     qDebug() << "Hello from rack daemon!";
 
     signal(SIGHUP,SigHandler);
     signal(SIGINT,SigHandler);
     signal(SIGTERM,SigHandler);
+
+    connect(m_watcher, SIGNAL(finished()), this, SLOT(loadStreamFinished()));
 
 
     //audio devices:
@@ -199,6 +204,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
     request.setVersion(QDataStream::Qt_5_0);
 
     //prepare response block:
+    m_response.clear();
     QDataStream out(&m_response, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
     out << quint16(0);
@@ -260,11 +266,30 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
 
         qDebug() << uri;
 
+
+
+
         BASS_SetDevice(device);
+
         HSTREAM handle;
         if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive))
         {
-            handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
+
+            //here call thread function!!!
+
+            //QFuture<QHash<RackdClientSocket *, QByteArray> > f = QtConcurrent::run(this, &Rackd::loadStreamThread, client, command, device, uri);
+
+            QFuture<RMessage> f = QtConcurrent::run(this, &Rackd::loadStreamThread, client, command, device, uri);
+
+            m_watcher->setFuture(f);
+            return;
+
+
+
+            //handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
+
+
+
         }
         else
         {
@@ -282,7 +307,13 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
             //qDebug() << "client streams:" << m_clients[client].handleList;
 
             //get the play time:
-            quint32 time = quint32(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+
+
+            quint32 time;
+            qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+            (t > 0) ? time = quint32(t) : time = 0;
+
+
             out << command << device << uri << quint32(handle) << time << true;
         }
         else
@@ -408,6 +439,106 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &requestBl
 
 }
 
+//TODO: RMessage object as function parameter!!!!
+// function to run in own thread:
+RMessage Rackd::loadStreamThread(RackdClientSocket *client, const QString &command, quint8 device, const QString &uri)
+{
+//    QByteArray response;
+//    QDataStream out(&response, QIODevice::WriteOnly);
+//    out.setVersion(QDataStream::Qt_5_0);
+//    out << quint16(0);
+
+    RMessage message;
+    message.client = client;
+    message.command = command;
+    message.device = device;
+    message.uri = uri;
+
+    BASS_SetDevice(device);
+    HSTREAM handle = BASS_StreamCreateURL(qPrintable(uri), 0, 0, NULL, 0);
+
+    if (handle)
+    {
+        qDebug() << "load stream:" << uri;
+
+        quint32 time;
+        qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+        (t > 0) ? time = quint32(t) : time = 0;
+        //out << command << device << uri << quint32(handle) << time << true;
+        message.time = time;
+        message.ok = true;
+        message.handle = handle;
+    }
+    else
+    {
+        qDebug() << "ERROR: load stream failed:" << uri << BASS_ErrorGetCode();
+        //out << command << device << uri << quint32(handle) << quint32(0) << false;
+        message.ok = false;
+        message.handle = 0;
+    }
+
+//    out.device()->seek(0);
+//    out << quint16(response.size() - sizeof(quint16));
+
+
+//    QHash<RackdClientSocket *, QByteArray> hash;
+//    hash.insert(client, response);
+//    return hash;
+
+    return message;
+}
+
+
+//slot called when loadstream thread is finnished:
+void Rackd::loadStreamFinished()
+{
+//    QHash<RackdClientSocket *, QByteArray> hash = m_watcher->result();
+//    RackdClientSocket *client;
+//    QByteArray response;
+//    QHashIterator<RackdClientSocket *, QByteArray> i(hash);
+//    while (i.hasNext()) {
+//        i.next();
+//        client = i.key();
+//        response = i.value();
+//    }
+
+//    if (client->state() == QAbstractSocket::ConnectedState)
+//    {
+
+//        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
+
+//        client->write(response);
+//    }
+
+    RMessage message = m_watcher->result();
+
+    QByteArray response;
+    QDataStream out(&response, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint16(0)
+        << message.command
+        << message.device
+        << message.uri
+        << message.handle
+        << message.time
+        << message.ok;
+    out.device()->seek(0);
+    out << quint16(response.size() - sizeof(quint16));
+    if (message.client->state() == QAbstractSocket::ConnectedState)
+    {
+
+        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
+
+        message.client->write(response);
+    }
+
+
+    //TODO: add handle from response to handle list
+    //use QList<QByteArray> instead of QHash ???
+
+}
+
+
 
 void Rackd::sendResponse(RackdClientSocket *client)
 {
@@ -418,7 +549,6 @@ void Rackd::sendResponse(RackdClientSocket *client)
 
         client->write(m_response);
     }
-    m_response.clear();
 }
 
 //void Rackd::getWaveForm(quint64 id, const qulonglong itemID)

@@ -24,8 +24,11 @@
 #define RACKD_H
 
 #include <QTcpServer>
+#include <QFutureWatcher>
 #include "bass.h"
 
+
+#include "rmessage.h"
 
 class RackdClientSocket;
 
@@ -48,6 +51,7 @@ protected:
 
     void incomingConnection(qintptr socketId);
 
+
 private slots:
 
     //connection handling:
@@ -56,6 +60,9 @@ private slots:
 
     //protocol handling:
     void handleRequest(RackdClientSocket *client, const QByteArray &requestBlock);
+
+    //loadStreamURL thread finished slot:
+    void loadStreamFinished();
 
 
 private:
@@ -82,6 +89,15 @@ private:
 //    };
 //    QList<RStreamData> m_streams;
 
+
+    //loadStreamURL thread stuff:
+
+    //QFutureWatcher<QHash<RackdClientSocket *, QByteArray> > *m_watcher;
+    //QHash<RackdClientSocket *, QByteArray> loadStreamThread(RackdClientSocket *client, const QString &command, quint8 device, const QString &uri);
+
+
+    QFutureWatcher<RMessage> *m_watcher;
+    RMessage loadStreamThread(RackdClientSocket *client, const QString &command, quint8 device, const QString &uri);
 
 
 };
