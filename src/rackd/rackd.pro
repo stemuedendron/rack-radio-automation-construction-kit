@@ -29,13 +29,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     rackd.cpp \
-    ../shared/rackdclientsocket.cpp \
-    rmessage.cpp
+    ../shared/rackdclientsocket.cpp
 
 HEADERS += \
     rackd.h \
-    ../shared/rackdclientsocket.h \
-    rmessage.h
+    ../shared/rackdclientsocket.h
 
 INCLUDEPATH += ../shared
 

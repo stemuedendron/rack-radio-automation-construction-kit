@@ -28,9 +28,20 @@
 #include "bass.h"
 
 
-#include "rmessage.h"
-
 class RackdClientSocket;
+
+
+class RStreamLoadURLData
+{
+public:
+    RStreamLoadURLData() {}
+    RackdClientSocket*client;
+    quint8 device;
+    QString uri;
+    quint32 time;
+    quint32 handle;
+};
+
 
 class Rackd : public QTcpServer
 {
@@ -59,7 +70,7 @@ private slots:
     void handleError(QAbstractSocket::SocketError);
 
     //protocol handling:
-    void handleRequest(RackdClientSocket *client, const QByteArray &requestBlock);
+    void handleRequest(RackdClientSocket *client, const QByteArray &request);
 
     //loadStreamURL thread finished slot:
     void loadStreamFinished();
@@ -68,13 +79,9 @@ private slots:
 private:
 
     //protocol handling:
-    void sendResponse(RackdClientSocket *client);
+    void sendResponse(RackdClientSocket *client, const QByteArray &response);
 
     quint16 m_maxConnections;
-
-
-    // delete: ?????
-    QByteArray m_response;
 
     QList<RackdClientSocket *> m_clients;
 
@@ -91,14 +98,8 @@ private:
 
 
     //loadStreamURL thread stuff:
-
-    //QFutureWatcher<QHash<RackdClientSocket *, QByteArray> > *m_watcher;
-    //QHash<RackdClientSocket *, QByteArray> loadStreamThread(RackdClientSocket *client, const QString &command, quint8 device, const QString &uri);
-
-
-    QFutureWatcher<RMessage> *m_watcher;
-    RMessage loadStreamThread(RackdClientSocket *client, const QString &command, quint8 device, const QString &uri);
-
+    QFutureWatcher<RStreamLoadURLData> *m_watcher;
+    RStreamLoadURLData loadStreamInThread(RStreamLoadURLData &data);
 
 };
 
