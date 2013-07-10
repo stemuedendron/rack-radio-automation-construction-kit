@@ -34,7 +34,6 @@ class RackdClientSocket;
 class RStreamLoadURLData
 {
 public:
-    RStreamLoadURLData() {}
     RackdClientSocket*client;
     quint8 device;
     QString uri;

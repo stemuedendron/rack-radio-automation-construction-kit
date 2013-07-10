@@ -29,6 +29,12 @@
 #include "rackd.h"
 #include "rackdclientsocket.h"
 
+//TODO: send waveform
+
+//TODO: crash if we quit while streamloadurl thread is running
+
+//TODO: use floating point channels (see bass docs)
+
 //TODO: if connections count is null go to auto modus ???
 //TODO: qsettings
 //loglevels?
@@ -215,16 +221,9 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     {
         QString pw;
         requestDS >> pw;
-        if (pw == "pass") //TODO: read from settings
-        {
-            client->setAuth(true);
-            responseDS << command << true;
-        }
-        else
-        {
-            client->setAuth(false);
-            responseDS << command << false;
-        }
+        bool ok = (pw == "pass"); //TODO: read from settings
+        client->setAuth(ok);
+        responseDS << command << ok;
 
         qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << client->isAuth();
 
@@ -314,18 +313,37 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         return;
     }
 
-    //    UP <conn-handle>!
+    if (command == "US")
+    {
+        quint32 handle;
+        requestDS >> handle;
+        bool ok = BASS_StreamFree(handle);
+        responseDS << command << handle << ok;
 
-    //    if (command == "PP")
-    //    {
-    //        quint32 handle;
-    //        quint32 position;
-    //        in >> handle >> position;
-    //        emit playPosition(handle, position);
-    //        return;
-    //    }
+        qDebug() << "unload stream:" << handle << ok << BASS_ErrorGetCode();
 
+        responseDS.device()->seek(0);
+        responseDS << quint16(response.size() - sizeof(quint16));
+        sendResponse(client, response);
+        return;
+    }
 
+    //TODO: check if position is out of range? (or is this clients job?)
+    if (command == "PP")
+    {
+        quint32 handle;
+        quint32 position;
+        requestDS >> handle >> position;
+        bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position/1000), BASS_POS_BYTE);
+        responseDS << command << handle << ok;
+
+        qDebug() << "seek:" << handle << "position:" << position << ok;
+
+        responseDS.device()->seek(0);
+        responseDS << quint16(response.size() - sizeof(quint16));
+        sendResponse(client, response);
+        return;
+    }
 
     if (command == "PY")
     {
@@ -334,16 +352,10 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         //quint16 speed;
         //bool pitch;
         requestDS >> handle;
-        if (BASS_ChannelPlay(handle, false))
-        {
-            qDebug() << "play ok:" << handle;
-            responseDS << command << handle << true;
-        }
-        else
-        {
-            qDebug() << "play not ok:" << handle << BASS_ErrorGetCode();
-            responseDS << command << handle << false;
-        }
+        bool ok = BASS_ChannelPlay(handle, false);
+        responseDS << command << handle << ok;
+
+        qDebug() << "play:" << handle << ok << BASS_ErrorGetCode();
 
         responseDS.device()->seek(0);
         responseDS << quint16(response.size() - sizeof(quint16));
@@ -352,20 +364,15 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     }
 
 
+    //TODO: pause vs stop ????
     if (command == "SP")
     {
         quint32 handle;
         requestDS >> handle;
-        if (BASS_ChannelPause(handle))
-        {
-            qDebug() << "stop ok:" << handle;
-            responseDS << command << handle << true;
-        }
-        else
-        {
-            qDebug() << "stop not ok:" << handle << BASS_ErrorGetCode();
-            responseDS << command << handle << false;
-        }
+        bool ok = BASS_ChannelPause(handle);
+        responseDS << command << handle << ok;
+
+        qDebug() << "stop:" << handle << ok << BASS_ErrorGetCode();
 
         responseDS.device()->seek(0);
         responseDS << quint16(response.size() - sizeof(quint16));

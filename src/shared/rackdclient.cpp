@@ -203,19 +203,38 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 
         qDebug() << "load stream:" << device << uri << handle << time << ok;
 
-        if (ok) emit streamLoaded(handle);
-        if (ok) emit streamTime(time);
+        if (ok)
+        {
+            emit streamLoaded(handle);
+            emit streamTime(time);
+        }
         return;
     }
 
-    //    if (command == "PP")
-    //    {
-    //        quint32 handle;
-    //        quint32 position;
-    //        response >> handle >> position;
-    //        emit playPosition(handle, position);
-    //        return;
-    //    }
+    if (command == "US")
+    {
+        quint32 handle;
+        bool ok;
+        response >> handle >> ok;
+
+        qDebug() << "unload stream:" << handle << ok;
+
+        if (ok) emit streamUnloaded(handle);
+        return;
+    }
+
+    if (command == "PP")
+    {
+        quint32 handle;
+        quint32 position;
+        bool ok;
+        response >> handle >> position >> ok;
+
+        qDebug() << "seek ok:" << handle << position;
+
+        if (ok) emit playPositioned(handle, position);
+        return;
+    }
 
     if (command == "PY")
     {
@@ -228,7 +247,7 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 
         qDebug() << "play:" << handle << ok;
 
-        emit playing(handle);
+        if (ok) emit playing(handle);
         return;
     }
 
@@ -240,7 +259,7 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 
         qDebug() << "stop:" << handle << ok;
 
-        emit stopped(handle);
+        if (ok) emit stopped(handle);
         return;
     }
 

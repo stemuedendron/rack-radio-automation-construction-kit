@@ -98,6 +98,8 @@ void RSelectPluginDialog::setIndex()
 int RSelectPluginDialog::getIndex(QWidget *parent, const QStringList &plugins, bool *ok)
 {
     RSelectPluginDialog dialog(plugins, parent);
+
+    //TODO check crash here!!!!
     int ret = dialog.exec();
     if (ok) *ok = !!ret;
     if (ret) return dialog.m_pluginList->currentRow();

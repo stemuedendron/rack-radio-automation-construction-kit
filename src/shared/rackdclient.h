@@ -76,7 +76,7 @@ signals:
 
     void streamLoaded(quint32 handle);
     void streamUnloaded(quint32 handle);
-    void playPositioned(quint32 handle, quint32 pos);
+    void playPositioned(quint32 handle, quint32 position);
     void playing(quint32 handle);
     void stopped(quint32 handle);
 
