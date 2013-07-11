@@ -27,7 +27,10 @@
 #include <QObject>
 #include <QHostAddress>
 
+
 class RackdClientSocket;
+class QUdpSocket;
+
 
 class RackdClient : public QObject
 {
@@ -55,6 +58,8 @@ public slots:
     void play(quint32 handle);
     void stop(quint32 handle);
 
+    void meterEnable(bool ok);
+
 
 private slots:
 
@@ -64,6 +69,8 @@ private slots:
     //protocol handling:
     void handleResponse(RackdClientSocket* client, const QByteArray &responseBlock);
 
+    //udp meter status handling:
+    void handleDatagram();
 
 signals:
 
@@ -82,12 +89,17 @@ signals:
 
     void streamTime(quint32 time);
 
+    //udp meter status:
+    void position(quint8 device, quint32 handle, quint32 position);
+
 
 private:
 
     RackdClientSocket *m_socket;
+    QUdpSocket *m_meterSocket;
     QByteArray m_request;
     void sendRequest();
+
 
 };
 

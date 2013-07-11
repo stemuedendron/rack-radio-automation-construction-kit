@@ -44,6 +44,8 @@
 //TODO: meterupdate timer should remove autofree streams from m_streams vs use bass syncproc
 
 
+//TODO: meter status: timer -> updateMeters -> loop over clients -> sendDatagramm (all streams)
+
 void SigHandler(int signum)
 {
   switch(signum)
@@ -110,19 +112,17 @@ void Rackd::incomingConnection(qintptr socketId)
 
     qDebug() << "new incomming connection";
 
+    RackdClientSocket *client = new RackdClientSocket(this);
+    client->setSocketDescriptor(socketId);
+
     if (m_clients.count() == m_maxConnections)
     {
         qDebug() << "max connections (" << m_clients.count() << ") reached";
         qDebug() << "reject client";
-        RackdClientSocket *dropClient = new RackdClientSocket(this);
-        dropClient->setSocketDescriptor(socketId);
-        connect(dropClient, SIGNAL(disconnected()), dropClient, SLOT(deleteLater()));
-        dropClient->disconnectFromHost();
+        connect(client, SIGNAL(disconnected()), client, SLOT(deleteLater()));
+        client->disconnectFromHost();
         return;
     }
-
-    RackdClientSocket *client = new RackdClientSocket(this);
-    client->setSocketDescriptor(socketId);
 
     m_clients.append(client);
 
@@ -286,15 +286,42 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
         if (handle)
         {
-//            RStreamData streamData = {handle, client, device};
-//            m_streams.append(streamData);
+
+
+
+
+
+
+
+
+
+            RStreamData streamData = {device, handle, client};
+            m_streams << streamData;
+
+
+            foreach (RStreamData streamData, m_streams)
+            {
+                qDebug() << "active streams:" << streamData.device << streamData.client << streamData.handle;
+            }
+
+
+//            for (int i = 0; i < m_streams.size(); ++i)
+//            {
+//                if (m_streams[i].handle == handle) m_streams.removeAt(i);
+//            }
+
+
+
+
+
+
+
+
+
 
             qDebug() << "load stream ok:" << uri;
 
-            //qDebug() << "client streams:" << m_clients[client].handleList;
-
             //get the play time:
-
             quint32 time;
             qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
             (t > 0) ? time = quint32(t) : time = 0;
@@ -410,7 +437,23 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     //    CO <card-num> <port-num> <udp-port> <samp-rate> <chans>!
     //    JC <output_name> | <input_name>!
     //    JD <output_name> | <input_name>!
-    //    ME <udp-port>!
+
+
+    if (command == "ME")
+    {
+        quint16 port;
+        requestDS >> port;
+        client->setClientMeterPort(port);
+        responseDS << command << port << true;
+
+        qDebug() << "meter enable:" << client << port;
+
+        responseDS.device()->seek(0);
+        responseDS << quint16(response.size() - sizeof(quint16));
+        sendResponse(client, response);
+        return;
+    }
+
     //    ML <type> <card-num> <port-num> <left-lvl> <right-lvl>!
     //    MO <card-num> <stream-num> <left-lvl> <right-lvl>!
     //    MP <card-num> <stream-num> <pos>!

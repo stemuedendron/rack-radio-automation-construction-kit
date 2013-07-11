@@ -36,6 +36,8 @@ public:
     explicit RackdClientSocket(QObject *parent = 0);
     bool isAuth() const {return m_isAuth;}
     void setAuth(bool ok) {m_isAuth = ok;}
+    quint16 clientMeterPort() const {return m_meterPort;}
+    void setClientMeterPort(const quint16 &port) {m_meterPort = port;}
 
 
 signals:
@@ -58,6 +60,7 @@ private:
 
     quint16 m_nextBlockSize;
     bool m_isAuth;
+    quint16 m_meterPort;
 
 };
 

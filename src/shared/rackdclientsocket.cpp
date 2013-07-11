@@ -33,7 +33,8 @@
 RackdClientSocket::RackdClientSocket(QObject *parent) :
     QTcpSocket(parent),
     m_nextBlockSize(0),
-    m_isAuth(false)
+    m_isAuth(false),
+    m_meterPort(0)
 {
     connect(this, SIGNAL(readyRead()), this, SLOT(readyData()));
     connect(this, SIGNAL(disconnected()), this, SLOT(disconnectedID()));

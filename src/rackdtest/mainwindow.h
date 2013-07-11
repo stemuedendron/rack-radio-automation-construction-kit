@@ -42,6 +42,7 @@ private slots:
 
     void connectToServer();
     void sendPass();
+    void meterEnable(bool ok);
     void loadStream();
     void play();
     void stop();

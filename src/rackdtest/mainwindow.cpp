@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_le = new QLineEdit;
     QPushButton *bConn = new QPushButton("connect");
     QPushButton *bPW = new QPushButton("send password");
+    QPushButton *bME = new QPushButton("meter enable");
+    bME->setCheckable(true);
     QPushButton *bLS = new QPushButton("load stream");
     QPushButton *bPY = new QPushButton("play");
     QPushButton *bSP = new QPushButton("stop");
@@ -43,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
+    connect(bME, SIGNAL(toggled(bool)), this, SLOT(meterEnable(bool)));
     connect(bLS, SIGNAL(clicked()), this, SLOT(loadStream()));
     connect(bPY, SIGNAL(clicked()), this, SLOT(play()));
     connect(bSP, SIGNAL(clicked()), this, SLOT(stop()));
@@ -56,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(m_le);
     l->addWidget(bConn);
     l->addWidget(bPW);
+    l->addWidget(bME);
     l->addWidget(bLS);
     l->addWidget(bPY);
     l->addWidget(bSP);
@@ -78,6 +82,11 @@ void MainWindow::sendPass()
     m_le->clear();
 }
 
+
+void MainWindow::meterEnable(bool ok)
+{
+    m_rackdClient->meterEnable(ok);
+}
 
 void MainWindow::loadStream()
 {

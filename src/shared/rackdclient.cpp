@@ -24,16 +24,33 @@
 #include "rackdclient.h"
 #include "rackdclientsocket.h"
 #include <QDataStream>
+#include <QUdpSocket>
 
 
 RackdClient::RackdClient(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_socket(new RackdClientSocket(this)),
+      m_meterSocket(new QUdpSocket(this))
 {
-    m_socket = new RackdClientSocket(this);
+
+    for (quint16 i = 30000; i < 30100; i++)
+    {
+        if (m_meterSocket->bind(i))
+        {
+            qDebug() << "udp meter socket bound to port:" << m_meterSocket->localPort();
+            connect(m_meterSocket, SIGNAL(readyRead()), this, SLOT(handleDatagram()));
+            connect(m_meterSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
+            break;
+        }
+    }
+
+    //TODO: change this to get status info from socket (peer address and port)
     connect(m_socket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(m_socket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+
     connect(m_socket, SIGNAL(newBlock(RackdClientSocket*, QByteArray)), this, SLOT(handleResponse(RackdClientSocket*, QByteArray)));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
+
 }
 
 
@@ -41,12 +58,14 @@ RackdClient::RackdClient(QObject *parent)
 
 void RackdClient::connectToRackd(const QHostAddress &address, quint16 port)
 {    
+    qDebug() << "connect to rackd:" << address.toString() << port;
     m_socket->connectToHost(address, port);
 }
 
 
 void RackdClient::disconnectFromRackd()
 {
+    qDebug() << "disconnect from rackd";
     m_socket->disconnectFromHost();
 }
 
@@ -137,6 +156,18 @@ void RackdClient::stop(quint32 handle)
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
     out << quint16(0) << QString("SP") << handle;
+    out.device()->seek(0);
+    out << quint16(m_request.size() - sizeof(quint16));
+    sendRequest();
+}
+
+
+
+void RackdClient::meterEnable(bool ok)
+{
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    ok ? out << quint16(0) << QString("ME") << m_meterSocket->localPort() : out << quint16(0) << QString("ME") << quint16(0);
     out.device()->seek(0);
     out << quint16(m_request.size() - sizeof(quint16));
     sendRequest();
@@ -263,19 +294,61 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
         return;
     }
 
+
+
+    if (command == "ME")
+    {
+        quint16 port;
+        bool ok;
+        response >> port >> ok;
+
+        qDebug() << "meter enable:" << port << ok;
+
+        //TODO: do something here like start timer????
+
+
+        return;
+    }
+
     qDebug() << "ERROR: unknown response" << command;
 
 }
 
 
+//udp meter status:
+void RackdClient::handleDatagram()
+{
+    QByteArray datagram;
 
+    do
+    {
+        datagram.resize(m_meterSocket->pendingDatagramSize());
+        m_meterSocket->readDatagram(datagram.data(), datagram.size());
+    }
+    while (m_meterSocket->hasPendingDatagrams());
 
+    QDataStream response(datagram);
+    response.setVersion(QDataStream::Qt_5_0);
 
+    QString command;
+    response >> command;
 
+    if (command == "MP")
+    {
+        quint8 device;
+        quint32 handle;
+        quint32 pos;
+        response >> device >> handle >> pos;
 
+        qDebug() << "meter position:" << device << handle << pos;
 
+        emit position(device, handle, pos);
+        return;
+    }
 
+    //TODO: ohter status commands...
 
+}
 
 
 

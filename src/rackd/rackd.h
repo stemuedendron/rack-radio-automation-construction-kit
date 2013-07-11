@@ -87,13 +87,15 @@ private:
     QList<quint8> m_devices;
 
 
-//    struct RStreamData
-//    {
-//        HSTREAM handle;
-//        RackdClientSocket *client;
-//        quint8 device;
-//    };
-//    QList<RStreamData> m_streams;
+
+    struct RStreamData
+    {
+        quint8 device;
+        HSTREAM handle;
+        RackdClientSocket *client;
+
+    };
+    QList<RStreamData> m_streams;
 
 
     //loadStreamURL thread stuff:
