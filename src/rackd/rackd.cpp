@@ -148,19 +148,21 @@ void Rackd::clientDisconnected(RackdClientSocket *client)
     //unload streams. unload all client streams except currently playing, which
     //we switch to autofree.
 
-    for (int i = 0; i < m_streams.size(); ++i)
+    //we need to iterate backwards because we use removeAt(i)
+    const int size = m_streams.size() - 1;
+    for (int i = size; i >= 0; --i)
     {
-        if (m_streams[i].client == client)
+        if (m_streams.at(i).client == client)
         {
-            if (BASS_ChannelIsActive(m_streams[i].handle) == BASS_ACTIVE_PLAYING)
+            if (BASS_ChannelIsActive(m_streams.at(i).handle) == BASS_ACTIVE_PLAYING)
             {
-                BASS_ChannelFlags(m_streams[i].handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-                BASS_ChannelSetSync(m_streams[i].handle, BASS_SYNC_FREE, 0, &Rackd::freeSyncProc, this);
+                BASS_ChannelFlags(m_streams.at(i).handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+                BASS_ChannelSetSync(m_streams.at(i).handle, BASS_SYNC_FREE, 0, &Rackd::freeSyncProc, this);
                 m_streams[i].client = 0;
             }
             else
             {
-                BASS_StreamFree(m_streams[i].handle);
+                BASS_StreamFree(m_streams.at(i).handle);
                 m_streams.removeAt(i);
             }
         }
@@ -483,9 +485,7 @@ void Rackd::sendResponse(RackdClientSocket *client, const QByteArray &response)
 {
     if (client->state() == QAbstractSocket::ConnectedState)
     {
-
-        qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
-
+        //qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
         client->write(response);
     }
 }
@@ -543,28 +543,28 @@ void Rackd::sendResponse(RackdClientSocket *client, const QByteArray &response)
 //meter status update:
 void Rackd::timerEvent(QTimerEvent *)
 {
-    foreach (RStreamData data, m_streams)
+    const int sSize = m_streams.size();
+    for (int i = 0; i < sSize; ++i)
     {
         QByteArray datagram;
         QDataStream out(&datagram, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_0);
-        qint64 pos = qint64(BASS_ChannelBytes2Seconds(data.handle, BASS_ChannelGetPosition(data.handle, BASS_POS_BYTE))*1000);
-        (pos > 0) ? data.position = quint32(pos) : data.position = 0;
-        out << QString("MP") << data.device << data.handle << data.position;
+        qint64 pos = qint64(BASS_ChannelBytes2Seconds(m_streams.at(i).handle, BASS_ChannelGetPosition(m_streams.at(i).handle, BASS_POS_BYTE))*1000);
+        (pos > 0) ? m_streams[i].position = quint32(pos) : m_streams[i].position = 0;
+        out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position;
 
         //qDebug() << data.client << data.handle << data.position;
 
-        foreach (RackdClientSocket *client, m_clients)
+        const int cSize = m_clients.size();
+        for (int i = 0; i < cSize; ++i)
         {
-            if (client->clientMeterPort() > 0)
+            if (m_clients.at(i)->clientMeterPort() > 0)
             {
-                m_meterSocket->writeDatagram(datagram, client->peerAddress(), client->clientMeterPort());
-
-                //qDebug() << "send" << client->peerPort();
+                m_meterSocket->writeDatagram(datagram, m_clients.at(i)->peerAddress(), m_clients.at(i)->clientMeterPort());
+                //qDebug() << "send" << m_clients.at(i)->peerPort();
             }
         }
     }
-
 }
 
 
@@ -573,7 +573,8 @@ void CALLBACK Rackd::freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack)
 {
     Rackd* rack = (Rackd*)ptr2rack;
 
-    for (int i = 0; i < rack->m_streams.size(); ++i)
+    const int size = rack->m_streams.size();
+    for (int i = 0; i < size; ++i)
     {
         if (rack->m_streams[i].handle == handle)
         {
@@ -593,13 +594,14 @@ void Rackd::doCleanUp()
     qDebug() << "stop listen for incoming connections";
     close();
 
-    foreach (int i, m_devices) if (BASS_SetDevice(i))
-    {
-        BASS_DEVICEINFO info;
-        BASS_GetDeviceInfo(i, &info);
-        if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
-    }
-
+    const int size = m_devices.size();
+    for (int i = 0; i < size; ++i)
+        if (BASS_SetDevice(i))
+        {
+            BASS_DEVICEINFO info;
+            BASS_GetDeviceInfo(i, &info);
+            if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
+        }
 }
 
 

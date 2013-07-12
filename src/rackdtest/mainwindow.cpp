@@ -49,8 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_log = new QTextEdit;
 
 
-
-
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
     connect(bME, SIGNAL(toggled(bool)), this, SLOT(meterEnable(bool)));

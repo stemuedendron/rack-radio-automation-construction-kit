@@ -81,7 +81,7 @@ void RackdClient::sendRequest()
 {
     if (m_socket->state() == QAbstractSocket::ConnectedState)
     {
-        qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
+        //qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
 
         m_socket->write(m_request);
     }

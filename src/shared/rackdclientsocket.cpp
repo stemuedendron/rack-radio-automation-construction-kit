@@ -44,7 +44,7 @@ RackdClientSocket::RackdClientSocket(QObject *parent) :
 void RackdClientSocket::readyData()
 {
 
-    qDebug() << "request received from" << peerAddress().toString() << peerPort();
+    //qDebug() << "data received from" << peerAddress().toString() << peerPort();
 
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_5_0);
@@ -55,25 +55,25 @@ void RackdClientSocket::readyData()
         if (m_nextBlockSize == 0)
         {
 
-            qDebug() << "block size unknown - bytes available:" << bytesAvailable();
+            //qDebug() << "block size unknown - bytes available:" << bytesAvailable();
 
             if (bytesAvailable() < sizeof(quint16)) break;
             in >> m_nextBlockSize;
         }
 
-        qDebug() << "next block size for" << peerAddress().toString() << peerPort() << "is" << m_nextBlockSize;
-        qDebug() << "bytes available" << bytesAvailable();
+        //qDebug() << "next block size for" << peerAddress().toString() << peerPort() << "is" << m_nextBlockSize;
+        //qDebug() << "bytes available" << bytesAvailable();
 
         if (bytesAvailable() < m_nextBlockSize) break;
 
-        qDebug() << "complete block received";
-        qDebug() << "current block size" << m_nextBlockSize;
-        qDebug() << "bytes available" << bytesAvailable();
+        //qDebug() << "complete block received";
+        //qDebug() << "current block size" << m_nextBlockSize;
+        //qDebug() << "bytes available" << bytesAvailable();
 
         //read the complete request block for later processing:
         QByteArray block = read(m_nextBlockSize);
 
-        qDebug() << "bytes available after read:" << bytesAvailable();
+        //qDebug() << "bytes available after read:" << bytesAvailable();
 
         //parse block:
         emit newBlock(this, block);
