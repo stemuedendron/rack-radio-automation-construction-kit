@@ -28,6 +28,9 @@
 class RackdClient;
 class QLineEdit;
 class QTextEdit;
+class QLabel;
+
+
 
 class MainWindow : public QWidget
 {
@@ -49,15 +52,16 @@ private slots:
     void dropConnection();
 
     void passWordOK(bool ok);
-    void streamLoaded(quint32 handle);
-
+    void streamLoaded(quint32 handle, quint32 time);
+    void position(quint8 device, quint32 handle, quint32 position);
     
 private:
 
     RackdClient *m_rackdClient;
     QLineEdit *m_le;
     QTextEdit *m_log;
-    
+    QLabel *m_time;
+
     quint32 m_handle;
 
 };

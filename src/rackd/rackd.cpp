@@ -24,6 +24,8 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QtConcurrent/QtConcurrent>
+#include <QUdpSocket>
+
 #include <signal.h>
 
 #include "rackd.h"
@@ -41,10 +43,11 @@
 
 //TODO: abstraction for sound stuff (make it possible to use other sound frameworks like gstreamer or ecasound)
 
-//TODO: meterupdate timer should remove autofree streams from m_streams vs use bass syncproc
-
+//TODO: meterupdate timer could remove autofree streams from m_streams instead of use bass syncproc ??????
 
 //TODO: meter status: timer -> updateMeters -> loop over clients -> sendDatagramm (all streams)
+
+
 
 void SigHandler(int signum)
 {
@@ -63,7 +66,8 @@ void SigHandler(int signum)
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
       m_maxConnections(3),
-      m_watcher(new QFutureWatcher<RStreamLoadURLData>(this))
+      m_watcher(new QFutureWatcher<RStreamLoadURLData>(this)),
+      m_meterSocket(new QUdpSocket(this))
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -89,9 +93,7 @@ Rackd::Rackd(QObject *parent)
         }
     }
 
-
-
-
+    //start listen:
     if (!listen(QHostAddress::Any, 1234))
     {
         qDebug() << "Unable to start tcp server!";
@@ -103,6 +105,9 @@ Rackd::Rackd(QObject *parent)
     {
         qDebug() << "waiting for incoming connections..." << serverAddress().toString() << serverPort();
     }
+
+    //udp meter status timer:
+    m_timer.start(50, this);
 
 }
 
@@ -143,51 +148,32 @@ void Rackd::clientDisconnected(RackdClientSocket *client)
     //unload streams. unload all client streams except currently playing, which
     //we switch to autofree.
 
-//    for (int i = 0; i < m_streams.size(); ++i)
-//    {
-//        if (m_streams.at(i).client == client)
-//        {
-//            if (BASS_ChannelIsActive(m_streams.at(i).handle) == BASS_ACTIVE_PLAYING)
-//            {
-//                BASS_ChannelFlags(m_streams.at(i).handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-//                m_streams[i].client = 0;
-//            }
-//            else
-//            {
-//                BASS_StreamFree(m_streams.at(i).handle);
-//                m_streams.removeAt(i);
-//            }
-//        }
-//    }
-
-//    foreach (RStreamData streamData, m_streams)
-//    {
-//        if (streamData.client == client)
-//        {
-//            if (BASS_ChannelIsActive(streamData.handle) == BASS_ACTIVE_PLAYING)
-//            {
-//                BASS_ChannelFlags(streamData.handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-//                streamData.client = 0;
-//            }
-//            else
-//            {
-//                BASS_StreamFree(streamData.handle);
-//                m_streams.removeOne(streamData);
-//            }
-//        }
-//    }
-
-
-//    foreach (RStreamData streamData, m_streams)
-//    {
-//        qDebug() << "active streams of" << streamData.client << "are:"  << streamData.handle;
-//    }
+    for (int i = 0; i < m_streams.size(); ++i)
+    {
+        if (m_streams[i].client == client)
+        {
+            if (BASS_ChannelIsActive(m_streams[i].handle) == BASS_ACTIVE_PLAYING)
+            {
+                BASS_ChannelFlags(m_streams[i].handle, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+                BASS_ChannelSetSync(m_streams[i].handle, BASS_SYNC_FREE, 0, &Rackd::freeSyncProc, this);
+                m_streams[i].client = 0;
+            }
+            else
+            {
+                BASS_StreamFree(m_streams[i].handle);
+                m_streams.removeAt(i);
+            }
+        }
+    }
 
     m_clients.removeAll(client);
     client->deleteLater();
 
     qDebug() << "client disconnected" << client->peerAddress().toString() << client->peerPort();
     qDebug() << "we have now" << m_clients.count() << "connections";
+
+    qDebug() << "active streams:";
+    foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
 }
 
@@ -287,39 +273,13 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         if (handle)
         {
 
-
-
-
-
-
-
-
-
-            RStreamData streamData = {device, handle, client};
-            m_streams << streamData;
-
-
-            foreach (RStreamData streamData, m_streams)
-            {
-                qDebug() << "active streams:" << streamData.device << streamData.client << streamData.handle;
-            }
-
-
-//            for (int i = 0; i < m_streams.size(); ++i)
-//            {
-//                if (m_streams[i].handle == handle) m_streams.removeAt(i);
-//            }
-
-
-
-
-
-
-
-
-
-
             qDebug() << "load stream ok:" << uri;
+
+            RStreamData streamData = {handle, client, device, 0};
+            m_streams.append(streamData);
+
+            qDebug() << "active streams:";
+            foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
             //get the play time:
             quint32 time;
@@ -348,6 +308,14 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         responseDS << command << handle << ok;
 
         qDebug() << "unload stream:" << handle << ok << BASS_ErrorGetCode();
+
+        if (ok) for (int i = 0; i < m_streams.size(); ++i)
+        {
+            if (m_streams[i].handle == handle) m_streams.removeAt(i);
+        }
+
+        qDebug() << "active streams:";
+        foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
         responseDS.device()->seek(0);
         responseDS << quint16(response.size() - sizeof(quint16));
@@ -494,6 +462,10 @@ RStreamLoadURLData Rackd::loadStreamInThread(RStreamLoadURLData &data)
 void Rackd::loadStreamFinished()
 {
     RStreamLoadURLData data = m_watcher->result();
+
+    RStreamData streamData = {data.handle, data.client, data.device, 0};
+    m_streams.append(streamData);
+
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
     responseDS.setVersion(QDataStream::Qt_5_0);
@@ -568,6 +540,52 @@ void Rackd::sendResponse(RackdClientSocket *client, const QByteArray &response)
 //}
 
 
+//meter status update:
+void Rackd::timerEvent(QTimerEvent *)
+{
+    foreach (RStreamData data, m_streams)
+    {
+        QByteArray datagram;
+        QDataStream out(&datagram, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_0);
+        qint64 pos = qint64(BASS_ChannelBytes2Seconds(data.handle, BASS_ChannelGetPosition(data.handle, BASS_POS_BYTE))*1000);
+        (pos > 0) ? data.position = quint32(pos) : data.position = 0;
+        out << QString("MP") << data.device << data.handle << data.position;
+
+        //qDebug() << data.client << data.handle << data.position;
+
+        foreach (RackdClientSocket *client, m_clients)
+        {
+            if (client->clientMeterPort() > 0)
+            {
+                m_meterSocket->writeDatagram(datagram, client->peerAddress(), client->clientMeterPort());
+
+                //qDebug() << "send" << client->peerPort();
+            }
+        }
+    }
+
+}
+
+
+// bass callback functions:
+void CALLBACK Rackd::freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack)
+{
+    Rackd* rack = (Rackd*)ptr2rack;
+
+    for (int i = 0; i < rack->m_streams.size(); ++i)
+    {
+        if (rack->m_streams[i].handle == handle)
+        {
+            rack->m_streams.removeAt(i);
+        }
+    }
+
+    qDebug() << "active streams:";
+    foreach (RStreamData streamData, rack->m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
+
+}
+
 
 void Rackd::doCleanUp()
 {
@@ -589,3 +607,6 @@ Rackd::~Rackd()
 {
     qDebug() << "destructor called. Goodbye from rack daemon!";
 }
+
+
+

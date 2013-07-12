@@ -234,11 +234,7 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 
         qDebug() << "load stream:" << device << uri << handle << time << ok;
 
-        if (ok)
-        {
-            emit streamLoaded(handle);
-            emit streamTime(time);
-        }
+        if (ok) emit streamLoaded(handle, time);
         return;
     }
 
@@ -324,27 +320,28 @@ void RackdClient::handleDatagram()
     {
         datagram.resize(m_meterSocket->pendingDatagramSize());
         m_meterSocket->readDatagram(datagram.data(), datagram.size());
+
+        QDataStream response(datagram);
+        response.setVersion(QDataStream::Qt_5_0);
+
+        QString command;
+        response >> command;
+
+        if (command == "MP")
+        {
+            quint8 device;
+            quint32 handle;
+            quint32 pos;
+            response >> device >> handle >> pos;
+
+            //qDebug() << "meter position:" << device << handle << pos;
+
+            emit position(device, handle, pos);
+        }
+
     }
     while (m_meterSocket->hasPendingDatagrams());
 
-    QDataStream response(datagram);
-    response.setVersion(QDataStream::Qt_5_0);
-
-    QString command;
-    response >> command;
-
-    if (command == "MP")
-    {
-        quint8 device;
-        quint32 handle;
-        quint32 pos;
-        response >> device >> handle >> pos;
-
-        qDebug() << "meter position:" << device << handle << pos;
-
-        emit position(device, handle, pos);
-        return;
-    }
 
     //TODO: ohter status commands...
 

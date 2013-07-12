@@ -41,7 +41,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *bSP = new QPushButton("stop");
     QPushButton *bDC = new QPushButton("drop connection");
 
+    m_time = new QLabel("00:00.0");
+    QFont f( "Ubuntu", 28, QFont::Bold);
+    m_time->setFont(f);
+
+
     m_log = new QTextEdit;
+
+
+
 
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
@@ -53,7 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
-    connect(m_rackdClient, SIGNAL(streamLoaded(quint32)), this, SLOT(streamLoaded(quint32)));
+    connect(m_rackdClient, SIGNAL(streamLoaded(quint32,quint32)), this, SLOT(streamLoaded(quint32,quint32)));
+    connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
 
     QVBoxLayout *l = new QVBoxLayout();
     l->addWidget(m_le);
@@ -65,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(bSP);
     l->addWidget(bDC);
     l->addWidget(m_log);
+    l->addWidget(m_time);
 
     setLayout(l);
 
@@ -118,8 +128,23 @@ void MainWindow::passWordOK(bool ok)
     ok ? m_log->append("password ok") : m_log->append("password not ok");
 }
 
-void MainWindow::streamLoaded(quint32 handle)
+void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
+
 }
+
+void MainWindow::position(quint8 device, quint32 handle, quint32 position)
+{
+    if (!(handle == m_handle)) return;
+
+    QTime n(0,0,0,0);
+    QTime positionTime = n.addMSecs(position);
+
+    m_time->setText(positionTime.toString("mm:ss.z"));
+
+    //qDebug() << device << handle << position;
+
+}
+
 

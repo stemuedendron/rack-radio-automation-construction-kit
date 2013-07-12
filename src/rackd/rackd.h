@@ -25,10 +25,13 @@
 
 #include <QTcpServer>
 #include <QFutureWatcher>
+#include <QBasicTimer>
+
 #include "bass.h"
 
 
 class RackdClientSocket;
+class QUdpSocket;
 
 
 class RStreamLoadURLData
@@ -60,7 +63,7 @@ public slots:
 protected:
 
     void incomingConnection(qintptr socketId);
-
+    void timerEvent(QTimerEvent*);
 
 private slots:
 
@@ -83,17 +86,15 @@ private:
     quint16 m_maxConnections;
 
     QList<RackdClientSocket *> m_clients;
-
     QList<quint8> m_devices;
-
 
 
     struct RStreamData
     {
-        quint8 device;
         HSTREAM handle;
         RackdClientSocket *client;
-
+        quint8 device;
+        quint32 position;
     };
     QList<RStreamData> m_streams;
 
@@ -102,6 +103,27 @@ private:
     QFutureWatcher<RStreamLoadURLData> *m_watcher;
     RStreamLoadURLData loadStreamInThread(RStreamLoadURLData &data);
 
+    //bass callback functions:
+    static void CALLBACK freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack);
+
+    QBasicTimer m_timer;
+    QUdpSocket *m_meterSocket;
+
 };
 
 #endif // RACKD_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

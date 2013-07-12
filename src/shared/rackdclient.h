@@ -81,13 +81,12 @@ signals:
     //protocoll implementation, responses:
     void passWordOK(bool ok);
 
-    void streamLoaded(quint32 handle);
+    void streamLoaded(quint32 handle, quint32 time);
     void streamUnloaded(quint32 handle);
     void playPositioned(quint32 handle, quint32 position);
     void playing(quint32 handle);
     void stopped(quint32 handle);
 
-    void streamTime(quint32 time);
 
     //udp meter status:
     void position(quint8 device, quint32 handle, quint32 position);
