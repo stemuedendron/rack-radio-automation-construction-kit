@@ -65,7 +65,7 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
-      m_maxConnections(3),
+      m_maxConnections(32),
       m_watcher(new QFutureWatcher<RStreamLoadURLData>(this)),
       m_meterSocket(new QUdpSocket(this))
 {
@@ -311,9 +311,14 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
         qDebug() << "unload stream:" << handle << ok << BASS_ErrorGetCode();
 
-        if (ok) for (int i = 0; i < m_streams.size(); ++i)
+        if (ok)
         {
-            if (m_streams[i].handle == handle) m_streams.removeAt(i);
+            //we need to iterate backwards because we use removeAt(i)
+            const int size = m_streams.size() - 1;
+            for (int i = size; i >= 0; --i)
+            {
+                if (m_streams.at(i).handle == handle) m_streams.removeAt(i);
+            }
         }
 
         qDebug() << "active streams:";
@@ -573,8 +578,9 @@ void CALLBACK Rackd::freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack)
 {
     Rackd* rack = (Rackd*)ptr2rack;
 
-    const int size = rack->m_streams.size();
-    for (int i = 0; i < size; ++i)
+    //we need to iterate backwards because we use removeAt(i)
+    const int size = rack->m_streams.size() - 1;
+    for (int i = size; i >= 0; --i)
     {
         if (rack->m_streams[i].handle == handle)
         {
