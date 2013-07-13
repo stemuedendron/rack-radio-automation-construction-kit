@@ -28,6 +28,7 @@
 class RackdClient;
 class QLineEdit;
 class QTextEdit;
+class QSlider;
 class QLabel;
 
 
@@ -47,20 +48,27 @@ private slots:
     void sendPass();
     void meterEnable(bool ok);
     void loadStream();
+    void waveForm();
     void play();
     void stop();
     void dropConnection();
+    void setPosition(int pos);
 
     void passWordOK(bool ok);
     void streamLoaded(quint32 handle, quint32 time);
     void position(quint8 device, quint32 handle, quint32 position);
+    void waveFormGenerated(quint32 handle, QImage waveform);
+
     
 private:
 
     RackdClient *m_rackdClient;
     QLineEdit *m_le;
     QTextEdit *m_log;
+    QSlider *m_slider;
     QLabel *m_time;
+    QLabel *m_wave;
+
 
     quint32 m_handle;
 

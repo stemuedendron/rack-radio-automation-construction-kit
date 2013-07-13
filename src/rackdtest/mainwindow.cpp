@@ -37,29 +37,35 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *bME = new QPushButton("meter enable");
     bME->setCheckable(true);
     QPushButton *bLS = new QPushButton("load stream");
+    QPushButton *bWF = new QPushButton("wave form");
     QPushButton *bPY = new QPushButton("play");
     QPushButton *bSP = new QPushButton("stop");
     QPushButton *bDC = new QPushButton("drop connection");
+    m_log = new QTextEdit;
+
+    m_slider = new QSlider(Qt::Horizontal);
 
     m_time = new QLabel("00:00.0");
     QFont f( "Ubuntu", 28, QFont::Bold);
     m_time->setFont(f);
 
-
-    m_log = new QTextEdit;
+    m_wave = new QLabel("(wave form)");
 
 
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
     connect(bME, SIGNAL(toggled(bool)), this, SLOT(meterEnable(bool)));
     connect(bLS, SIGNAL(clicked()), this, SLOT(loadStream()));
+    connect(bWF, SIGNAL(clicked()), this, SLOT(waveForm()));
     connect(bPY, SIGNAL(clicked()), this, SLOT(play()));
     connect(bSP, SIGNAL(clicked()), this, SLOT(stop()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
+    connect(m_slider, &QSlider::sliderMoved, this, &MainWindow::setPosition);
 
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
     connect(m_rackdClient, SIGNAL(streamLoaded(quint32,quint32)), this, SLOT(streamLoaded(quint32,quint32)));
+    connect(m_rackdClient, SIGNAL(waveFormGenerated(quint32,QImage)), this, SLOT(waveFormGenerated(quint32,QImage)));
     connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
 
     QVBoxLayout *l = new QVBoxLayout();
@@ -68,11 +74,14 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(bPW);
     l->addWidget(bME);
     l->addWidget(bLS);
+    l->addWidget(bWF);
     l->addWidget(bPY);
     l->addWidget(bSP);
     l->addWidget(bDC);
     l->addWidget(m_log);
+    l->addWidget(m_slider);
     l->addWidget(m_time);
+    l->addWidget(m_wave);
 
     setLayout(l);
 
@@ -101,6 +110,11 @@ void MainWindow::loadStream()
     m_rackdClient->loadStream(quint8(2), m_le->text());
 }
 
+void MainWindow::waveForm()
+{
+    m_rackdClient->waveForm(m_handle);
+}
+
 
 void MainWindow::play()
 {
@@ -120,6 +134,12 @@ void MainWindow::dropConnection()
 }
 
 
+void MainWindow::setPosition(int pos)
+{
+    m_rackdClient->positionPlay(m_handle, quint32(pos));
+}
+
+
 //connected to signals from rackdclient:
 void MainWindow::passWordOK(bool ok)
 {
@@ -129,11 +149,13 @@ void MainWindow::passWordOK(bool ok)
 void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
+    m_slider->setMaximum(time);
 
 }
 
 void MainWindow::position(quint8 device, quint32 handle, quint32 position)
 {
+    Q_UNUSED(device);
     if (!(handle == m_handle)) return;
 
     QTime n(0,0,0,0);
@@ -141,8 +163,18 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
 
     m_time->setText(positionTime.toString("mm:ss.z"));
 
+    m_slider->setSliderPosition(position);
+
     //qDebug() << device << handle << position;
 
 }
+
+void MainWindow::waveFormGenerated(quint32 handle, QImage waveform)
+{
+    Q_UNUSED(handle);
+    m_wave->setPixmap(QPixmap::fromImage(waveform));
+}
+
+
 
 

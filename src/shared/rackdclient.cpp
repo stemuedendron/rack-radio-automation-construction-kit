@@ -95,9 +95,9 @@ void RackdClient::passWord(const QString &password)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("PW") << password;
+    out << quint32(0) << QString("PW") << password;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -105,9 +105,9 @@ void RackdClient::dropConnection()
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("DC");
+    out << quint32(0) << QString("DC");
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -115,9 +115,9 @@ void RackdClient::loadStream(quint8 device, const QString &uri)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("LS") << device << uri;
+    out << quint32(0) << QString("LS") << device << uri;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -125,9 +125,9 @@ void RackdClient::unloadStream(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("US") << handle;
+    out << quint32(0) << QString("US") << handle;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -135,9 +135,9 @@ void RackdClient::positionPlay(quint32 handle, quint32 pos)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("PP") << handle << pos;
+    out << quint32(0) << QString("PP") << handle << pos;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -145,9 +145,9 @@ void RackdClient::play(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("PY") << handle;
+    out << quint32(0) << QString("PY") << handle;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -155,9 +155,9 @@ void RackdClient::stop(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    out << quint16(0) << QString("SP") << handle;
+    out << quint32(0) << QString("SP") << handle;
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -167,9 +167,19 @@ void RackdClient::meterEnable(bool ok)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_0);
-    ok ? out << quint16(0) << QString("ME") << m_meterSocket->localPort() : out << quint16(0) << QString("ME") << quint16(0);
+    ok ? out << quint32(0) << QString("ME") << m_meterSocket->localPort() : out << quint32(0) << QString("ME") << quint16(0);
     out.device()->seek(0);
-    out << quint16(m_request.size() - sizeof(quint16));
+    out << quint32(m_request.size() - sizeof(quint32));
+    sendRequest();
+}
+
+void RackdClient::waveForm(quint32 handle)
+{
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint32(0) << QString("WF") << handle;
+    out.device()->seek(0);
+    out << quint32(m_request.size() - sizeof(quint32));
     sendRequest();
 }
 
@@ -257,7 +267,7 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
         bool ok;
         response >> handle >> position >> ok;
 
-        qDebug() << "seek ok:" << handle << position;
+        qDebug() << "seek:" << handle << position << ok;
 
         if (ok) emit playPositioned(handle, position);
         return;
@@ -305,6 +315,21 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 
         return;
     }
+
+
+    if (command == "WF")
+    {
+        quint32 handle;
+        QImage waveform;
+        bool ok;
+        response >> handle >> waveform >> ok;
+
+        qDebug() << "wave form:" << handle << ok;
+
+        if (ok) emit waveFormGenerated(handle, waveform);
+        return;
+    }
+
 
     qDebug() << "ERROR: unknown response" << command;
 

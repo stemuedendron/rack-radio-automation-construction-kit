@@ -26,6 +26,7 @@
 #include <QTcpServer>
 #include <QFutureWatcher>
 #include <QBasicTimer>
+#include <QImage>
 
 #include "bass.h"
 
@@ -34,14 +35,16 @@ class RackdClientSocket;
 class QUdpSocket;
 
 
-class RStreamLoadURLData
+class RThreadFunctionData
 {
 public:
-    RackdClientSocket*client;
+    RackdClientSocket *client;
     quint8 device;
     QString uri;
     quint32 time;
     quint32 handle;
+    QImage waveform;
+    bool ok;
 };
 
 
@@ -65,6 +68,7 @@ protected:
     void incomingConnection(qintptr socketId);
     void timerEvent(QTimerEvent*);
 
+
 private slots:
 
     //connection handling:
@@ -76,6 +80,9 @@ private slots:
 
     //loadStreamURL thread finished slot:
     void loadStreamFinished();
+
+    //generate waveform thread finished slot:
+    void generateWaveformFinished();
 
 
 private:
@@ -99,15 +106,21 @@ private:
     QList<RStreamData> m_streams;
 
 
-    //loadStreamURL thread stuff:
-    QFutureWatcher<RStreamLoadURLData> *m_watcher;
-    RStreamLoadURLData loadStreamInThread(RStreamLoadURLData &data);
+    //loadStreamURL in another thread:
+    QFutureWatcher<RThreadFunctionData> *m_createUrlWatcher;
+    RThreadFunctionData loadStreamInThread(RThreadFunctionData &data);
+
+    //generate wave form in another thread:
+    QFutureWatcher<RThreadFunctionData> *m_waveformWatcher;
+    RThreadFunctionData generateWaveformInThread(RThreadFunctionData &data);
 
     //bass callback functions:
     static void CALLBACK freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack);
 
     QBasicTimer m_timer;
     QUdpSocket *m_meterSocket;
+
+    int m_lastBassError;
 
 };
 

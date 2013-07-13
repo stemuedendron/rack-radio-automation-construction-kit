@@ -58,7 +58,7 @@ public slots:
 
 private:
 
-    quint16 m_nextBlockSize;
+    quint32 m_nextBlockSize;
     bool m_isAuth;
     quint16 m_meterPort;
 

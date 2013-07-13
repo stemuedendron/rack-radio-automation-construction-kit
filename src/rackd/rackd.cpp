@@ -25,12 +25,16 @@
 #include <QDir>
 #include <QtConcurrent/QtConcurrent>
 #include <QUdpSocket>
+#include <QColor>
+#include <QPainter>
 
 #include <signal.h>
 
 #include "rackd.h"
 #include "rackdclientsocket.h"
 
+
+//TODO: protocol for device information/init
 //TODO: send waveform
 
 //TODO: crash if we quit while streamloadurl thread is running
@@ -45,8 +49,7 @@
 
 //TODO: meterupdate timer could remove autofree streams from m_streams instead of use bass syncproc ??????
 
-//TODO: meter status: timer -> updateMeters -> loop over clients -> sendDatagramm (all streams)
-
+//TODO use QtConcurrent::mappedReduced() instead of QtConcurrent::run() for cancel ????? check this!
 
 
 void SigHandler(int signum)
@@ -66,8 +69,10 @@ void SigHandler(int signum)
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
       m_maxConnections(32),
-      m_watcher(new QFutureWatcher<RStreamLoadURLData>(this)),
-      m_meterSocket(new QUdpSocket(this))
+      m_createUrlWatcher(new QFutureWatcher<RThreadFunctionData>(this)),
+      m_waveformWatcher(new QFutureWatcher<RThreadFunctionData>(this)),
+      m_meterSocket(new QUdpSocket(this)),
+      m_lastBassError(0)
 {
     qDebug() << "Hello from rack daemon!";
 
@@ -75,20 +80,24 @@ Rackd::Rackd(QObject *parent)
     signal(SIGINT,SigHandler);
     signal(SIGTERM,SigHandler);
 
-    connect(m_watcher, SIGNAL(finished()), this, SLOT(loadStreamFinished()));
+    connect(m_createUrlWatcher, SIGNAL(finished()), this, SLOT(loadStreamFinished()));
+    connect(m_waveformWatcher, SIGNAL(finished()), this, SLOT(generateWaveformFinished()));
 
 
     //audio devices:
     BASS_DEVICEINFO info;
-    for (int i = 1; BASS_GetDeviceInfo(i, &info); i++) if (info.flags&BASS_DEVICE_ENABLED)
+    for (int i = 0; BASS_GetDeviceInfo(i, &info); i++) if (info.flags&BASS_DEVICE_ENABLED)
     {
         if (QString::compare(info.name,"Default") == 0) continue;
 
-        qDebug() << i << "audio device name:" << info.name;
-        qDebug() << "audio device driver:" << info.driver;
-        if (BASS_Init(i,44100,0,0,NULL))
+        qDebug() << i << "audio device name:" << info.name << info.driver;
+
+        int flag;
+        i == 0 ? flag = BASS_DEVICE_MONO : flag = 0;
+
+        if (BASS_Init(i, 44100, flag, 0, NULL))
         {
-            qDebug() << info.driver << "initialized";
+            qDebug() << "initialized";
             m_devices.append(i);
         }
     }
@@ -126,6 +135,7 @@ void Rackd::incomingConnection(qintptr socketId)
         qDebug() << "reject client";
         connect(client, SIGNAL(disconnected()), client, SLOT(deleteLater()));
         client->disconnectFromHost();
+        client = 0;
         return;
     }
 
@@ -169,7 +179,6 @@ void Rackd::clientDisconnected(RackdClientSocket *client)
     }
 
     m_clients.removeAll(client);
-    client->deleteLater();
 
     qDebug() << "client disconnected" << client->peerAddress().toString() << client->peerPort();
     qDebug() << "we have now" << m_clients.count() << "connections";
@@ -177,7 +186,9 @@ void Rackd::clientDisconnected(RackdClientSocket *client)
     qDebug() << "active streams:";
     foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
+    client->deleteLater();
 }
+
 
 //TODO:
 void Rackd::handleError(QAbstractSocket::SocketError)
@@ -198,7 +209,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
     responseDS.setVersion(QDataStream::Qt_5_0);
-    responseDS << quint16(0);
+    responseDS << quint32(0);
 
     QString command;
     requestDS >> command;
@@ -216,7 +227,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << client->isAuth();
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -237,13 +248,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
         responseDS << QString("ER") << command << QString("request need authentication");
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
 
-
-    //move complete load stream in thread function to avoid duplicate code ??
     if (command == "LS")
     {
         quint8 device;
@@ -257,12 +266,15 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive))
         {
             //load stream from url in another thread:
-            RStreamLoadURLData data;
+            RThreadFunctionData data;
+
             data.client = client;
+
+
             data.device = device;
             data.uri = uri;
-            QFuture<RStreamLoadURLData> f = QtConcurrent::run(this, &Rackd::loadStreamInThread, data);
-            m_watcher->setFuture(f);
+            QFuture<RThreadFunctionData> f = QtConcurrent::run(this, &Rackd::loadStreamInThread, data);
+            m_createUrlWatcher->setFuture(f);
             return;
         }
         else
@@ -297,7 +309,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         }
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -325,7 +337,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -339,10 +351,10 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position/1000), BASS_POS_BYTE);
         responseDS << command << handle << ok;
 
-        qDebug() << "seek:" << handle << "position:" << position << ok;
+        qDebug() << "seek:" << handle << position << ok << BASS_ErrorGetCode();
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -360,7 +372,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         qDebug() << "play:" << handle << ok << BASS_ErrorGetCode();
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -377,7 +389,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         qDebug() << "stop:" << handle << ok << BASS_ErrorGetCode();
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -413,6 +425,21 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     //    JC <output_name> | <input_name>!
     //    JD <output_name> | <input_name>!
 
+    if (command == "WF")
+    {
+        quint32 handle;
+        requestDS >> handle;
+
+        qDebug() << "wave form:" << client << handle;
+
+        //generate waveform in another thread:
+        RThreadFunctionData data;
+        data.client = client;
+        data.handle = handle;
+        QFuture<RThreadFunctionData> f = QtConcurrent::run(this, &Rackd::generateWaveformInThread, data);
+        m_waveformWatcher->setFuture(f);
+        return;
+    }
 
     if (command == "ME")
     {
@@ -424,7 +451,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         qDebug() << "meter enable:" << client << port;
 
         responseDS.device()->seek(0);
-        responseDS << quint16(response.size() - sizeof(quint16));
+        responseDS << quint32(response.size() - sizeof(quint32));
         sendResponse(client, response);
         return;
     }
@@ -438,20 +465,20 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     qDebug() << "ERROR: unknown request" << command;
     responseDS << QString("ER") << command << QString("unknown request");
     responseDS.device()->seek(0);
-    responseDS << quint16(response.size() - sizeof(quint16));
+    responseDS << quint32(response.size() - sizeof(quint32));
     sendResponse(client, response);
 
 }
 
 
-// function runs in own thread:
-RStreamLoadURLData Rackd::loadStreamInThread(RStreamLoadURLData &data)
+// function runs in another thread:
+RThreadFunctionData Rackd::loadStreamInThread(RThreadFunctionData &data)
 {
     BASS_SetDevice(data.device);
     HSTREAM handle = BASS_StreamCreateURL(qPrintable(data.uri), 0, 0, NULL, 0);
     if (handle)
     {
-        qDebug() << "load stream url ok:" << data.uri;
+        qDebug() << "load stream url ok:" << data.uri << handle;
         data.handle = handle;
         qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
         (t > 0) ? data.time = quint32(t) : data.time = 0;
@@ -461,6 +488,7 @@ RStreamLoadURLData Rackd::loadStreamInThread(RStreamLoadURLData &data)
         qDebug() << "ERROR: load stream url failed:" << data.uri << BASS_ErrorGetCode();
         data.handle = 0;
     }
+    data.ok = bool(handle);
     return data;
 }
 
@@ -468,81 +496,118 @@ RStreamLoadURLData Rackd::loadStreamInThread(RStreamLoadURLData &data)
 //slot called when loadstream thread is finnished:
 void Rackd::loadStreamFinished()
 {
-    RStreamLoadURLData data = m_watcher->result();
+    RThreadFunctionData data = m_createUrlWatcher->result();
+
+    //check if the client pointer is valid anymore (since we was in another thread the connection may be dropped)
+    if (!m_clients.contains(data.client))
+    {
+        qDebug() << "client that requested load url stream is disconnected";
+        bool ok = BASS_StreamFree(data.handle);
+        qDebug() << "unload url stream:" << data.handle << ok;
+        return;
+    }
 
     RStreamData streamData = {data.handle, data.client, data.device, 0};
     m_streams.append(streamData);
+    QByteArray response;
+    QDataStream responseDS(&response, QIODevice::WriteOnly);
+    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS << quint32(0) << QString("LS") << data.device << data.uri << data.handle << data.time << data.ok;
+    responseDS.device()->seek(0);
+    responseDS << quint32(response.size() - sizeof(quint32));
+    sendResponse(data.client, response);
+}
+
+
+// function runs in another thread:
+RThreadFunctionData Rackd::generateWaveformInThread(RThreadFunctionData &data)
+{
+    quint16 width = 500;
+    quint16 height = 60;
+    QColor color("#4175FF");
+    bool aa = true;
+    BASS_CHANNELINFO info;
+    DWORD decoder = 0;
+
+    if (BASS_ChannelGetInfo(data.handle, &info))
+    {
+        BASS_SetDevice(0);
+        decoder = BASS_StreamCreateFile(FALSE, info.filename, 0, 0, BASS_STREAM_DECODE);
+    }
+
+    if (decoder)
+    {
+
+        qDebug() << "prepare wave form decode stream ok:" << data.handle;
+
+        QImage waveform = QImage(width, height, QImage::Format_ARGB32_Premultiplied);
+        DWORD bytesPerPixel = BASS_ChannelGetLength(decoder, BASS_POS_BYTE) / width;
+        if (bytesPerPixel < BASS_ChannelSeconds2Bytes(decoder, 0.02)) bytesPerPixel = BASS_ChannelSeconds2Bytes(decoder, 0.02);
+        QPainter painter(&waveform);
+        painter.setPen(color);
+        if (aa) painter.setRenderHint(QPainter::Antialiasing);
+        painter.fillRect(waveform.rect(), Qt::black);
+        DWORD level = 0, peak = 0, scanPos = 0, imagePos = 0, line = 0;
+        while (BASS_ChannelIsActive(decoder) == BASS_ACTIVE_PLAYING)
+        {
+            level = BASS_ChannelGetLevel(decoder);
+            if (peak < LOWORD(level)) peak = LOWORD(level);
+            scanPos = BASS_ChannelGetPosition(decoder, BASS_POS_BYTE) / bytesPerPixel;
+            if (scanPos > imagePos)
+            {
+                line = peak * (height - 8) / 32768;
+                painter.drawLine(imagePos, (height - line) / 2, imagePos, (height - line) / 2 + line);
+                imagePos = scanPos;
+                peak = 0;
+            }
+        }
+        data.waveform = waveform;
+
+        qDebug() << "generate wave form ok:" << data.handle;
+
+        BASS_StreamFree(decoder);
+    }
+    else
+    {
+        qDebug() << "ERROR: generate waveform failed:" << data.handle << BASS_ErrorGetCode();
+    }
+    data.ok = bool(decoder);
+    return data;
+}
+
+
+//slot called when generate waveform thread is finnished:
+void Rackd::generateWaveformFinished()
+{
+    RThreadFunctionData data = m_waveformWatcher->result();
+
+    //check if the client pointer is valid anymore (since we was in another thread the connection may be dropped)
+    if (!m_clients.contains(data.client))
+    {
+        qDebug() << "client that requested wave form is disconnected";
+        return;
+    }
 
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
     responseDS.setVersion(QDataStream::Qt_5_0);
-    responseDS << quint16(0) << QString("LS") << data.device << data.uri << data.handle << data.time << bool(data.handle);
+    responseDS << quint32(0) << QString("WF") << data.handle << data.waveform << data.ok;
     responseDS.device()->seek(0);
-    responseDS << quint16(response.size() - sizeof(quint16));
+    responseDS << quint32(response.size() - sizeof(quint32));
     sendResponse(data.client, response);
-
-    //TODO: add handle from response to handle list
-
 }
 
 
 void Rackd::sendResponse(RackdClientSocket *client, const QByteArray &response)
 {
+
+
     if (client->state() == QAbstractSocket::ConnectedState)
     {
         //qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
         client->write(response);
     }
 }
-
-//void Rackd::getWaveForm(quint64 id, const qulonglong itemID)
-//{
-
-//    if (itemID > 9999999999)
-//    {
-//        qDebug() << "id out of range";
-//        return;
-//    }
-
-//    qDebug() << "waveform image requested from client" << id << "for item id" << itemID;
-
-//    QString itemIDStr = QString::number(itemID);
-//    itemIDStr = itemIDStr.rightJustified(10, '0');
-
-//    //QString absFileName;
-//    //absFileName = "/home/rf/Documents/qt-projects/00-Steffen/rack-network-test/build-release/rackd";
-
-//    QString absFileName(QDir::currentPath());
-
-//    absFileName.append("/repo");
-
-//    absFileName.append("/");
-//    absFileName.append(itemIDStr.mid(0,2));
-//    absFileName.append("/");
-//    absFileName.append(itemIDStr.mid(2,2));
-//    absFileName.append("/");
-//    absFileName.append(itemIDStr.mid(4,2));
-//    absFileName.append("/");
-//    absFileName.append(itemIDStr.mid(6,2));
-//    absFileName.append("/");
-//    absFileName.append(itemIDStr);
-//    absFileName.append(".png");
-
-//    qDebug() << "absolute file:" << absFileName;
-
-//    QImage wavForm;
-//    if (!wavForm.load(absFileName))
-//    {
-
-//        qDebug() << "can not load waveform image" << absFileName;
-//        //todo: send fail message
-//        return;
-
-//    }
-//    qDebug() << "send waveform image" << absFileName;
-//    m_rpcPeer->call(id, "waveForm", wavForm);
-
-//}
 
 
 //meter status update:
@@ -570,6 +635,11 @@ void Rackd::timerEvent(QTimerEvent *)
             }
         }
     }
+
+    if (BASS_ErrorGetCode() == m_lastBassError) return;
+    m_lastBassError = BASS_ErrorGetCode();
+    qDebug () << m_lastBassError;
+
 }
 
 
@@ -600,14 +670,12 @@ void Rackd::doCleanUp()
     qDebug() << "stop listen for incoming connections";
     close();
 
-    const int size = m_devices.size();
-    for (int i = 0; i < size; ++i)
-        if (BASS_SetDevice(i))
-        {
-            BASS_DEVICEINFO info;
-            BASS_GetDeviceInfo(i, &info);
-            if (BASS_Free()) qDebug() << "audio device" << info.driver << "deinitialized";
-        }
+    foreach (int i, m_devices) if (BASS_SetDevice(i))
+    {
+        BASS_DEVICEINFO info;
+        BASS_GetDeviceInfo(i, &info);
+        if (BASS_Free()) qDebug() << i << "audio device" << info.driver << "deinitialized";
+    }
 }
 
 

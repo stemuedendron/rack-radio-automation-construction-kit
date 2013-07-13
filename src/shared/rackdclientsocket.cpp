@@ -57,7 +57,7 @@ void RackdClientSocket::readyData()
 
             //qDebug() << "block size unknown - bytes available:" << bytesAvailable();
 
-            if (bytesAvailable() < sizeof(quint16)) break;
+            if (bytesAvailable() < sizeof(quint32)) break;
             in >> m_nextBlockSize;
         }
 

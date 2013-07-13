@@ -26,6 +26,7 @@
 
 #include <QObject>
 #include <QHostAddress>
+#include <QImage>
 
 
 class RackdClientSocket;
@@ -59,6 +60,7 @@ public slots:
     void stop(quint32 handle);
 
     void meterEnable(bool ok);
+    void waveForm(quint32 handle);
 
 
 private slots:
@@ -90,6 +92,8 @@ signals:
 
     //udp meter status:
     void position(quint8 device, quint32 handle, quint32 position);
+
+    void waveFormGenerated(quint32 handle, QImage waveform);
 
 
 private:
