@@ -23,10 +23,11 @@
 #ifndef RACKD_H
 #define RACKD_H
 
+#include <QThread>
 #include <QTcpServer>
-#include <QFutureWatcher>
 #include <QBasicTimer>
 #include <QImage>
+
 
 #include "bass.h"
 
@@ -35,17 +36,54 @@ class RackdClientSocket;
 class QUdpSocket;
 
 
-class RThreadFunctionData
+
+class StreamLoadURLThread : public QThread
 {
+    Q_OBJECT
+
 public:
-    RackdClientSocket *client;
-    quint8 device;
-    QString uri;
-    quint32 time;
-    quint32 handle;
-    QImage waveform;
-    bool ok;
+
+    StreamLoadURLThread(RackdClientSocket *client, quint8 device, const QString &uri, QObject * parent = 0);
+
+protected:
+
+    void run();
+
+signals:
+
+    void resultReady(RackdClientSocket *client, quint8 device, const QString &uri, quint32 handle, quint32 time, bool ok);
+
+private:
+
+    RackdClientSocket *m_client;
+    quint8 m_device;
+    QString m_uri;
 };
+
+
+
+class waveformThread : public QThread
+{
+    Q_OBJECT
+
+public:
+
+    waveformThread(RackdClientSocket *client, quint32 handle, QObject * parent = 0);
+
+protected:
+
+    void run();
+
+signals:
+
+    void resultReady(RackdClientSocket *client, quint32 handle, QImage waveform, bool ok);
+
+private:
+
+    RackdClientSocket *m_client;
+    quint32 m_handle;
+};
+
 
 
 class Rackd : public QTcpServer
@@ -78,11 +116,9 @@ private slots:
     //protocol handling:
     void handleRequest(RackdClientSocket *client, const QByteArray &request);
 
-    //loadStreamURL thread finished slot:
-    void loadStreamFinished();
-
-    //generate waveform thread finished slot:
-    void generateWaveformFinished();
+    //slots to connect to thread signals
+    void loadStreamFinished(RackdClientSocket *client, quint8 device, const QString &uri, quint32 handle, quint32 time, bool ok);
+    void waveformFinished(RackdClientSocket *client, quint32 handle, QImage waveform, bool ok);
 
 
 private:
@@ -104,15 +140,6 @@ private:
         quint32 position;
     };
     QList<RStreamData> m_streams;
-
-
-    //loadStreamURL in another thread:
-    QFutureWatcher<RThreadFunctionData> *m_createUrlWatcher;
-    RThreadFunctionData loadStreamInThread(RThreadFunctionData &data);
-
-    //generate wave form in another thread:
-    QFutureWatcher<RThreadFunctionData> *m_waveformWatcher;
-    RThreadFunctionData generateWaveformInThread(RThreadFunctionData &data);
 
     //bass callback functions:
     static void CALLBACK freeSyncProc(HSYNC, DWORD handle, DWORD, void *ptr2rack);
