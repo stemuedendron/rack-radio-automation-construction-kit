@@ -88,7 +88,7 @@ waveformThread::waveformThread(RackdClientSocket *client, quint32 handle, QObjec
 
 void waveformThread::run()
 {
-    quint16 width = 500;
+    quint16 width = 5000;
     quint16 height = 60;
     QColor color("#4175FF");
     bool aa = true;

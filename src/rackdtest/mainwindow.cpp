@@ -55,7 +55,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_view = new QGraphicsView(m_scene);
    // m_view->setRenderHints(QPainter::Antialiasing);
     m_view->setAlignment(Qt::AlignLeft);
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -176,6 +177,9 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     m_slider->setSliderPosition(position);
 
     //qDebug() << device << handle << position;
+    qreal pos = position*5000/m_slider->maximum();
+    if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
+
 
 }
 
