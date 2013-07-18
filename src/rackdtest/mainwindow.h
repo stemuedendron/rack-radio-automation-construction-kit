@@ -31,7 +31,8 @@ class QSpinBox;
 class QTextEdit;
 class QSlider;
 class QLabel;
-
+class QGraphicsScene;
+class QGraphicsView;
 
 
 class MainWindow : public QWidget
@@ -69,8 +70,8 @@ private:
     QTextEdit *m_log;
     QSlider *m_slider;
     QLabel *m_time;
-    QLabel *m_wave;
-
+    QGraphicsScene *m_scene;
+    QGraphicsView *m_view;
 
     quint32 m_handle;
 

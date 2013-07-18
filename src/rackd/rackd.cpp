@@ -584,6 +584,8 @@ void Rackd::waveformFinished(RackdClientSocket *client, quint32 handle, QImage w
     responseDS.device()->seek(0);
     responseDS << quint32(response.size() - sizeof(quint32));
     sendResponse(client, response);
+
+    qDebug() << "block size:" << response.size();
 }
 
 

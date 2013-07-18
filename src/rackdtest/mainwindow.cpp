@@ -50,7 +50,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QFont f( "Ubuntu", 28, QFont::Bold);
     m_time->setFont(f);
 
-    m_wave = new QLabel("(wave form)");
+    m_scene = new QGraphicsScene;
+    m_scene->setBackgroundBrush(Qt::black);
+    m_view = new QGraphicsView(m_scene);
+   // m_view->setRenderHints(QPainter::Antialiasing);
+    m_view->setAlignment(Qt::AlignLeft);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
 
 
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
@@ -83,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(m_log);
     l->addWidget(m_slider);
     l->addWidget(m_time);
-    l->addWidget(m_wave);
+    l->addWidget(m_view);
 
     setLayout(l);
 
@@ -174,7 +182,10 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
 void MainWindow::waveFormGenerated(quint32 handle, QImage waveform)
 {
     Q_UNUSED(handle);
-    m_wave->setPixmap(QPixmap::fromImage(waveform));
+    m_scene->clear();
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(waveform));
+    m_scene->addItem(item);
+    m_view->scale(1,1);
 }
 
 
