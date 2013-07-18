@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_rackdClient = new RackdClient(this);
     m_le = new QLineEdit;
+    m_sb = new QSpinBox;
     QPushButton *bConn = new QPushButton("connect");
     QPushButton *bPW = new QPushButton("send password");
     QPushButton *bME = new QPushButton("meter enable");
@@ -70,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QVBoxLayout *l = new QVBoxLayout();
     l->addWidget(m_le);
+    l->addWidget(m_sb);
     l->addWidget(bConn);
     l->addWidget(bPW);
     l->addWidget(bME);
@@ -107,7 +109,7 @@ void MainWindow::meterEnable(bool ok)
 
 void MainWindow::loadStream()
 {
-    m_rackdClient->loadStream(quint8(2), m_le->text());
+    m_rackdClient->loadStream(quint8(m_sb->value()), m_le->text());
 }
 
 void MainWindow::waveForm()

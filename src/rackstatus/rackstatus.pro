@@ -1,5 +1,5 @@
 #
-#    Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
+#    Copyright (C) 2013, Steffen Müller and the r.a.c.k. team.
 #    All rights reserved.
 #
 #    This file is part of r.a.c.k. radio automation construction kit
@@ -20,19 +20,24 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = app \
-              plugins/digitalclock \
-              plugins/hotkeywidget \
-              plugins/librarywidget \
-              plugins/radioclock \
-              plugins/webbrowser \
-              tests/rplayertest \
-              tests/colordialog \
-    rackd \
-    rackdtest \
-    rackstatus
+QT       += core gui network
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = rackstatus
+TEMPLATE = app
 
 
+SOURCES += main.cpp\
+        mainwindow.cpp \
+    ../shared/rackdclient.cpp \
+    ../shared/rackdclientsocket.cpp
 
+HEADERS  += mainwindow.h \
+    ../shared/rackdclient.h \
+    ../shared/rackdclientsocket.h
 
+INCLUDEPATH += ../shared
+
+RESOURCES += \
+    ../resources/rack.qrc
