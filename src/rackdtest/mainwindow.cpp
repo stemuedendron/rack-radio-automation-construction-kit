@@ -196,11 +196,13 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     //qDebug() << device << handle << position;
 
 
-    qreal pos = position * m_view->sceneRect().width() / m_slider->maximum();
+    //qreal pos = position * m_view->sceneRect().width() / m_slider->maximum();
+    //if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
 
+    qreal pos = position * m_view->horizontalScrollBar()->maximum() / m_slider->maximum();
     m_view->horizontalScrollBar()->setValue(pos);
 
-    //if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
+
 
 
 }
