@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     bME->setCheckable(true);
     QPushButton *bLS = new QPushButton("load stream");
     QPushButton *bWF = new QPushButton("wave form");
+
+    QPushButton *bWF1 = new QPushButton("wave form1");
+
+
     QPushButton *bPY = new QPushButton("play");
     QPushButton *bSP = new QPushButton("stop");
     QPushButton *bDC = new QPushButton("drop connection");
@@ -54,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_scene->setBackgroundBrush(Qt::black);
     m_view = new QGraphicsView(m_scene);
    // m_view->setRenderHints(QPainter::Antialiasing);
-    m_view->setAlignment(Qt::AlignLeft);
+   // m_view->setAlignment(Qt::AlignLeft);
 
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -67,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bME, SIGNAL(toggled(bool)), this, SLOT(meterEnable(bool)));
     connect(bLS, SIGNAL(clicked()), this, SLOT(loadStream()));
     connect(bWF, SIGNAL(clicked()), this, SLOT(waveForm()));
+
+    connect(bWF1, SIGNAL(clicked()), this, SLOT(waveForm1()));
+
     connect(bPY, SIGNAL(clicked()), this, SLOT(play()));
     connect(bSP, SIGNAL(clicked()), this, SLOT(stop()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
@@ -76,6 +83,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
     connect(m_rackdClient, SIGNAL(streamLoaded(quint32,quint32)), this, SLOT(streamLoaded(quint32,quint32)));
     connect(m_rackdClient, SIGNAL(waveFormGenerated(quint32,QImage)), this, SLOT(waveFormGenerated(quint32,QImage)));
+
+    connect(m_rackdClient, SIGNAL(waveFormGenerated1(quint32,QList<QImage>)), this, SLOT(waveFormGenerated1(quint32,QList<QImage>)));
+
     connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
 
     QVBoxLayout *l = new QVBoxLayout();
@@ -86,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(bME);
     l->addWidget(bLS);
     l->addWidget(bWF);
+
+    l->addWidget(bWF1);
+
     l->addWidget(bPY);
     l->addWidget(bSP);
     l->addWidget(bDC);
@@ -126,6 +139,11 @@ void MainWindow::waveForm()
     m_rackdClient->waveForm(m_handle);
 }
 
+void MainWindow::waveForm1()
+{
+    m_rackdClient->waveForm1(m_handle);
+}
+
 
 void MainWindow::play()
 {
@@ -161,7 +179,6 @@ void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
     m_slider->setMaximum(time);
-
 }
 
 void MainWindow::position(quint8 device, quint32 handle, quint32 position)
@@ -177,8 +194,13 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     m_slider->setSliderPosition(position);
 
     //qDebug() << device << handle << position;
-    qreal pos = position*5000/m_slider->maximum();
-    if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
+
+
+    qreal pos = position * m_view->sceneRect().width() / m_slider->maximum();
+
+    m_view->horizontalScrollBar()->setValue(pos);
+
+    //if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
 
 
 }
@@ -192,6 +214,38 @@ void MainWindow::waveFormGenerated(quint32 handle, QImage waveform)
     m_view->scale(1,1);
 }
 
+void MainWindow::waveFormGenerated1(quint32 handle, QList<QImage> waveforms)
+{
+    Q_UNUSED(handle);
+    m_scene->clear();
 
+    for (int i = 0; i < waveforms.size(); ++i)
+    {
+        m_scene->addPixmap(QPixmap::fromImage(waveforms.at(i)));
+    }
+
+    QResizeEvent event(size(), size());
+    QApplication::sendEvent(this, &event);
+}
+
+
+void MainWindow::resizeEvent(QResizeEvent *)
+{
+    QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
+    if (items.isEmpty()) return;
+
+    int centerX = m_view->viewport()->rect().center().x();
+    int waveformWidth = 0;
+    int waveformHeight = items.at(0)->boundingRect().height();
+
+    for (int i = 0; i < items.size(); i++)
+    {
+        waveformWidth += items.at(i)->boundingRect().width();
+        items.at(i)->setX(i * items.at(0)->boundingRect().width() + centerX);
+    }
+
+    m_scene->setSceneRect(0, 0, waveformWidth + centerX * 2, waveformHeight);
+
+}
 
 

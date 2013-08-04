@@ -62,6 +62,8 @@ public slots:
     void meterEnable(bool ok);
     void waveForm(quint32 handle);
 
+    void waveForm1(quint32 handle);
+
 
 private slots:
 
@@ -95,6 +97,7 @@ signals:
 
     void waveFormGenerated(quint32 handle, QImage waveform);
 
+    void waveFormGenerated1(quint32 handle, QList<QImage> waveforms);
 
 private:
 

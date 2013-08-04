@@ -43,6 +43,9 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
 
+protected:
+
+    void resizeEvent(QResizeEvent *);
 
 private slots:
 
@@ -51,6 +54,9 @@ private slots:
     void meterEnable(bool ok);
     void loadStream();
     void waveForm();
+
+    void waveForm1();
+
     void play();
     void stop();
     void dropConnection();
@@ -60,6 +66,8 @@ private slots:
     void streamLoaded(quint32 handle, quint32 time);
     void position(quint8 device, quint32 handle, quint32 position);
     void waveFormGenerated(quint32 handle, QImage waveform);
+
+    void waveFormGenerated1(quint32 handle, QList<QImage> waveforms);
 
     
 private:
@@ -74,6 +82,7 @@ private:
     QGraphicsView *m_view;
 
     quint32 m_handle;
+
 
 };
 

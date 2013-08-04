@@ -183,6 +183,16 @@ void RackdClient::waveForm(quint32 handle)
     sendRequest();
 }
 
+void RackdClient::waveForm1(quint32 handle)
+{
+    QDataStream out(&m_request, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_0);
+    out << quint32(0) << QString("WL") << handle;
+    out.device()->seek(0);
+    out << quint32(m_request.size() - sizeof(quint32));
+    sendRequest();
+}
+
 
 
 //TODO: check if we got a complete response (end response marker field)
@@ -327,6 +337,20 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
         qDebug() << "wave form:" << handle << ok;
 
         if (ok) emit waveFormGenerated(handle, waveform);
+        return;
+    }
+
+
+    if (command == "WL")
+    {
+        quint32 handle;
+        QList<QImage> waveforms;
+        bool ok;
+        response >> handle >> waveforms >> ok;
+
+        qDebug() << "wave form1:" << handle << ok;
+
+        if (ok) emit waveFormGenerated1(handle, waveforms);
         return;
     }
 

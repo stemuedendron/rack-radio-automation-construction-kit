@@ -46,6 +46,8 @@
 //TODO: meterupdate timer could remove autofree streams from m_streams instead of use bass syncproc ??????
 
 
+int metatype_id = qRegisterMetaType<RImageList>("RImageList");
+
 
 //StreamLoadURL Thread:
 StreamLoadURLThread::StreamLoadURLThread(RackdClientSocket *client, quint8 device, const QString &uri, QObject *parent)
@@ -64,17 +66,22 @@ void StreamLoadURLThread::run()
     quint32 time = 0;
     if (handle)
     {
+
         qDebug() << "load stream url ok:" << m_uri << handle;
+
         qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
         if (t > 0) time = quint32(t);
     }
     else
     {
+
         qDebug() << "ERROR: load stream url failed:" << m_uri << BASS_ErrorGetCode();
+
         handle = 0;
     }
     emit resultReady(m_client, m_device, m_uri, handle, time, bool(handle));
 }
+
 
 
 //waveform Thread:
@@ -88,7 +95,7 @@ waveformThread::waveformThread(RackdClientSocket *client, quint32 handle, QObjec
 
 void waveformThread::run()
 {
-    quint16 width = 5000;
+    quint16 width = 500;
     quint16 height = 60;
     QColor color("#4175FF");
     bool aa = true;
@@ -133,10 +140,85 @@ void waveformThread::run()
     }
     else
     {
+
         qDebug() << "ERROR: generate waveform failed:" << m_handle << BASS_ErrorGetCode();
+
     }
     emit resultReady(m_client, m_handle, waveform, bool(decoder));
 }
+
+
+
+//waveform Thread 1:
+waveformThread1::waveformThread1(RackdClientSocket *client, quint32 handle, QObject *parent)
+    :QThread(parent),
+      m_client(client),
+      m_handle(handle)
+{
+}
+
+
+void waveformThread1::run()
+{
+    quint16 imageWidth = 2000;
+    quint8 middle = 30;
+    QColor color("#4175FF");
+    bool aa = true;
+    QList<QImage> waveforms;
+    BASS_CHANNELINFO info;
+    DWORD decoder = 0;
+    if (BASS_ChannelGetInfo(m_handle, &info))
+    {
+        BASS_SetDevice(0);
+        decoder = BASS_StreamCreateFile(FALSE, info.filename, 0, 0, BASS_STREAM_DECODE);
+    }
+    if (decoder)
+    {
+
+        qDebug() << "prepare waveform1 decode stream ok:" << m_handle;
+
+        quint32 unit = qRound(float(info.chans * info.freq) / 200);
+        float buf[unit];
+        QList<QPair<float, float> > samples;
+        while (BASS_ChannelIsActive(decoder) == BASS_ACTIVE_PLAYING)
+        {
+            DWORD written = BASS_ChannelGetData(decoder, buf, (unit * sizeof(float)) | BASS_DATA_FLOAT);
+            float min = 0;
+            float max = 0;
+            for (quint16 i = 0; i < written / (info.chans * sizeof(float)); i++)
+            {
+                if (buf[i] < min) min = buf[i];
+                if (buf[i] > max) max = buf[i];
+            }
+            samples.append(qMakePair(min, max));
+        }
+
+        for (int i = 0; i < samples.size(); i += imageWidth)
+        {
+            int realWidth = (imageWidth > samples.size() - i) ? samples.size() - i : imageWidth;
+            QImage waveform = QImage(realWidth, middle * 2, QImage::Format_ARGB32_Premultiplied);;
+            QPainter painter(&waveform);
+            painter.fillRect(waveform.rect(), Qt::black);
+            if (aa) painter.setRenderHint(QPainter::Antialiasing);
+            painter.setPen(color);
+            for (int x = 0; x < realWidth; ++x)
+            {
+                painter.drawLine(x, middle - samples.at(i + x).first * middle, x, middle - samples.at(i + x).second * middle);
+            }
+            waveforms.append(waveform);
+        }
+
+        qDebug() << "generate waveform1 ok:" << m_handle;
+
+        BASS_StreamFree(decoder);
+    }
+    else
+    {
+        qDebug() << "ERROR: generate waveform1 failed:" << m_handle << BASS_ErrorGetCode();
+    }
+    emit resultReady(m_client, m_handle, waveforms, bool(decoder));
+}
+
 
 
 //rackd main class:
@@ -515,6 +597,22 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         return;
     }
 
+    if (command == "WL")
+    {
+        quint32 handle;
+        requestDS >> handle;
+
+        qDebug() << "waveform1:" << client << handle;
+
+        //generate waveform1 in another thread:
+        waveformThread1 *th = new waveformThread1(client, handle, this);
+        connect(th, &waveformThread1::resultReady, this, &Rackd::waveformFinished1);
+        connect(th, &waveformThread1::finished, th, &QObject::deleteLater);
+        th->start();
+        return;
+    }
+
+
     if (command == "ME")
     {
         quint16 port;
@@ -574,13 +672,34 @@ void Rackd::waveformFinished(RackdClientSocket *client, quint32 handle, QImage w
     //check if the client pointer is valid anymore (since we was in another thread the connection may be dropped)
     if (!m_clients.contains(client))
     {
-        qDebug() << "client that requested wave form is disconnected";
+        qDebug() << "client that requested waveform is disconnected";
         return;
     }
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
     responseDS.setVersion(QDataStream::Qt_5_0);
     responseDS << quint32(0) << QString("WF") << handle << waveform << ok;
+    responseDS.device()->seek(0);
+    responseDS << quint32(response.size() - sizeof(quint32));
+    sendResponse(client, response);
+
+    qDebug() << "block size:" << response.size();
+}
+
+
+//slot called when generate waveform1 thread is finnished:
+void Rackd::waveformFinished1(RackdClientSocket *client, quint32 handle, QList<QImage> waveforms, bool ok)
+{
+    //check if the client pointer is valid anymore (since we was in another thread the connection may be dropped)
+    if (!m_clients.contains(client))
+    {
+        qDebug() << "client that requested waveform1 is disconnected";
+        return;
+    }
+    QByteArray response;
+    QDataStream responseDS(&response, QIODevice::WriteOnly);
+    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS << quint32(0) << QString("WL") << handle << waveforms << ok;
     responseDS.device()->seek(0);
     responseDS << quint32(response.size() - sizeof(quint32));
     sendResponse(client, response);

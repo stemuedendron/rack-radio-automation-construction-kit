@@ -86,6 +86,32 @@ private:
 
 
 
+typedef QList<QImage> RImageList;
+
+class waveformThread1 : public QThread
+{
+    Q_OBJECT
+
+public:
+
+    waveformThread1(RackdClientSocket *client, quint32 handle, QObject * parent = 0);
+
+protected:
+
+    void run();
+
+signals:
+
+    void resultReady(RackdClientSocket *client, quint32 handle, RImageList waveforms, bool ok);
+
+private:
+
+    RackdClientSocket *m_client;
+    quint32 m_handle;
+};
+
+
+
 class Rackd : public QTcpServer
 {
     Q_OBJECT
@@ -119,6 +145,8 @@ private slots:
     //slots to connect to thread signals
     void loadStreamFinished(RackdClientSocket *client, quint8 device, const QString &uri, quint32 handle, quint32 time, bool ok);
     void waveformFinished(RackdClientSocket *client, quint32 handle, QImage waveform, bool ok);
+
+    void waveformFinished1(RackdClientSocket *client, quint32 handle, QList<QImage> waveforms, bool ok);
 
 
 private:
