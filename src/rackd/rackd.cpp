@@ -69,7 +69,7 @@ void StreamLoadURLThread::run()
 
         qDebug() << "load stream url ok:" << m_uri << handle;
 
-        qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+        qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE)) * 1000);
         if (t > 0) time = quint32(t);
     }
     else
@@ -454,7 +454,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
             //get the play time:
             quint32 time;
-            qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE))*1000);
+            qint64 t = qint64(BASS_ChannelBytes2Seconds(handle, BASS_ChannelGetLength(handle, BASS_POS_BYTE)) * 1000);
+
             (t > 0) ? time = quint32(t) : time = 0;
 
             responseDS << command << device << uri << quint32(handle) << time << true;
@@ -505,7 +506,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         quint32 handle;
         quint32 position;
         requestDS >> handle >> position;
-        bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position/1000), BASS_POS_BYTE);
+
+        bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position / double(1000)), BASS_POS_BYTE);
         responseDS << command << handle << ok;
 
         qDebug() << "seek:" << handle << position << ok << BASS_ErrorGetCode();
@@ -728,7 +730,7 @@ void Rackd::timerEvent(QTimerEvent *)
         QByteArray datagram;
         QDataStream out(&datagram, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_0);
-        qint64 pos = qint64(BASS_ChannelBytes2Seconds(m_streams.at(i).handle, BASS_ChannelGetPosition(m_streams.at(i).handle, BASS_POS_BYTE))*1000);
+        qint64 pos = qint64(BASS_ChannelBytes2Seconds(m_streams.at(i).handle, BASS_ChannelGetPosition(m_streams.at(i).handle, BASS_POS_BYTE)) * 1000);
         (pos > 0) ? m_streams[i].position = quint32(pos) : m_streams[i].position = 0;
         out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position;
 
