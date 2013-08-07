@@ -33,6 +33,8 @@
 #include "rackdclientsocket.h"
 
 
+//TODO #define macros for often used protocol commands (datastream prepare and finalize)
+
 //TODO: protocol for device information/init
 
 //TODO: use floating point channels (see bass docs)
@@ -508,7 +510,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         requestDS >> handle >> position;
 
         bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position / double(1000)), BASS_POS_BYTE);
-        responseDS << command << handle << ok;
+        responseDS << command << handle << position << ok;
 
         qDebug() << "seek:" << handle << position << ok << BASS_ErrorGetCode();
 
