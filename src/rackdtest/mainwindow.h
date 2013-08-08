@@ -43,6 +43,8 @@ public:
 
     explicit MainWindow(QWidget *parent = 0);
 
+
+
 protected:
 
     void resizeEvent(QResizeEvent *);
@@ -59,9 +61,11 @@ private slots:
 
     void play();
     void stop();
+    void unloadStream();
     void dropConnection();
     void setPosition(int pos);
 
+    //slots for response signals:
     void passWordOK(bool ok);
     void streamLoaded(quint32 handle, quint32 time);
     void position(quint8 device, quint32 handle, quint32 position);
@@ -69,7 +73,8 @@ private slots:
 
     void waveFormGenerated1(quint32 handle, QList<QImage> waveforms);
 
-    
+    void streamUnloaded(quint32 handle);
+
 private:
 
     RackdClient *m_rackdClient;

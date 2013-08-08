@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QPushButton *bPY = new QPushButton("play");
     QPushButton *bSP = new QPushButton("stop");
+    QPushButton *bUS = new QPushButton("unload stream");
     QPushButton *bDC = new QPushButton("drop connection");
     m_log = new QTextEdit;
 
@@ -76,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(bPY, SIGNAL(clicked()), this, SLOT(play()));
     connect(bSP, SIGNAL(clicked()), this, SLOT(stop()));
+    connect(bUS, SIGNAL(clicked()), this, SLOT(unloadStream()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
     connect(m_slider, &QSlider::sliderMoved, this, &MainWindow::setPosition);
@@ -86,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(m_rackdClient, SIGNAL(waveFormGenerated1(quint32,QList<QImage>)), this, SLOT(waveFormGenerated1(quint32,QList<QImage>)));
 
+    connect(m_rackdClient, SIGNAL(streamUnloaded(quint32)), this, SLOT(streamUnloaded(quint32)));
     connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
 
     QVBoxLayout *l = new QVBoxLayout();
@@ -101,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     l->addWidget(bPY);
     l->addWidget(bSP);
+    l->addWidget(bUS);
     l->addWidget(bDC);
     l->addWidget(m_log);
     l->addWidget(m_slider);
@@ -156,6 +160,11 @@ void MainWindow::stop()
     m_rackdClient->stop(m_handle);
 }
 
+void MainWindow::unloadStream()
+{
+    m_rackdClient->unloadStream(m_handle);
+
+}
 
 void MainWindow::dropConnection()
 {
@@ -202,9 +211,6 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     qreal pos = position * m_view->horizontalScrollBar()->maximum() / m_slider->maximum();
     m_view->horizontalScrollBar()->setValue(pos);
 
-
-
-
 }
 
 void MainWindow::waveFormGenerated(quint32 handle, QImage waveform)
@@ -228,6 +234,15 @@ void MainWindow::waveFormGenerated1(quint32 handle, QList<QImage> waveforms)
 
     QResizeEvent event(size(), size());
     QApplication::sendEvent(this, &event);
+}
+
+void MainWindow::streamUnloaded(quint32 handle)
+{
+    Q_UNUSED(handle);
+    m_handle = 0;
+    m_scene->clear();
+    m_time->setText("00:00.0");
+    m_slider->setSliderPosition(0);
 }
 
 

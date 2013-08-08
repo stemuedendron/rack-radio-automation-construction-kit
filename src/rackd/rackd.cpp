@@ -33,8 +33,6 @@
 #include "rackdclientsocket.h"
 
 
-//TODO #define macros for often used protocol commands (datastream prepare and finalize)
-
 //TODO: protocol for device information/init
 
 //TODO: use floating point channels (see bass docs)
