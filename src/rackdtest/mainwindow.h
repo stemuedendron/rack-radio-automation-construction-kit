@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
+    Copyright (C) 2011, Steffen Müller.
     All rights reserved.
 
     This file is part of r.a.c.k. radio automation construction kit
@@ -33,6 +33,7 @@ class QSlider;
 class QLabel;
 class QGraphicsScene;
 class QGraphicsView;
+class QFrame;
 
 
 class MainWindow : public QWidget
@@ -85,6 +86,7 @@ private:
     QLabel *m_time;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
+    QFrame *m_playCursor;
 
     quint32 m_handle;
 

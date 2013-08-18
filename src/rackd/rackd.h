@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
+    Copyright (C) 2011, Steffen Müller.
     All rights reserved.
 
     This file is part of r.a.c.k. radio automation construction kit

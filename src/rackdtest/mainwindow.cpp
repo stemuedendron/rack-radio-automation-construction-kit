@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, Steffen Müller and the r.a.c.k. team.
+    Copyright (C) 2011, Steffen Müller.
     All rights reserved.
 
     This file is part of r.a.c.k. radio automation construction kit
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_slider = new QSlider(Qt::Horizontal);
 
-    m_time = new QLabel("00:00.0");
+    m_time = new QLabel("00:00:00.0");
     QFont f( "Ubuntu", 28, QFont::Bold);
     m_time->setFont(f);
 
@@ -65,7 +65,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
-
+    //test play cursor as QFrame:
+    m_playCursor = new QFrame(m_view);
+    m_playCursor->setFrameShape(QFrame::VLine);
+    m_playCursor->setStyleSheet("color: gray;");
 
     connect(bConn, SIGNAL(clicked()), this, SLOT(connectToServer()));
     connect(bPW, SIGNAL(clicked()), this, SLOT(sendPass()));
@@ -174,7 +177,7 @@ void MainWindow::dropConnection()
 
 void MainWindow::setPosition(int pos)
 {
-    m_rackdClient->positionPlay(m_handle, quint32(pos));
+    m_rackdClient->positionPlay(m_handle, quint32(pos * 10));
 }
 
 
@@ -187,7 +190,7 @@ void MainWindow::passWordOK(bool ok)
 void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
-    m_slider->setMaximum(time);
+    m_slider->setMaximum(time/10);
 }
 
 void MainWindow::position(quint8 device, quint32 handle, quint32 position)
@@ -197,10 +200,13 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
 
     QTime n(0,0,0,0);
     QTime positionTime = n.addMSecs(position);
+    QString posStr = positionTime.toString("HH:mm:ss.zzz");
+    posStr.chop(2);
 
-    m_time->setText(positionTime.toString("mm:ss.z"));
+    m_time->setText(posStr);
 
-    m_slider->setSliderPosition(position);
+
+    m_slider->setSliderPosition(position / 10);
 
     //qDebug() << device << handle << position;
 
@@ -208,7 +214,7 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     //qreal pos = position * m_view->sceneRect().width() / m_slider->maximum();
     //if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
 
-    qreal pos = position * m_view->horizontalScrollBar()->maximum() / m_slider->maximum();
+    qreal pos = (position / 10) * m_view->horizontalScrollBar()->maximum() / m_slider->maximum();
     m_view->horizontalScrollBar()->setValue(pos);
 
 }
@@ -248,6 +254,9 @@ void MainWindow::streamUnloaded(quint32 handle)
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
+
+    m_playCursor->setGeometry(QRect(m_view->viewport()->rect().width() / 2, 1, 1, m_view->viewport()->rect().height()));
+
     QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
     if (items.isEmpty()) return;
 
@@ -262,6 +271,9 @@ void MainWindow::resizeEvent(QResizeEvent *)
     }
 
     m_scene->setSceneRect(0, 0, waveformWidth + centerX * 2, waveformHeight);
+
+
+
 
 }
 
