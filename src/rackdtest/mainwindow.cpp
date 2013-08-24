@@ -27,7 +27,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
-    m_handle(0)
+    m_handle(0),
+    m_time(0)
 {
 
     m_rackdClient = new RackdClient(this);
@@ -49,11 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *bDC = new QPushButton("drop connection");
     m_log = new QTextEdit;
 
-    m_slider = new QSlider(Qt::Horizontal);
 
-    m_time = new QLabel("00:00:00.0");
+    m_labelTime = new QLabel("00:00:00.0");
     QFont f( "Ubuntu", 28, QFont::Bold);
-    m_time->setFont(f);
+    m_labelTime->setFont(f);
 
     m_scene = new QGraphicsScene;
     m_scene->setBackgroundBrush(Qt::black);
@@ -61,8 +61,11 @@ MainWindow::MainWindow(QWidget *parent) :
    // m_view->setRenderHints(QPainter::Antialiasing);
    // m_view->setAlignment(Qt::AlignLeft);
 
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
+    m_view->setDragMode(QGraphicsView::ScrollHandDrag);
 
 
     //test play cursor as QFrame:
@@ -83,7 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bUS, SIGNAL(clicked()), this, SLOT(unloadStream()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
-    connect(m_slider, &QSlider::sliderMoved, this, &MainWindow::setPosition);
+
+    connect(m_view->horizontalScrollBar(), &QAbstractSlider::sliderMoved, this, &MainWindow::setPosition);
+
 
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
     connect(m_rackdClient, SIGNAL(streamLoaded(quint32,quint32)), this, SLOT(streamLoaded(quint32,quint32)));
@@ -110,8 +115,7 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(bUS);
     l->addWidget(bDC);
     l->addWidget(m_log);
-    l->addWidget(m_slider);
-    l->addWidget(m_time);
+    l->addWidget(m_labelTime);
     l->addWidget(m_view);
 
     setLayout(l);
@@ -126,8 +130,7 @@ void MainWindow::connectToServer()
 
 void MainWindow::sendPass()
 {
-    m_rackdClient->passWord(m_le->text());
-    m_le->clear();
+    m_rackdClient->passWord("pass");
 }
 
 
@@ -177,7 +180,8 @@ void MainWindow::dropConnection()
 
 void MainWindow::setPosition(int pos)
 {
-    m_rackdClient->positionPlay(m_handle, quint32(pos * 10));
+    qreal scale = qreal(pos) / m_view->horizontalScrollBar()->maximum();
+    m_rackdClient->positionPlay(m_handle, quint32(m_time * scale));
 }
 
 
@@ -190,7 +194,7 @@ void MainWindow::passWordOK(bool ok)
 void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
-    m_slider->setMaximum(time/10);
+    m_time = time;
 }
 
 void MainWindow::position(quint8 device, quint32 handle, quint32 position)
@@ -203,19 +207,13 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
     QString posStr = positionTime.toString("HH:mm:ss.zzz");
     posStr.chop(2);
 
-    m_time->setText(posStr);
+    m_labelTime->setText(posStr);
 
-
-    m_slider->setSliderPosition(position / 10);
 
     //qDebug() << device << handle << position;
 
-
-    //qreal pos = position * m_view->sceneRect().width() / m_slider->maximum();
-    //if (m_scene->items().count() > 0) m_scene->items().at(0)->setX(-pos);
-
-    qreal pos = (position / 10) * m_view->horizontalScrollBar()->maximum() / m_slider->maximum();
-    m_view->horizontalScrollBar()->setValue(pos);
+    qreal scale = qreal(position) / m_time;
+    m_view->horizontalScrollBar()->setValue(int(m_view->horizontalScrollBar()->maximum() * scale));
 
 }
 
@@ -225,7 +223,7 @@ void MainWindow::waveFormGenerated(quint32 handle, QImage waveform)
     m_scene->clear();
     QGraphicsPixmapItem *item = new QGraphicsPixmapItem(QPixmap::fromImage(waveform));
     m_scene->addItem(item);
-    m_view->scale(1,1);
+    m_view->scale(1,1);   
 }
 
 void MainWindow::waveFormGenerated1(quint32 handle, QList<QImage> waveforms)
@@ -242,19 +240,22 @@ void MainWindow::waveFormGenerated1(quint32 handle, QList<QImage> waveforms)
     QApplication::sendEvent(this, &event);
 }
 
+
 void MainWindow::streamUnloaded(quint32 handle)
 {
     Q_UNUSED(handle);
     m_handle = 0;
     m_scene->clear();
-    m_time->setText("00:00.0");
-    m_slider->setSliderPosition(0);
+
+    //TODO reset views size
+
+    m_labelTime->setText("00:00.0");
+    m_time = 0;
 }
 
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
-
     m_playCursor->setGeometry(QRect(m_view->viewport()->rect().width() / 2, 1, 1, m_view->viewport()->rect().height()));
 
     QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
@@ -271,10 +272,6 @@ void MainWindow::resizeEvent(QResizeEvent *)
     }
 
     m_scene->setSceneRect(0, 0, waveformWidth + centerX * 2, waveformHeight);
-
-
-
-
 }
 
 

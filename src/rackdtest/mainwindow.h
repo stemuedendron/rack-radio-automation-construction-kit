@@ -29,7 +29,7 @@ class RackdClient;
 class QLineEdit;
 class QSpinBox;
 class QTextEdit;
-class QSlider;
+//class QSlider;
 class QLabel;
 class QGraphicsScene;
 class QGraphicsView;
@@ -82,13 +82,14 @@ private:
     QLineEdit *m_le;
     QSpinBox *m_sb;
     QTextEdit *m_log;
-    QSlider *m_slider;
-    QLabel *m_time;
+    //QSlider *m_slider;
+    QLabel *m_labelTime;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
     QFrame *m_playCursor;
 
     quint32 m_handle;
+    quint32 m_time;
 
 
 };
