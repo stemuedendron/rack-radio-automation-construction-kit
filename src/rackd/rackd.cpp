@@ -32,6 +32,22 @@
 #include "rackd.h"
 #include "rackdclientsocket.h"
 
+//TODO: cache system for waveform images (tags, files?) and check if up to date
+
+//QCryptographicHash crypto(QCryptographicHash::Sha1);
+//QFile file(fileName);
+//file.open(QFile::ReadOnly);
+
+//if (crypto.addData(&file))
+//{
+//    QByteArray hash = crypto.result();
+//    qDebug() << "hash:" << hash.toHex();
+//}
+
+
+
+
+
 
 //TODO: protocol for device information/init
 
@@ -164,7 +180,7 @@ void waveformThread1::run()
     quint8 middle = 30;
     QColor color("#4175FF");
     bool aa = true;
-    QList<QImage> waveforms;
+    RImageList waveforms;
     BASS_CHANNELINFO info;
     DWORD decoder = 0;
     if (BASS_ChannelGetInfo(m_handle, &info))
@@ -690,7 +706,7 @@ void Rackd::waveformFinished(RackdClientSocket *client, quint32 handle, QImage w
 
 
 //slot called when generate waveform1 thread is finnished:
-void Rackd::waveformFinished1(RackdClientSocket *client, quint32 handle, QList<QImage> waveforms, bool ok)
+void Rackd::waveformFinished1(RackdClientSocket *client, quint32 handle, RImageList waveforms, bool ok)
 {
     //check if the client pointer is valid anymore (since we was in another thread the connection may be dropped)
     if (!m_clients.contains(client))

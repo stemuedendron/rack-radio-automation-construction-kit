@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
    // m_view->setRenderHints(QPainter::Antialiasing);
    // m_view->setAlignment(Qt::AlignLeft);
 
-    //m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
@@ -246,9 +246,7 @@ void MainWindow::streamUnloaded(quint32 handle)
     Q_UNUSED(handle);
     m_handle = 0;
     m_scene->clear();
-
-    //TODO reset views size
-
+    m_scene->setSceneRect(0,0,0,0);
     m_labelTime->setText("00:00.0");
     m_time = 0;
 }

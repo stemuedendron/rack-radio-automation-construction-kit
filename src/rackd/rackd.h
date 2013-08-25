@@ -146,7 +146,7 @@ private slots:
     void loadStreamFinished(RackdClientSocket *client, quint8 device, const QString &uri, quint32 handle, quint32 time, bool ok);
     void waveformFinished(RackdClientSocket *client, quint32 handle, QImage waveform, bool ok);
 
-    void waveformFinished1(RackdClientSocket *client, quint32 handle, QList<QImage> waveforms, bool ok);
+    void waveformFinished1(RackdClientSocket *client, quint32 handle, RImageList waveforms, bool ok);
 
 
 private:
