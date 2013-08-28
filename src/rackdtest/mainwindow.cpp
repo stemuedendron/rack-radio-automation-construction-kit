@@ -22,6 +22,7 @@
 
 #include "mainwindow.h"
 #include "rackdclient.h"
+
 #include <QtWidgets>
 #include <QHostAddress>
 

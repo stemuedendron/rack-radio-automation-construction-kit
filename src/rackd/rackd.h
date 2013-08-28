@@ -23,13 +23,12 @@
 #ifndef RACKD_H
 #define RACKD_H
 
+#include "bass.h"
+
 #include <QThread>
 #include <QTcpServer>
 #include <QBasicTimer>
 #include <QImage>
-
-
-#include "bass.h"
 
 
 class RackdClientSocket;

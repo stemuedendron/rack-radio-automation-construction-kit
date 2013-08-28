@@ -20,9 +20,9 @@
     Author: Steffen Müller
 */
 
-
-#include <QCoreApplication>
 #include "rackd.h"
+#include <QCoreApplication>
+
 
 int main(int argc, char *argv[])
 {

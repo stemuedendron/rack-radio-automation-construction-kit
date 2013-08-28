@@ -20,6 +20,8 @@
     Author: Steffen Müller
 */
 
+#include "rackd.h"
+#include "rackdclientsocket.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -29,10 +31,17 @@
 
 #include <signal.h>
 
-#include "rackd.h"
-#include "rackdclientsocket.h"
+
+
+
+//TODO check memory usage (waveform images) -> 3 hours 500MB ???
+
+
+//TODO send stop reply when playback ends (look at caed)
 
 //TODO: cache system for waveform images (tags, files?) and check if up to date
+
+//or use QFileInfo::lastModified() ???
 
 //QCryptographicHash crypto(QCryptographicHash::Sha1);
 //QFile file(fileName);
@@ -44,9 +53,15 @@
 //    qDebug() << "hash:" << hash.toHex();
 //}
 
+/*
+maybe this:
+- calc checksum audio file
+- search if we have a image file with checksum as name
+- if not generate waveform and store (set name to checksum)
+- else load image from cache
 
 
-
+*/
 
 
 //TODO: protocol for device information/init
