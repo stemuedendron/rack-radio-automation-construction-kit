@@ -398,12 +398,12 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 {
 
     QDataStream requestDS(request);
-    requestDS.setVersion(QDataStream::Qt_5_0);
+    requestDS.setVersion(QDataStream::Qt_4_9);
 
     //prepare response block:
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS.setVersion(QDataStream::Qt_4_9);
     responseDS << quint32(0);
 
     QString command;
@@ -691,7 +691,7 @@ void Rackd::loadStreamFinished(RackdClientSocket *client, quint8 device, const Q
     m_streams.append(streamData);
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS.setVersion(QDataStream::Qt_4_9);
     responseDS << quint32(0) << QString("LS") << device << uri << handle << time << ok;
     responseDS.device()->seek(0);
     responseDS << quint32(response.size() - sizeof(quint32));
@@ -710,7 +710,7 @@ void Rackd::waveformFinished(RackdClientSocket *client, quint32 handle, QImage w
     }
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS.setVersion(QDataStream::Qt_4_9);
     responseDS << quint32(0) << QString("WF") << handle << waveform << ok;
     responseDS.device()->seek(0);
     responseDS << quint32(response.size() - sizeof(quint32));
@@ -731,7 +731,7 @@ void Rackd::waveformFinished1(RackdClientSocket *client, quint32 handle, RImageL
     }
     QByteArray response;
     QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_5_0);
+    responseDS.setVersion(QDataStream::Qt_4_9);
     responseDS << quint32(0) << QString("WL") << handle << waveforms << ok;
     responseDS.device()->seek(0);
     responseDS << quint32(response.size() - sizeof(quint32));
@@ -760,7 +760,7 @@ void Rackd::timerEvent(QTimerEvent *)
     {
         QByteArray datagram;
         QDataStream out(&datagram, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_0);
+        out.setVersion(QDataStream::Qt_4_9);
         qint64 pos = qint64(BASS_ChannelBytes2Seconds(m_streams.at(i).handle, BASS_ChannelGetPosition(m_streams.at(i).handle, BASS_POS_BYTE)) * 1000);
         (pos > 0) ? m_streams[i].position = quint32(pos) : m_streams[i].position = 0;
         out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position;

@@ -1,5 +1,5 @@
 #
-#    Copyright (C) 2011, Steffen Müller.
+#    Copyright (C) 2013, Steffen Müller.
 #    All rights reserved.
 #
 #    This file is part of r.a.c.k. radio automation construction kit
@@ -20,20 +20,23 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-SUBDIRS     = app \
-              plugins/digitalclock \
-              plugins/hotkeywidget \
-              plugins/librarywidget \
-              plugins/radioclock \
-              plugins/webbrowser \
-              tests/rplayertest \
-              tests/colordialog \
-    rackd \
-    rackdtest \
-    rackstatus \
-    plugins/wikipedia
+include(../../libs/extensionsystem/plugins.pri)
+
+QT      +=  widgets webkitwidgets network
+
+TEMPLATE = lib
+CONFIG += plugin
+
+HEADERS = \
+    ../../shared/rack.h \
+    rwikipedia.h \
+    rwikipediaplugin.h
+
+SOURCES += \
+    rwikipedia.cpp \
+    rwikipediaplugin.cpp
 
 
+TARGET = $$qtLibraryTarget(wikipediaplugin)
 
 

@@ -42,6 +42,7 @@
 //BUG: if we load many plugins each in one pluginhost (splitter) then we have many toolbars
 //that make the window width grown
 
+
 RackWindow::RackWindow() :
     m_coreImpl(new CoreImpl(this)),
     m_mainSplitter(new RSplitter(Qt::Horizontal)),
@@ -60,6 +61,38 @@ RackWindow::RackWindow() :
 
     m_mainSplitter->setObjectName("rackMainSplitter");
     setCentralWidget(m_mainSplitter);
+
+
+
+
+
+    //test webkit crash:
+
+
+//    QPluginLoader pluginLoader("/home/rf/Dokumente/rack-radio-automation-construction-kit/build-release/app/plugins/libwebbrowserplugin.so");
+//    QObject *plugin = pluginLoader.instance();
+
+//    if (plugin)
+//    {
+//        IWidgetPlugin *widgetPlugin = qobject_cast<IWidgetPlugin *>(plugin);
+//        if (widgetPlugin)
+//        {
+//            QWidget *newWidget = widgetPlugin->createRWidget(m_coreImpl, this);
+//            setCentralWidget(newWidget);
+//        }
+//    }
+
+
+
+
+
+
+    //end;
+
+
+
+
+
     createToolBars();
     createPluginHost(0);
 
@@ -365,21 +398,32 @@ void RackWindow::loadPlugin(QWidget *pluginHost)
         pluginsDir.cdUp();
     }
 #endif
-    pluginsDir.cd("plugins");
 
-
+    if (!pluginsDir.cd("plugins"))
+    {
+        QMessageBox::information(this, "Error", "No plugin folder found");
+        return;
+    }
 
 
     QStringList pluginList = pluginsDir.entryList(QDir::Files);
-    bool ok;
-    int newPluginIndex = RSelectPluginDialog::getIndex(this, pluginList, &ok);
-    if (ok) {
+
+
+    RSelectPluginDialog pluginDialog(this);
+    pluginDialog.pluginListWidget->addItems(pluginList);
+    pluginDialog.pluginListWidget->setCurrentRow(0);
+    if (pluginDialog.exec())
+    {
 
 
 
-        QString fileName = pluginsDir.entryList(QDir::Files).at(newPluginIndex);
+//    bool ok;
+//    int newPluginIndex = RSelectPluginDialog::getIndex(this, pluginList, &ok);
+//    if (ok) {
 
+        //QString fileName = pluginsDir.entryList(QDir::Files).at(newPluginIndex);
 
+        QString fileName = pluginsDir.entryList(QDir::Files).at(pluginDialog.pluginListWidget->currentRow());
 
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();

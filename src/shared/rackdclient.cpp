@@ -95,7 +95,7 @@ void RackdClient::sendRequest()
 void RackdClient::passWord(const QString &password)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("PW") << password;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -105,7 +105,7 @@ void RackdClient::passWord(const QString &password)
 void RackdClient::dropConnection()
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("DC");
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -115,7 +115,7 @@ void RackdClient::dropConnection()
 void RackdClient::loadStream(quint8 device, const QString &uri)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("LS") << device << uri;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -125,7 +125,7 @@ void RackdClient::loadStream(quint8 device, const QString &uri)
 void RackdClient::unloadStream(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("US") << handle;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -135,7 +135,7 @@ void RackdClient::unloadStream(quint32 handle)
 void RackdClient::positionPlay(quint32 handle, quint32 pos)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("PP") << handle << pos;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -145,7 +145,7 @@ void RackdClient::positionPlay(quint32 handle, quint32 pos)
 void RackdClient::play(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("PY") << handle;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -155,7 +155,7 @@ void RackdClient::play(quint32 handle)
 void RackdClient::stop(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("SP") << handle;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -167,7 +167,7 @@ void RackdClient::stop(quint32 handle)
 void RackdClient::meterEnable(bool ok)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     ok ? out << quint32(0) << QString("ME") << m_meterSocket->localPort() : out << quint32(0) << QString("ME") << quint16(0);
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -177,7 +177,7 @@ void RackdClient::meterEnable(bool ok)
 void RackdClient::waveForm(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("WF") << handle;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -187,7 +187,7 @@ void RackdClient::waveForm(quint32 handle)
 void RackdClient::waveForm1(quint32 handle)
 {
     QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_0);
+    out.setVersion(QDataStream::Qt_4_9);
     out << quint32(0) << QString("WL") << handle;
     out.device()->seek(0);
     out << quint32(m_request.size() - sizeof(quint32));
@@ -205,7 +205,7 @@ void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &re
 {
     Q_UNUSED(client);
     QDataStream response(responseBlock);
-    response.setVersion(QDataStream::Qt_5_0);
+    response.setVersion(QDataStream::Qt_4_9);
 
     QString command;
     response >> command;
@@ -372,7 +372,7 @@ void RackdClient::handleDatagram()
         m_meterSocket->readDatagram(datagram.data(), datagram.size());
 
         QDataStream response(datagram);
-        response.setVersion(QDataStream::Qt_5_0);
+        response.setVersion(QDataStream::Qt_4_9);
 
         QString command;
         response >> command;

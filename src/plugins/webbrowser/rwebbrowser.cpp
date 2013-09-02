@@ -36,7 +36,9 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
 
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
+
     m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+
     m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
 
     QToolBar *toolBar = new QToolBar;
@@ -53,7 +55,12 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     QObject::connect(m_webView, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
     QObject::connect(m_locationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
 
-    //m_webView->load(QUrl("http://www.radiofrei.de/"));
+
+
+
+    m_webView->load(QUrl("http://www.radiofrei.de/"));
+
+
 
 
     ///test zoom

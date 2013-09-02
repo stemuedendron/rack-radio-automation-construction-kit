@@ -48,7 +48,7 @@ void RackdClientSocket::readyData()
     //qDebug() << "data received from" << peerAddress().toString() << peerPort();
 
     QDataStream in(this);
-    in.setVersion(QDataStream::Qt_5_0);
+    in.setVersion(QDataStream::Qt_4_9);
 
     //read all available blocks:
     forever

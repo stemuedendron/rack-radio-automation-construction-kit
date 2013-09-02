@@ -30,10 +30,12 @@
 //    int newPluginIndex = RSelectPluginDialog::getIndex(this, StringList, &ok);
 //    if (ok) ....
 
-RSelectPluginDialog::RSelectPluginDialog(const QStringList &plugins, QWidget *parent) :
+RSelectPluginDialog::RSelectPluginDialog(QWidget *parent) :
     QDialog(parent),
-    m_pluginList(new QListWidget)
+    pluginListWidget(new QListWidget),
+    m_btOK(new QPushButton)
 {
+
 
     //setObjectName("rackDialog");
 
@@ -50,31 +52,36 @@ RSelectPluginDialog::RSelectPluginDialog(const QStringList &plugins, QWidget *pa
     headerLayout->addWidget(subTitle);
 
     //plugin list:
-    m_pluginList->setObjectName("rackSelectPluginList");
-    m_pluginList->addItems(plugins);
-    m_pluginList->setCurrentRow(0);
+    pluginListWidget->setObjectName("rackSelectPluginList");
+
+    //m_pluginList->addItems(plugins);
+    //m_pluginList->setCurrentRow(0);
 
     //dialog buttons:
-    RPushButton *btOK = new RPushButton;
-    btOK->setObjectName("rackOkButton");
-    btOK->setDefault(true);
+    m_btOK->setObjectName("rackOkButton");
+    m_btOK->setEnabled(false);
+    m_btOK->setDefault(true);
+
     RPushButton *btClose = new RPushButton;
     btClose->setObjectName("rackCloseButton");
+
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addStretch();
-    hl->addWidget(btOK);
+    hl->addWidget(m_btOK);
     hl->addWidget(btClose);
 
 
 
-    //connections
-    QObject::connect(btOK, SIGNAL(clicked()), this, SLOT(setIndex()));
-    QObject::connect(btClose, SIGNAL(clicked()), this, SLOT(close()));
+    //connections:
+    connect(m_btOK, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(btClose, SIGNAL(clicked()), this, SLOT(reject()));
+
+    connect(pluginListWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*,QListWidgetItem*)));
 
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(header);
-    layout->addWidget(m_pluginList);
+    layout->addWidget(pluginListWidget);
     layout->addLayout(hl);
     setLayout(layout);
 
@@ -84,23 +91,32 @@ RSelectPluginDialog::RSelectPluginDialog(const QStringList &plugins, QWidget *pa
 
 }
 
-void RSelectPluginDialog::setIndex()
+void RSelectPluginDialog::currentItemChanged(QListWidgetItem *, QListWidgetItem *)
 {
-    //RPushButton *senderButton = qobject_cast<RPushButton *>(sender());
-    //colorValue = senderButton->getColor();
-
-
-    //change this: disable ok Button if no entrys in the list
-    if (m_pluginList->count() == 0) close();
-    else done(true);
+    m_btOK->setEnabled(true);
 }
 
-int RSelectPluginDialog::getIndex(QWidget *parent, const QStringList &plugins, bool *ok)
-{
-    RSelectPluginDialog dialog(plugins, parent);
 
-    //TODO check crash here!!!!
-    int ret = dialog.exec();
-    if (ok) *ok = !!ret;
-    if (ret) return dialog.m_pluginList->currentRow();
-}
+//void RSelectPluginDialog::setIndex()
+//{
+//    //RPushButton *senderButton = qobject_cast<RPushButton *>(sender());
+//    //colorValue = senderButton->getColor();
+
+
+//    //change this: disable ok Button if no entrys in the list
+//    if (m_pluginList->count() == 0) close();
+//    else done(true);
+//}
+
+//int RSelectPluginDialog::getIndex(QWidget *parent, const QStringList &plugins, bool *ok)
+//{
+
+//    //qDebug() << plugins;
+
+//    RSelectPluginDialog dialog(plugins, parent);
+
+
+//    int ret = dialog.exec();
+//    if (ok) *ok = !!ret;
+//    if (ret) return dialog.m_pluginList->currentRow();
+//}
