@@ -37,7 +37,7 @@
 
 //disable next and preview buttons while play
 
-//how to save? after create page or befor remove?
+//how to save? after create page or before remove?
 
 //switch to hotkey page at defined clock (7.00 kaffeesatz) (abfrage + rotes blinken?)
 

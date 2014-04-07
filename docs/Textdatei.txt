@@ -1,4 +1,4 @@
-disable next, prvious and index button during playback
+disable next, previous and index button during playback
 
 
 splitter handle über qss stylen (rot)

@@ -39,9 +39,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
     m_device = devices[0].engineIndex;
 
-    if (!RPlayer::init(m_device)) qWarning("Can't initialize device %d", m_device);
+    //if (!RPlayer::init(m_device)) qWarning("Can't initialize device %d", m_device);
 
-    //if (!RPlayer::init(3)) qWarning("Can't initialize device %d", 3);
+    if (!RPlayer::init(4)) qWarning("Can't initialize device %d", 3);
 
     devices = RPlayer::getDevices();
     foreach (const audiodevice &dev, devices)

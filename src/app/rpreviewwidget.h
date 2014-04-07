@@ -46,10 +46,12 @@ protected:
     void paintEvent(QPaintEvent *);
     bool eventFilter(QObject *obj, QEvent *event);
 
+
 private:
 
     QPropertyAnimation *m_ani;
     bool m_in;
+
 
 };
 

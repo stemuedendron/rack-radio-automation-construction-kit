@@ -97,6 +97,7 @@ RPreviewWidget::RPreviewWidget(QWidget *parent) :
 
 }
 
+
 void RPreviewWidget::fade(bool in)
 {
     raise();
@@ -107,6 +108,7 @@ void RPreviewWidget::fade(bool in)
     m_in = in;
 }
 
+
 void RPreviewWidget::paintEvent(QPaintEvent *)
 {
     QStyleOption opt;
@@ -114,6 +116,7 @@ void RPreviewWidget::paintEvent(QPaintEvent *)
     QPainter p(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
+
 
 bool RPreviewWidget::eventFilter(QObject *obj, QEvent *event)
 {

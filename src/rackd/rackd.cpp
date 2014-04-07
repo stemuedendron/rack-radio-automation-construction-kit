@@ -292,11 +292,14 @@ Rackd::Rackd(QObject *parent)
         qDebug() << "waiting for incoming connections..." << serverAddress().toString() << serverPort();
     }
 
+    //global bass options:
+    BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1); // Process URLs in PLS and M3U playlists within BASS_StreamCreateURL
+
     //audio devices:
     BASS_DEVICEINFO info;
     for (int i = 0; BASS_GetDeviceInfo(i, &info); i++) if (info.flags&BASS_DEVICE_ENABLED)
     {
-        if (QString::compare(info.name,"Default") == 0) continue;
+        //if (QString::compare(info.name,"Default") == 0) continue;
 
         qDebug() << i << "audio device name:" << info.name << info.driver;
 
@@ -573,7 +576,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
     {
         quint32 handle;
         requestDS >> handle;
-        bool ok = BASS_ChannelPause(handle);
+        //bool ok = BASS_ChannelPause(handle);
+        bool ok = BASS_ChannelStop(handle);
         responseDS << command << handle << ok;
 
         qDebug() << "stop:" << handle << ok << BASS_ErrorGetCode();

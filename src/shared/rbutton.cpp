@@ -56,6 +56,7 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
 
     if (!RPlayer::init(m_device)) qWarning("Can't initialize device %d", m_device);
 
+
     devices = RPlayer::getDevices();
     foreach (const audiodevice &dev, devices)
         if (dev.isInitialized)
