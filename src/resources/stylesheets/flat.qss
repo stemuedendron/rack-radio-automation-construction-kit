@@ -1,0 +1,1010 @@
+/*
+    Copyright (C) 2011, Steffen Müller.
+    All rights reserved.
+
+    This file is part of r.a.c.k. radio automation construction kit
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    Author: Steffen Müller
+*/
+
+/* R.A.C.K. default style sheet */
+
+
+/* todo: use variables and implement own stylesheet loader to parse the sheet
+
+rack colors gradients 1-9 via colordialog buttons properties
+
+
+*/
+
+/* Icons for plugin widgets follow the rule: classname + ToolButton */
+
+/* this is a fallback if no image is provided and MUST be before real images: */
+#rackPluginHostToolBar > QToolButton {
+    image: url(:/images/default-plugin.png);
+}
+#rackPluginHostToolBar > QToolButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+#rackPluginToolBar > QToolButton {
+    image: url(:/images/default-plugin.png);
+}
+#rackPluginToolBar > QTollButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+
+/* now the real ones: */
+QToolButton#RRadioClockToolButton {
+    image: url(:/images/radioclock.png);
+}
+QToolButton#RRadioClockToolButton:hover {
+    image: url(:/images/radioclock-hover.png);
+}
+
+QToolButton#RDigitalClockToolButton {
+    image: url(:/images/digitalclock.png);
+}
+QToolButton#RDigitalClockToolButton:hover {
+    image: url(:/images/digitalclock-hover.png);
+}
+
+QToolButton#RHotKeyWidgetToolButton {
+    image: url(:/images/hotkeys.png);
+}
+QToolButton#RHotKeyWidgetToolButton:hover {
+    image: url(:/images/hotkeys-hover.png);
+}
+
+
+/* Preview Widget */
+
+#rackPreviewWidget,
+#rackPreviewWidgetBox,
+#rackPreviewWidgetTimeBox {
+    background-color: black
+}
+
+#rackPreviewWidget {
+    min-width: 520px;
+    min-height: 175px;
+    border: 4px solid red;
+}
+
+#rackPreviewWidgetBox,
+#rackPreviewWidgetTimeBox {
+    border: 2px solid #202020;
+}
+
+#rackPreviewWidgetLabel,
+#rackPreviewWidgetTimeLabel,
+#rackPreviewWidgetMSLabel,
+#rackPreviewWidgetStatusLabel,
+#rackPreviewWidgetJumpLabel,
+#rackPreviewWidgetSliderLabels {
+    color: #FFFFFF;
+}
+
+#rackPreviewWidgetLabel {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#rackPreviewWidgetTimeLabel {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+#rackPreviewWidgetMSLabel,
+#rackPreviewWidgetStatusLabel {
+    font-size: 11px;
+    font-weight: bold;
+    color: #A0A0A0;
+}
+
+#rackPreviewWidgetJumpLabel,
+#rackPreviewWidgetSliderLabels {
+    font-size: 16px;
+}
+
+#rackPreviewWidgetPlay,
+#rackPreviewWidgetStop {
+    min-width: 45px;
+    min-height: 45px;
+    icon-size: 35px;
+}
+
+#rackPreviewWidgetPlay:pressed,
+#rackPreviewWidgetStop:pressed {
+    border-color:#FFFFFF;
+}
+
+#rackPreviewWidgetPlay {
+    background-color: #007000;
+    border-color: #007000;
+    qproperty-icon: url(:/images/play.png);
+}
+
+#rackPreviewWidgetPlay:hover {
+    background-color: #0D8313;
+    border-color: #0D8313;
+}
+
+#rackPreviewWidgetStop {
+    background-color: #C00000;
+    border-color: #C00000;
+    qproperty-icon: url(:/images/stop.png)
+}
+
+#rackPreviewWidgetStop:hover {
+    background-color: #CD1313;
+    border-color: #CD1313;
+}
+
+#rackPreviewWidgetSlider {
+    height: 33px;
+}
+
+#rackPreviewWidgetSlider::groove:horizontal {
+    height: 14px;
+    background: #008000;
+    margin-left: 9px;
+    margin-right: 9px;
+}
+
+#rackPreviewWidgetSlider::handle:horizontal {
+    image: url(:/images/previewslider.png);
+    margin: -9px;
+}
+
+#rackPreviewWidgetJumpButton {
+    min-height: 35px;
+    max-height: 35px;
+}
+
+
+#rackMainSplitter {
+    margin: 2px;
+}
+
+#rackAddPluginWidgetButton {
+    color: #000000;
+    font-size: 12px;
+    padding: 8px;
+}
+
+
+/*todo: communicate over radius property to set the widget mask to round rect with style sheet radius*/
+RColorDialog {
+    background-color: lightgray;
+    border: 4px solid red;
+}
+
+
+RDigitalClock,
+RRadioClock {
+    background-color: #606060;
+    color: #FFFFFF;
+    font-family: "Digital-7";
+    font-size: 16px;
+}
+
+
+#rackPluginHostToolBar {
+    border: none;
+    /*this is the size for the qt bugfix dummy button and controls in this way the text position*/
+    icon-size: 24px;
+}
+
+#rackPluginHostToolBar > QToolButton {
+    height: 24px;
+    width: 200px;
+    image-position: left;
+    padding: 2px;
+    margin:1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #F3F3F3;
+    background-color: #F3F3F3;
+    color: #000000;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#rackPluginHostToolBar > QToolButton:checked {
+    border-color: red;
+}
+
+#rackPluginHostToolBarSettingsButton,
+#rackPluginHostToolBarDeleteButton {
+    height: 27px;
+    width: 27px;
+    border: none;
+    margin-right: 3px;
+}
+
+#rackPluginHostToolBarSettingsButton:pressed {
+    border: 1px solid red;
+}
+
+#rackPluginHostToolBarDeleteButton:pressed {
+    border: 1px solid white;
+}
+
+#rackPluginHostToolBarSettingsButton {
+    image: url(:/images/default-plugin.png);
+}
+
+#rackPluginHostToolBarSettingsButton:hover {
+    image: url(:/images/default-plugin-hover.png);
+}
+
+#rackPluginHostToolBarDeleteButton {
+    image: url(:/images/menu-delete.png);
+}
+
+#rackPluginHostToolBarDeleteButton:hover {
+    image: url(:/images/menu-delete-hover.png);
+}
+
+
+/*
+
+QToolButton::menu-indicator siehe toolbutton styling
+
+QToolButton#qt_toolbar_ext_button
+{
+    color: #FFFFFF;
+    background-color: #FFFFFF;
+    border: 1px solid red;
+    width: 20px;
+}
+*/
+
+/*ToolBars*/
+#rackMainToolBar,
+#rackSettingsToolBar,
+#rackPluginToolBar {
+    border: none;
+    border-top: 1px solid #1541AC;
+}
+
+#rackPluginToolBar {
+    border-right: 3px solid black;
+}
+
+/*Main ToolBar*/
+#rackMainToolBar {
+    background-color: #828282;
+}
+
+/*Settings ToolBar*/
+#rackSettingsToolBar,
+#rackPluginToolBar,
+#rackWidgetFooter {
+    background-color: #202020;
+}
+
+#rackSettingsToolBar > RPushButton,
+#rackMainToolBar > RPushButton,
+#rackPluginToolBar > QToolButton {
+    height: 70px;
+    width: 70px;
+    background:none;
+    border:none;
+    text-align: bottom;
+    image-position: top;
+    color: #EEEEEE;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px;
+    margin: 2px;
+}
+
+
+/*this is the size for the qt bugfix dummy button and controls in this way the text position*/
+#rackPluginToolBar {
+    icon-size: 52px;
+}
+
+#rackPluginToolBar > QToolButton:checked {
+    background-color: #326CB5;
+}
+
+
+#rackSettingsButton {
+    image: url(:/images/menu-main.png);
+}
+
+#rackSettingsButton:hover {
+    image: url(:/images/menu-main-hover.png);
+}
+
+#rackSettingsButton:open {
+    background-color: #BBBBBB;
+    color: #000000;
+}
+
+#rackSettingsButton::menu-indicator {
+    image: none;
+    width: 0px;
+    height: 0px;
+}
+
+#rackDeleteButton {
+    image: url(:/images/menu-delete.png);
+}
+
+#rackDeleteButton:hover {
+    image: url(:/images/menu-delete-hover.png);
+}
+
+#rackPreviewButton {
+    image: url(:/images/menu-preview.png);
+}
+
+#rackPreviewButton:hover {
+    image: url(:/images/menu-preview-hover.png);
+}
+
+[blinking="true"]#rackDeleteButton,
+[blinking="true"]#rackPreviewButton {
+    background-color: #BBBBBB;
+    color: #000000;
+    qproperty-interval: 500;
+}
+
+#rackSettingsOKButton {
+    image: url(:/images/menu-ok.png);
+}
+
+#rackSettingsOKButton:hover {
+    image: url(:/images/menu-ok-hover.png);
+}
+
+#rackSettingsCancelButton {
+    image: url(:/images/menu-cancel.png);
+}
+
+#rackSettingsCancelButton:hover {
+    image: url(:/images/menu-cancel-hover.png);
+}
+
+
+/*Main Menu*/
+#rackMainMenu {
+    background-color: #5F5F5F;
+    font-size: 16px;
+    font-weight: bold;
+    margin:0px;
+}
+
+#rackMainMenu::item {
+    background-color: #202020;
+    color: #FFFFFF;
+    margin: 0px 10px 10px 10px;
+    padding: 10px 20px 10px 20px ;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #202020;
+}
+
+#rackMainMenu::item:selected {
+    border-color: #FFFFFF;
+}
+
+#rackMainMenu::item:default {
+    color: yellow;
+    margin: 0px 0px 10px 0px;
+    padding: 3px;
+    font-size: 14px;
+    border-width: 1px;
+    border-color: #202020;
+    border-radius: 0px;
+}
+
+
+/*40 x 40 Buttons*/
+#rackSettingsCloseButton,
+#rackSettingsLeftArrowButton,
+#rackSettingsRightArrowButton,
+#rackSettingsTopArrowButton,
+#rackSettingsBottomArrowButton {
+    min-width: 40px;
+    max-width: 40px;
+    min-height: 40px;
+    max-height: 40px;
+}
+
+
+
+/*all settings buttons*/
+#rackSettingsCloseButton,
+#rackSettingsLeftArrowButton,
+#rackSettingsRightArrowButton,
+#rackSettingsTopArrowButton,
+#rackSettingsBottomArrowButton {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #737373;
+    background: transparent;
+}
+#rackSettingsCloseButton:hover,
+#rackSettingsLeftArrowButton:hover,
+#rackSettingsRightArrowButton:hover,
+#rackSettingsTopArrowButton:hover,
+#rackSettingsBottomArrowButton:hover {
+
+    border-color: #FFFFFF
+}
+#rackSettingsCloseButton:pressed,
+#rackSettingsLeftArrowButton:pressed,
+#rackSettingsRightArrowButton:pressed,
+#rackSettingsTopArrowButton:pressed,
+#rackSettingsBottomArrowButton:pressed {
+    border-color: red
+}
+
+
+
+/*left buttons*/
+#rackLeftArrowButton,
+#rackSettingsLeftArrowButton {
+    image: url(:/images/left.png);
+}
+#rackLeftArrowButton:disabled,
+#rackSettingsLeftArrowButton:disabled {
+    image: url(:/images/left-disabled.png);
+}
+
+
+
+/*right buttons*/
+#rackRightArrowButton,
+#rackSettingsRightArrowButton {
+    image: url(:/images/right.png);
+}
+#rackRightArrowButton:disabled,
+#rackRightArrowButton:disabled {
+    image: url(:/images/right-disabled.png);
+}
+
+
+
+/*top buttons*/
+#rackTopArrowButton,
+#rackSettingsTopArrowButton {
+    image: url(:/images/top.png);
+}
+#rackTopArrowButton:disabled,
+#rackSettingsTopArrowButton:disabled {
+    image: url(:/images/top-disabled.png);
+}
+
+
+
+/*bottom buttons*/
+#rackBottomArrowButton,
+#rackSettingsBottomArrowButton {
+    image: url(:/images/bottom.png);
+}
+#rackBottomArrowButton:disabled,
+#rackBottomArrowButton:disabled {
+    image: url(:/images/bottom-disabled.png);
+}
+
+
+
+/*close buttons*/
+#rackCloseButton,
+#rackSettingsCloseButton {
+    image: url(:/images/close.png);
+}
+#rackCloseButton:disabled,
+#rackSettingsCloseButton:disabled {
+    image: url(:/images/close-disabled.png);
+}
+
+
+
+/*ok buttons*/
+#rackOkButton {
+    image: url(:/images/ok.png);
+}
+
+
+#rackPluginStack,
+RackWindow {
+    background-color: #000000;
+}
+
+#rackPluginStack {
+    border: 1px solid #3E3E3E;
+}
+
+#rackDialog {
+    border: 4px solid #FF0000;
+    background-color: #CBCDCE;
+    min-height: 400px;
+/*    max-height: 400px; */
+    min-width: 300px;
+/*    max-width: 300px; */
+}
+
+
+
+#rackDialog QLabel {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackDialog QLabel:disabled {
+    color: rgba(255,255,255,30%);
+}
+
+#rackTabWidget:pane {
+    background-color: #5F5F5F;
+}
+
+QLabel#rackErrorLabel {
+    color: #FF0000;
+}
+
+/*why this not work???*/
+* {
+    trash-icon: url(:/images/pfl-small.png)
+}
+
+QScrollBar:vertical {
+    border: none;
+    background-color: #717171;
+    width: 46px;
+    margin: 48px 0 48px 0;
+}
+
+QScrollBar::handle:vertical {
+    border: 2px solid #717171;
+    background-color: #505050;
+    min-height: 44px;
+}
+
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    border: 2px solid #505050;
+    background-color: #505050;
+    height: 44px;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+    background-color: #636363;
+}
+
+QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+    border-color: #FFFFFF;
+}
+
+QScrollBar::add-line:vertical {
+    subcontrol-position: bottom;
+}
+
+QScrollBar::sub-line:vertical {
+    subcontrol-position: top;
+}
+
+QScrollBar::up-arrow, QScrollBar::down-arrow {
+    border: none;
+}
+
+QScrollBar::up-arrow:vertical {
+    image: url(:/images/top.png);
+}
+
+QScrollBar::down-arrow:vertical {
+    image: url(:/images/bottom.png);
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+
+
+/*ACHTUNG: gilt auch für hotkey-buttons usw.*/
+QPushButton {
+    border-width: 2px;
+    border-style: solid;
+    background-color: #2D58CB;
+    border-color: #2D58CB;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QPushButton:disabled {
+    color: rgba(255,255,255,30%);
+}
+
+QPushButton:hover {
+    background-color: #3266F1;
+     border-color: #3266F1;
+}
+
+
+QPushButton:pressed {
+    border-color: #FFFFFF;
+}
+
+#rackOkButton {
+    min-width: 60px;
+    max-width: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    background-color: #007000;
+    border-color: #007000;
+}
+
+#rackOkButton:hover {
+    background-color: #0D8313;
+    border-color: #0D8313;
+}
+
+#rackOkButton:pressed {
+    border-color: #FFFFFF;
+}
+
+
+
+#rackCloseButton {
+    min-width: 60px;
+    max-width: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    background-color: #C00000;
+    border-color: #C00000;
+}
+
+#rackCloseButton:hover {
+    background-color: #CD1313;
+    border-color: #CD1313;
+}
+
+#rackCloseButton:pressed {
+    border-color: #FFFFFF;
+}
+
+
+#rackButton {
+    min-width: 96px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+[blinking="true"]#rackButton {
+    background-color: #C00000;
+    border-color: #AAAAAA;
+}
+
+#rackLeftArrowButton,
+#rackRightArrowButton,
+#rackTopArrowButton {
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+#rackFooterButton {
+    min-width: 96px;
+    min-height: 32px;
+    max-height: 32px;
+}
+
+
+
+/*all widgets title headers*/
+
+#rackWidgetHeader {
+    background-color: #383838;
+    min-height: 60px;
+    max-height: 60px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #383838;
+}
+
+#rackWidgetHeaderTitle {
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#rackWidgetHeaderSubTitle {
+    color: #F8FE1E;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/*all widgets title footers*/
+
+#rackWidgetFooter {
+    min-height: 60px;
+    max-height: 60px;
+}
+
+/*Hotkeys Widget*/
+
+#rackHotkeyIndexButton {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000000;
+    background-color:#F3F3F3;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+
+
+#rackHotkeyIndexButton:pressed, #rackHotkeyIndexButton:checked {
+
+    background-color: #2D58CB;
+}
+
+#rackHotkeyIndexButtonTitleLabel {
+    color: #000000;
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 30px;
+}
+
+#rackHotkeyIndexButtonKeysLabel {
+    color: #B3B3B3;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackHotkeyIndexPage {
+    background-color: #000000;
+    border: none;
+}
+
+#rackHotkeyEditMode {
+    color: rgba(255,255,255,50%);
+    font-size: 12px;
+    background-color: rgba(0,0,255,30%);
+}
+
+/* CoreStates:
+0 NormalState,
+1 InsertState,
+2 PreviewState,
+3 DeleteState
+*/
+
+[state="1"]#rackHotkeyButton {
+    background-color: blue;
+}
+
+[state="2"]#rackHotkeyButton {
+    background-image: url(:/images/pfl-small.png);
+    background-repeat: none;
+    background-origin: content;
+    background-position: top right;
+}
+
+[state="3"]#rackHotkeyButton {
+    color: red;
+}
+
+
+
+/*
+[playingOrPaused="true"]#rackHotkeyButton {
+    border-color: #FFFFFF;
+}
+
+[fadingOut="true"]#rackHotkeyButton {
+    border-color: red;
+    qproperty-positionClockColor: rgba(255,0,0,100);
+}
+
+*/
+
+
+/*Library Widget*/
+
+[state="1"]#rackLibraryViewButton {
+    background-color: blue;
+}
+
+[state="2"]#rackLibraryViewButton {
+    background-image: url(:/images/pfl-small.png);
+    background-repeat: none;
+    background-origin: content;
+    background-position: top right;
+}
+
+[state="3"]#rackLibraryViewButton {
+    color: red;
+}
+
+[isFolder="true"]#rackLibraryViewButton {
+    background-image: url(:/images/folder.png);
+    background-repeat: none;
+    background-position: center left;
+    padding-left: 52px;
+}
+
+[isFolder="true"]#rackLibraryViewButton:pressed {
+    border: 2px solid #FFFFFF;
+}
+
+#rackLibraryViewButton:disabled {
+    background-color: none;
+}
+
+#rackLibraryViewButton {
+    background-color: #8F8F8F;
+    border: none;
+    width: 200;
+    height: 200;
+    max-width: 160px;
+    max-height: 160px;
+    min-height: 60px;
+    min-width: 60px;
+    color: #FFFFFF;
+    padding: 5px;
+}
+
+#rackLibraryViewButtonTitle {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackLibraryViewButtonLabel {
+    color: #DDDDDD;
+    font-size: 14px;
+}
+
+#rackLibraryViewButtonId {
+    color: #DDDDDD;
+    font-size: 10px;
+}
+
+/*End Library Widget*/
+
+
+RButton {
+    border-width: 2px;
+    border-style: solid;
+    qproperty-borderRadius: 0;
+    background-color: #606060;
+    border-color: #606060;
+
+    qproperty-positionClockColor: rgba(255,255,255,100);
+
+   /* background-image: url(:/images/pfl-small.png);*/
+    background-repeat: no-repeat;
+
+
+    background-origin: content;
+    padding: 4px
+}
+
+
+
+RButton:hover {
+    background-color: #737373;
+    border-color: #737373
+}
+
+/*
+RButton:pressed {
+    border-color: #FFFFFF;
+}
+*/
+
+
+/* Gradient Button */
+
+RButton[bk="0"] {
+    min-width: 40px;
+    min-height: 40px
+}
+
+
+/* On Air Button */
+
+RButton[bk="1"] {
+    min-width: 92px;
+    min-height: 92px;
+    background-color: #009900;
+    border-color: #009900
+}
+
+RButton[bk="1"][position="0"] {
+    image: url(:/images/play.png)
+}
+
+RButton[bk="1"]:hover {
+    background-color: #00B800;
+    border-color: #00B800
+}
+
+RButton[bk="1"]:pressed {
+    border-color: white
+}
+
+
+/* Stack Button */
+
+RButton[bk="2"] {
+    min-width: 250px;
+    min-height: 100px
+}
+
+
+/* HotKey Button */
+
+RButton[bk="3"] {
+    min-width: 80px;
+    min-height: 60px;
+    background-color: #4175FF;
+    border-color: #4175FF
+}
+
+
+
+
+
+/* Library Button */
+
+RButton[bk="4"] {
+    min-width: 200px;
+    min-height: 100px;
+    background-color: #787878;
+    border-color: #787878
+}
+
+
+
+RButton[bk="4"]:pressed {
+    border-color: white
+}
+
+/*player states:
+0   LoadingState,
+1   PlayingState,
+2   PausedState,
+3   FadingState,
+4   StoppedState,
+5   ErrorState,
+6   DisabledState
+
+*/
+RButton:pressed {
+}
+
+RButton[playerState="1"] {
+    border-color: #FFFFFF;
+}
+
+RButton[playerState="3"] {
+    border-color: red;
+    qproperty-positionClockColor: rgba(255,0,0,100);
+}
