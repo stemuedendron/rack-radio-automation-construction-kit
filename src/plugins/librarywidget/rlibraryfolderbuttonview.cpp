@@ -164,7 +164,7 @@ void RLibraryFolderButtonView::updateButtonCount()
 RLibraryButton *RLibraryFolderButtonView::createOneButton()
 {
     RLibraryButton *b = new RLibraryButton;
-    b->setObjectName("rackLibraryViewButton");
+
     b->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     //we silently ignore user set style sheet geometry values by overriding them :
@@ -199,7 +199,21 @@ void RLibraryFolderButtonView::setButtonData()
 
         if (m_model->hasIndex(i + indexOffset, 0, m_root))
         {
-            button->setText(m_model->data(m_model->index(i + indexOffset, 0, m_root)).toString());
+
+
+
+
+            button->setId(m_model->data(m_model->index(i + indexOffset, 0, m_root)).toString());
+            button->setArtist(m_model->data(m_model->index(i + indexOffset, 1, m_root)).toString());
+            button->setTitle(m_model->data(m_model->index(i + indexOffset, 2, m_root)).toString());
+
+
+            //button->setTime(m_model->data(m_model->index(i + indexOffset, x, m_root)).toString());
+            button->setTime("03:34");
+
+
+
+
             button->setEnabled(true);
             if (m_model->hasChildren(m_model->index(i + indexOffset, 0, m_root)))
             {
@@ -214,7 +228,14 @@ void RLibraryFolderButtonView::setButtonData()
         }
         else
         {
-            button->setText("");
+
+
+            //button->setText("");
+            button->setTitle("");
+            button->setArtist("");
+            button->setTime("");
+            button->setId("");
+
             button->setEnabled(false);
         }
 

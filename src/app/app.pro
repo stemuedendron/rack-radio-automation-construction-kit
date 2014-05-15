@@ -35,7 +35,8 @@ SOURCES += \
     rsortfilterproxymodel.cpp \
     rpreviewwidget.cpp \
     ../shared/rackdclient.cpp \
-    ../shared/rackdclientsocket.cpp
+    ../shared/rackdclientsocket.cpp \
+    rcouchdbmodel.cpp
 
 HEADERS += \
     coreimpl.h \
@@ -50,7 +51,8 @@ HEADERS += \
     rpreviewwidget.h \
     ../shared/rack.h \
     ../shared/rackdclient.h \
-    ../shared/rackdclientsocket.h
+    ../shared/rackdclientsocket.h \
+    rcouchdbmodel.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -60,7 +62,8 @@ RESOURCES += \
     ../resources/rack.qrc
 
 OTHER_FILES += \
-    ../resources/stylesheets/default.qss
+    ../resources/stylesheets/default.qss \
+    ../resources/stylesheets/flat.qss
 
 
 

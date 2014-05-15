@@ -3,8 +3,6 @@
         <file>audio/main.ogg</file>
         <file>audio/mini.ogg</file>
         <file>stylesheets/default.qss</file>
-        <file>stylesheets/default-old.qss</file>
-        <file>stylesheets/matrix.qss</file>
         <file>fonts/DroidSans.ttf</file>
         <file>fonts/digital-7.ttf</file>
         <file>images/top.png</file>
@@ -47,5 +45,6 @@
         <file>images/folder.png</file>
         <file>images/stop.png</file>
         <file>images/previewslider.png</file>
+        <file>stylesheets/flat.qss</file>
     </qresource>
 </RCC>

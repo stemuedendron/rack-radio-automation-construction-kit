@@ -29,7 +29,6 @@
 class ICore;
 class QAbstractItemModel;
 class QModelIndex;
-class RPushButton;
 class RLibraryButton;
 
 class RLibraryFolderButtonView : public QWidget

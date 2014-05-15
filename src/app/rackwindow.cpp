@@ -54,10 +54,8 @@ RackWindow::RackWindow() :
     setWindowTitle(tr("R.A.C.K."));
     setContextMenuPolicy(Qt::NoContextMenu);
 
-    QFile file(":/stylesheets/default.qss");
-    file.open(QFile::ReadOnly);
-    QString styleSheet = QLatin1String(file.readAll());
-    setStyleSheet(styleSheet);
+    m_styleSheetName = ":/stylesheets/default.qss";
+    loadStyleSheet();
 
     m_mainSplitter->setObjectName("rackMainSplitter");
     setCentralWidget(m_mainSplitter);
@@ -174,8 +172,17 @@ void RackWindow::createToolBars()
     ////////////////////////////
 
 
+    /////////////////////////style sheet load
+    QAction *styleAct = new QAction(tr("Load Style Sheet"), this);
+    mainMenu->addAction(styleAct);
+    QObject::connect(styleAct, SIGNAL(triggered()), this, SLOT(openStyleSheet()));
+    ////////////////////////////
 
-
+    /////////////////////////style sheet reload
+    QAction *restyleAct = new QAction(tr("Reload Style Sheet"), this);
+    mainMenu->addAction(restyleAct);
+    QObject::connect(restyleAct, SIGNAL(triggered()), this, SLOT(loadStyleSheet()));
+    ////////////////////////////
 
 
     //settings toolbar buttons:
@@ -851,6 +858,30 @@ void RackWindow::toggleFullscreen()
 {
     setWindowState(windowState() ^ Qt::WindowFullScreen);
 }
+
+
+
+void RackWindow::loadStyleSheet()
+{
+    QFile file(m_styleSheetName);
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(file.readAll());
+    setStyleSheet(styleSheet);
+    //qApp->setStyleSheet(styleSheet);
+    file.close();
+}
+
+void RackWindow::openStyleSheet()
+{
+    QString fileName(QFileDialog::getOpenFileName(this, tr("Open Style Sheet"), QDir::homePath(), tr("Qt Style Sheet Files (*.qss)")));
+    if (!fileName.isEmpty())
+    {
+        m_styleSheetName = fileName;
+        loadStyleSheet();
+    }
+}
+
+
 
 
 ////test show/hide plugin widget

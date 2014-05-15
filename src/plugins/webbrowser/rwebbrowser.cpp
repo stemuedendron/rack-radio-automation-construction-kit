@@ -34,9 +34,10 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
       m_progress(0)
 {
 
-    QNetworkProxyFactory::setUseSystemConfiguration(true);
+    //make sure we use application wide NetworkAccessManager:
+    m_webView->page()->setNetworkAccessManager(m_core->networkAccessManager());
 
-
+    //TODO: make this configurable via settings
     m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
 
     m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
@@ -57,7 +58,7 @@ RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
 
 
 
-
+    //TODO: load webpage given in user settings
     m_webView->load(QUrl("http://www.radiofrei.de/"));
 
 

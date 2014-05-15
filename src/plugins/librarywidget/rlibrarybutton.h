@@ -25,14 +25,27 @@
 
 #include "rpushbutton.h"
 
+class QLabel;
+
 class RLibraryButton : public RPushButton
 {
     Q_OBJECT
 
-protected:
+public:
 
-    void paintEvent(QPaintEvent *);
-    
+    explicit RLibraryButton(QWidget *parent = 0);
+    void setTitle(const QString &title);
+    void setArtist(const QString &artist);
+    void setTime(const QString &time);
+    void setId(const QString &id);
+
+private:
+
+    QLabel *m_title;
+    QLabel *m_artist;
+    QLabel *m_time;
+    QLabel *m_id;
+
 };
 
 #endif // RLIBRARYBUTTON_H

@@ -54,6 +54,8 @@ private slots:
     void deletePluginSwitchAction(QObject *action);
 
     void toggleFullscreen();
+    void loadStyleSheet();
+    void openStyleSheet();
 
     ////test show/hide plugin widget
 
@@ -90,6 +92,8 @@ private:
     QSignalMapper *m_mapperLoadNewPlugin;
     QSignalMapper *m_mapperClosePlugin;
     QSignalMapper *m_mapperClosePluginHost;
+
+    QString m_styleSheetName;
 
 };
 

@@ -39,7 +39,7 @@ public:
     ~CoreImpl();
 
     Rack::CoreState state() const;
-
+    QNetworkAccessManager *networkAccessManager() const;
     QList<QAbstractItemModel *> modelList() const;
 
 public slots:
@@ -56,11 +56,14 @@ private:
     RackWindow *m_mainwindow;
 
     Rack::CoreState m_state;
+    QList<QAbstractItemModel *> m_modelList;
+    QNetworkAccessManager *m_networkAccessManager;
+
+
     Rack::CoreState m_oldState;
     void toggleState(Rack::CoreState stateOne, Rack::CoreState stateTwo);
     void emitStateChangeSignals(Rack::CoreState state, bool set);
 
-    QList<QAbstractItemModel *> m_modelList;
 
     //core implemented models to be used in plugin widgets
     QFileSystemModel *m_fileSystemModel;

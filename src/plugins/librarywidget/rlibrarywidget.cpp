@@ -36,7 +36,7 @@ RLibraryWidget::RLibraryWidget(ICore *api, QWidget *parent) :
     //TODO: hardcoded model select:
     if (!m_core->modelList().isEmpty())
     {
-        m_model = m_core->modelList().at(1);
+        m_model = m_core->modelList().at(2);
     }
 
     m_folderButtonView->setModel(m_model);

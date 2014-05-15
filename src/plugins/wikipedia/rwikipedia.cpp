@@ -31,6 +31,8 @@ RWikipedia::RWikipedia(ICore *api, QWidget *parent)
 {
 
     QWebView *webView = new QWebView;
+    //make sure we use application wide NetworkAccessManager:
+    webView->page()->setNetworkAccessManager(m_core->networkAccessManager());
     webView->load(QUrl("http://de.mobile.wikipedia.org/"));
     //webView->setZoomFactor(0.8);
 

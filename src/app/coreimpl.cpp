@@ -22,14 +22,18 @@
 
 #include "coreimpl.h"
 #include "rackwindow.h"
+#include "rcouchdbmodel.h"
 
 #include <QtWidgets>
+#include <QNetworkAccessManager>
+#include <QNetworkProxyFactory>
 #include <QtSql>
 
 
 CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_mainwindow(mainwindow),
     m_state(Rack::NormalState),
+    m_networkAccessManager(new QNetworkAccessManager(this)),
     m_oldState(Rack::NormalState),
     m_fileSystemModel(new QFileSystemModel(this)),
     m_sqlQueryModel(new QSqlQueryModel(this))
@@ -47,9 +51,16 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     m_modelList.append(m_fileSystemModel);
 
     //sql
-    m_sqlQueryModel->setQuery("SELECT artist, title FROM audio ORDER BY artist");
+    m_sqlQueryModel->setQuery("SELECT * FROM audio ORDER BY artist");
 
     m_modelList.append(m_sqlQueryModel);
+
+    //couchdb
+    //localhost:5984/rackdb/_design/library/_view/media
+    QUrl url("http://localhost:5984/rackdb/_design/library/_view/media");
+    RCouchDBModel *couchDBModel = new RCouchDBModel(m_networkAccessManager, url, this);
+    m_modelList.append(couchDBModel);
+
 
     startTimer(1000);
 }
@@ -58,6 +69,16 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 Rack::CoreState CoreImpl::state() const
 {
     return m_state;
+}
+
+QNetworkAccessManager *CoreImpl::networkAccessManager() const
+{
+    return m_networkAccessManager;
+}
+
+QList<QAbstractItemModel *> CoreImpl::modelList() const
+{
+    return m_modelList;
 }
 
 void CoreImpl::setNormalState()
@@ -110,12 +131,6 @@ void CoreImpl::emitStateChangeSignals(Rack::CoreState state, bool set)
             emit deleteStateChanged(set);
             break;
     }
-}
-
-
-QList<QAbstractItemModel *> CoreImpl::modelList() const
-{
-    return m_modelList;
 }
 
 void CoreImpl::timerEvent(QTimerEvent *)

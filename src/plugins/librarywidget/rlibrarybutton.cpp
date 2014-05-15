@@ -23,19 +23,48 @@
 #include "rlibrarybutton.h"
 #include <QtWidgets>
 
-void RLibraryButton::paintEvent(QPaintEvent *)
+RLibraryButton::RLibraryButton(QWidget *parent) :
+    RPushButton(parent),
+    m_title(new QLabel),
+    m_artist(new QLabel),
+    m_time(new QLabel),
+    m_id(new QLabel)
 {
-    QStylePainter painter(this);
-    QStyleOptionButton option;
-    initStyleOption(&option);
-    option.text = "";
-    uint flags = Qt::TextWordWrap | Qt::AlignLeft | Qt::AlignVCenter;
-    QRectF rect = painter.style()->subElementRect(QStyle::SE_PushButtonContents, &option, this);
-    if (rect.height() < painter.boundingRect(rect, flags, text()).height())
-    {
-        flags =  Qt::TextWordWrap | Qt::AlignLeft | Qt::AlignTop;
-    }
-    painter.drawControl(QStyle::CE_PushButton, option);
-    painter.drawText(rect, flags, text());
+    setObjectName("rackLibraryViewButton");
+    m_title->setObjectName("rackLibraryViewButtonTitle");
+    m_artist->setObjectName("rackLibraryViewButtonLabel");
+    m_time->setObjectName("rackLibraryViewButtonLabel");
+    m_id->setObjectName("rackLibraryViewButtonId");
+
+    QGridLayout *gl = new QGridLayout;
+    gl->addWidget(m_title, 0, 0, 1, 2);
+    gl->addWidget(m_artist, 1, 0, 1, 2);
+    gl->addWidget(m_time, 2, 0, 1, 1);
+    gl->addWidget(m_id, 2, 1, 1, 1, Qt::AlignRight);
+    setLayout(gl);
+}
+
+void RLibraryButton::setTitle(const QString &title)
+{
+    if (m_title->text() == title) return;
+    m_title->setText(title);
+}
+
+void RLibraryButton::setArtist(const QString &artist)
+{
+    if (m_artist->text() == artist) return;
+    m_artist->setText(artist);
+}
+
+void RLibraryButton::setTime(const QString &time)
+{
+    if (m_time->text() == time) return;
+    m_time->setText(time);
+}
+
+void RLibraryButton::setId(const QString &id)
+{
+    if (m_id->text() == id) return;
+    m_id->setText(id);
 }
 

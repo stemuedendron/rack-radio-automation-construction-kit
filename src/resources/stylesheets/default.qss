@@ -810,6 +810,7 @@ QPushButton:pressed {
     background-image: url(:/images/pfl-small.png);
     background-repeat: none;
     background-origin: content;
+    background-position: top right;
 }
 
 [state="3"]#rackHotkeyButton {
@@ -841,15 +842,12 @@ QPushButton:pressed {
     background-image: url(:/images/pfl-small.png);
     background-repeat: none;
     background-origin: content;
+    background-position: top right;
 }
 
 [state="3"]#rackLibraryViewButton {
     color: red;
 }
-
-
-
-
 
 [isFolder="true"]#rackLibraryViewButton {
     background-image: url(:/images/folder.png);
@@ -878,6 +876,22 @@ QPushButton:pressed {
     min-width: 60px;
     color: #FFFFFF;
     padding: 5px;
+}
+
+#rackLibraryViewButtonTitle {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#rackLibraryViewButtonLabel {
+    color: #DDDDDD;
+    font-size: 14px;
+}
+
+#rackLibraryViewButtonId {
+    color: #DDDDDD;
+    font-size: 10px;
 }
 
 /*End Library Widget*/

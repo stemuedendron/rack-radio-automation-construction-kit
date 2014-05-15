@@ -26,6 +26,8 @@
 #include "rack.h"
 #include <QObject>
 
+
+class QNetworkAccessManager;
 class QAbstractItemModel;
 //class QItemSelection;
 
@@ -41,7 +43,7 @@ public:
 
 
     virtual Rack::CoreState state() const = 0;
-
+    virtual QNetworkAccessManager *networkAccessManager() const = 0;
     virtual QList<QAbstractItemModel *> modelList() const = 0;
 
 
@@ -50,6 +52,8 @@ public:
 
     //if we only want one item to be inserted just use a QModelIndex
     //QItemSelection currentItemSelection;
+
+
 
 public slots:
 
