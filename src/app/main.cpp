@@ -30,11 +30,13 @@ int main(int argc, char *argv[])
 
     //TODO: read carefully QApplication and Qt Namespace docs!!!!
 
-    QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
-    QApplication app(argc, argv);
-    app.setOrganizationName("Radio F.R.E.I.");
-    app.setApplicationName("r.a.c.k. - Radio Automation Construction Kit");
+    //QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
 
+    QApplication app(argc, argv);
+
+    app.setApplicationName("r.a.c.k.");
+    app.setOrganizationName("Radio F.R.E.I.");
+    app.setApplicationDisplayName("r.a.c.k. - Radio Automation Construction Kit");
 
     //connect to database:
     //TODO: settings from config

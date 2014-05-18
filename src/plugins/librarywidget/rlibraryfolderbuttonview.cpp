@@ -372,7 +372,7 @@ void RLibraryFolderButtonView::dataChanged(const QModelIndex &topLeft, const QMo
 void RLibraryFolderButtonView::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     qDebug() << "model: rowsInserted";
-//    setButtonData();
+    setButtonData();
 }
 
 void RLibraryFolderButtonView::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)

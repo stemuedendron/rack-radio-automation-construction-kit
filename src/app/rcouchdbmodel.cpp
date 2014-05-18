@@ -31,24 +31,25 @@
 
 RCouchDBModel::RCouchDBModel(QNetworkAccessManager *nam, QUrl url, QObject *parent) :
     QStandardItemModel(parent),
-    m_nam(nam),
-    m_reply(0)
+    m_nam(nam)
 {
 
     QNetworkRequest request;
     request.setUrl(url);
 
-    m_reply = m_nam->get(request);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(finished()));
+    QNetworkReply *reply = m_nam->get(request);
+    connect(reply, SIGNAL(finished()), this, SLOT(populateFinished()));
 
 }
 
-void RCouchDBModel::finished()
+void RCouchDBModel::populateFinished()
 {
-    QJsonDocument doc = QJsonDocument::fromJson(m_reply->readAll());
-    qDebug() << doc.toJson();
 
-    // check if reply is empty
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+    //qDebug() << doc.toJson();
+
+    // check if reply is not empty
     if (!doc.isNull())
     {
         QJsonObject json = doc.object();
@@ -71,8 +72,14 @@ void RCouchDBModel::finished()
 
     qDebug() << this->rowCount();
 
-    m_reply->deleteLater();
-    m_reply = 0;
+    reply->deleteLater();
+    
+    
+}
+
+void RCouchDBModel::couchDBChanged()
+{
+    
 }
 
 

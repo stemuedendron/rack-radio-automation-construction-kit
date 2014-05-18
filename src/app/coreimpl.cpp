@@ -57,7 +57,9 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
 
     //couchdb
     //localhost:5984/rackdb/_design/library/_view/media
-    QUrl url("http://localhost:5984/rackdb/_design/library/_view/media");
+
+    QUrl url("http://localhost:5984/dummy/_design/library/_view/media");
+
     RCouchDBModel *couchDBModel = new RCouchDBModel(m_networkAccessManager, url, this);
     m_modelList.append(couchDBModel);
 

@@ -52,7 +52,8 @@ HEADERS += \
     ../shared/rack.h \
     ../shared/rackdclient.h \
     ../shared/rackdclientsocket.h \
-    rcouchdbmodel.h
+    rcouchdbmodel.h \
+    version.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \

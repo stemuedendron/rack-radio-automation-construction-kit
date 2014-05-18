@@ -51,7 +51,6 @@ RackWindow::RackWindow() :
     m_mapperClosePluginHost(new QSignalMapper(this))
 {
 
-    setWindowTitle(tr("R.A.C.K."));
     setContextMenuPolicy(Qt::NoContextMenu);
 
     m_styleSheetName = ":/stylesheets/default.qss";

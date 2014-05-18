@@ -26,7 +26,6 @@
 #include <QStandardItemModel>
 
 class QNetworkAccessManager;
-class QNetworkReply;
 
 class RCouchDBModel : public QStandardItemModel
 {
@@ -43,12 +42,12 @@ public slots:
 
 private slots:
 
-    void finished();
+    void populateFinished();
+    void couchDBChanged();
 
 private:
 
     QNetworkAccessManager *m_nam;
-    QNetworkReply *m_reply;
 
 };
 
