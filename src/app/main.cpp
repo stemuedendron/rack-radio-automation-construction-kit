@@ -28,6 +28,8 @@
 int main(int argc, char *argv[])
 {
 
+    qDebug() << "welcome to r.a.c.k. version" << VER;
+
     //TODO: read carefully QApplication and Qt Namespace docs!!!!
 
     //QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
@@ -35,8 +37,10 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     app.setApplicationName("r.a.c.k.");
-    app.setOrganizationName("Radio F.R.E.I.");
     app.setApplicationDisplayName("r.a.c.k. - Radio Automation Construction Kit");
+    app.setOrganizationName("Radio F.R.E.I.");
+    app.setApplicationVersion("0.1");
+
 
     //connect to database:
     //TODO: settings from config

@@ -52,8 +52,7 @@ HEADERS += \
     ../shared/rack.h \
     ../shared/rackdclient.h \
     ../shared/rackdclientsocket.h \
-    rcouchdbmodel.h \
-    version.h
+    rcouchdbmodel.h
 
 INCLUDEPATH += \
     ../libs/extensionsystem \
@@ -67,9 +66,9 @@ OTHER_FILES += \
     ../resources/stylesheets/flat.qss
 
 
-
-
-
+VERSION = $$system(git describe)
+VERSTR = '\\"$${VERSION}\\"'  # place quotes around the version string
+DEFINES += VER=\"$${VERSTR}\" # create a VER macro containing the version string
 
 
 
