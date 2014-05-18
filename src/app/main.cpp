@@ -28,18 +28,24 @@
 int main(int argc, char *argv[])
 {
 
-    qDebug() << "welcome to r.a.c.k. version" << VER;
-
     //TODO: read carefully QApplication and Qt Namespace docs!!!!
 
     //QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
 
-    QApplication app(argc, argv);
+    QApplication app(argc, argv);    
 
     app.setApplicationName("r.a.c.k.");
     app.setApplicationDisplayName("r.a.c.k. - Radio Automation Construction Kit");
     app.setOrganizationName("Radio F.R.E.I.");
-    app.setApplicationVersion("0.1");
+    app.setOrganizationDomain("rack-broadcast.org");
+
+    QString version =  QString("%1.%2 git%3").arg(VER_MAJ, VER_MIN).arg(QString(VER_GIT).toInt(0,16));
+    app.setApplicationVersion(version);
+    app.setProperty("buildDateTime", QDateTime::currentDateTimeUtc());
+
+    qDebug() << "welcome to r.a.c.k." << qApp->applicationVersion();
+    qDebug() << "build" << qApp->property("buildDateTime").toDateTime().toString("dd.MM.yyyy hh:mm:ss UTC");
+
 
 
     //connect to database:

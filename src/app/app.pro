@@ -20,6 +20,17 @@
 #    Author: Steffen Müller
 #
 
+
+# versioning:
+VER_MAJ = 0
+VER_MIN = 1
+VER_GIT = $$system(git describe --always)
+DEFINES += VER_MAJ=\\\"$$VER_MAJ\\\"
+DEFINES += VER_MIN=\\\"$$VER_MIN\\\"
+DEFINES += VER_GIT=\\\"$$VER_GIT\\\"
+
+
+
 QT += sql widgets network
 
 TARGET = rack
@@ -64,11 +75,6 @@ RESOURCES += \
 OTHER_FILES += \
     ../resources/stylesheets/default.qss \
     ../resources/stylesheets/flat.qss
-
-
-VERSION = $$system(git describe)
-VERSTR = '\\"$${VERSION}\\"'  # place quotes around the version string
-DEFINES += VER=\"$${VERSTR}\" # create a VER macro containing the version string
 
 
 
