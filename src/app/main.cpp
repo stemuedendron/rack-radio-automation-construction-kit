@@ -20,6 +20,7 @@
     Author: Steffen Müller
 */
 
+#include "rack.h"
 #include "rackwindow.h"
 
 #include <QtWidgets>
@@ -39,11 +40,14 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Radio F.R.E.I.");
     app.setOrganizationDomain("rack-broadcast.org");
 
-    QString version =  QString("%1.%2 git%3").arg(VER_MAJ, VER_MIN).arg(QString(VER_GIT).toInt(0,16));
-    app.setApplicationVersion(version);
+    app.setApplicationVersion(RACK_VERSION_STR);
+    app.setProperty("gitVersion", RACK_VER_GIT);
     app.setProperty("buildDateTime", QDateTime::currentDateTimeUtc());
 
+
+
     qDebug() << "welcome to r.a.c.k." << qApp->applicationVersion();
+    qDebug() << "git:" << qApp->property("gitVersion");
     qDebug() << "build" << qApp->property("buildDateTime").toDateTime().toString("dd.MM.yyyy hh:mm:ss UTC");
 
 

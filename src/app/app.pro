@@ -20,15 +20,12 @@
 #    Author: Steffen Müller
 #
 
+# QSLog:
+include(../libs/3rdparty/QsLog/QsLog.pri)
 
-# versioning:
-VER_MAJ = 0
-VER_MIN = 1
-VER_GIT = $$system(git describe --always)
-DEFINES += VER_MAJ=\\\"$$VER_MAJ\\\"
-DEFINES += VER_MIN=\\\"$$VER_MIN\\\"
-DEFINES += VER_GIT=\\\"$$VER_GIT\\\"
-
+# git version:
+RACK_VER_GIT = $$system(git describe --always)
+DEFINES += RACK_VER_GIT=\\\"$$RACK_VER_GIT\\\"
 
 
 QT += sql widgets network
