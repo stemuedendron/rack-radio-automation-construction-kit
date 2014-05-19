@@ -68,15 +68,15 @@ int main(int argc, char *argv[])
 //    QLOG_FATAL() << "Fatal error!";
 
 
-    app.setApplicationName("r.a.c.k.");
-    app.setApplicationDisplayName("r.a.c.k. - Radio Automation Construction Kit");
+    app.setApplicationName("R.A.C.K.");
+    app.setApplicationDisplayName("R.A.C.K - Radio Automation Construction Kit");
     app.setOrganizationName("Radio F.R.E.I.");
     app.setOrganizationDomain("rack-broadcast.org");
     app.setApplicationVersion(RACK_VERSION_STR);
 
 
-    qDebug() << "welcome to r.a.c.k." << RACK_VERSION_STR << "build:" << __TIME__ << __DATE__;
-    qDebug() << "git:" << RACK_VERSION_GIT;
+    qDebug() << "R.A.C.K." << RACK_VERSION_STR;
+    qDebug() << "Built on" << RACK_BUILD_DATE_STR << "at" << RACK_BUILD_TIME_STR;
 
 
 

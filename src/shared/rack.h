@@ -23,9 +23,9 @@
 #ifndef RACK_H
 #define RACK_H
 
-
-#define RACK_VERSION_STR   "0.0.1"
-
+#define RACK_VERSION_STR   "0.4.6"
+#define RACK_BUILD_DATE_STR __DATE__
+#define RACK_BUILD_TIME_STR __TIME__
 
 #include <QObject>
 
