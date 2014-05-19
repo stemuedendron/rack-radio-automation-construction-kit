@@ -21,18 +21,22 @@
 #
 
 TEMPLATE    = subdirs
+CONFIG     += ordered
 SUBDIRS     = app \
+              rackd \
               plugins/digitalclock \
+              plugins/radioclock \
               plugins/hotkeywidget \
               plugins/librarywidget \
-              plugins/radioclock \
+              plugins/wikipedia \
               plugins/webbrowser \
+              rackdtest \
+              rackstatus \
               tests/rplayertest \
-              tests/colordialog \
-    rackd \
-    rackdtest \
-    rackstatus \
-    plugins/wikipedia
+              tests/colordialog
+
+
+
 
 
 

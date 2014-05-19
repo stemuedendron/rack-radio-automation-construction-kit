@@ -23,8 +23,12 @@
 #include "rack.h"
 #include "rackwindow.h"
 
+#include "QsLog.h"
+#include "QsLogDest.h"
+
 #include <QtWidgets>
 #include <QtSql>
+
 
 int main(int argc, char *argv[])
 {
@@ -33,22 +37,46 @@ int main(int argc, char *argv[])
 
     //QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
 
-    QApplication app(argc, argv);    
+    QApplication app(argc, argv);
+    using namespace QsLogging;
+
+
+
+    // 1. init the logging mechanism
+    Logger& logger = Logger::instance();
+    logger.setLoggingLevel(QsLogging::TraceLevel);
+    const QString sLogPath(QDir(app.applicationDirPath()).filePath("log.txt"));
+
+    // 2. add two destinations
+    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(
+                                      sLogPath, EnableLogRotation, MaxSizeBytes(512), MaxOldLogCount(2)));
+    DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
+    logger.addDestination(debugDestination);
+    logger.addDestination(fileDestination);
+
+
+    // 3. start logging
+//    QLOG_INFO() << "Program started";
+//    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
+
+//    QLOG_TRACE() << "Here's a" << QString::fromUtf8("trace") << "message";
+//    QLOG_DEBUG() << "Here's a" << static_cast<int>(QsLogging::DebugLevel) << "message";
+//    QLOG_WARN()  << "Uh-oh!";
+//    qDebug() << "This message won't be picked up by the logger";
+//    QLOG_ERROR() << "An error has occurred";
+//    qWarning() << "Neither will this one";
+//    QLOG_FATAL() << "Fatal error!";
+
 
     app.setApplicationName("r.a.c.k.");
     app.setApplicationDisplayName("r.a.c.k. - Radio Automation Construction Kit");
     app.setOrganizationName("Radio F.R.E.I.");
     app.setOrganizationDomain("rack-broadcast.org");
-
     app.setApplicationVersion(RACK_VERSION_STR);
-    app.setProperty("gitVersion", RACK_VER_GIT);
-    app.setProperty("buildDateTime", QDateTime::currentDateTimeUtc());
 
 
-
-    qDebug() << "welcome to r.a.c.k." << qApp->applicationVersion();
-    qDebug() << "git:" << qApp->property("gitVersion");
-    qDebug() << "build" << qApp->property("buildDateTime").toDateTime().toString("dd.MM.yyyy hh:mm:ss UTC");
+    qDebug() << "welcome to r.a.c.k." << RACK_VERSION_STR << "build:" << __TIME__ << __DATE__;
+    qDebug() << "git:" << RACK_VERSION_GIT;
 
 
 

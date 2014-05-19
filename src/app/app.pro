@@ -24,8 +24,8 @@
 include(../libs/3rdparty/QsLog/QsLog.pri)
 
 # git version:
-RACK_VER_GIT = $$system(git describe --always)
-DEFINES += RACK_VER_GIT=\\\"$$RACK_VER_GIT\\\"
+RACK_VERSION_GIT = $$system(git describe --always)
+DEFINES += RACK_VERSION_GIT=\\\"$$RACK_VERSION_GIT\\\"
 
 
 QT += sql widgets network
