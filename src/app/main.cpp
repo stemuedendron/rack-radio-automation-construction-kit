@@ -38,35 +38,6 @@ int main(int argc, char *argv[])
     //QApplication::setStyle(QStyleFactory::create(QLatin1String("windows")));
 
     QApplication app(argc, argv);
-    using namespace QsLogging;
-
-
-
-    // 1. init the logging mechanism
-    Logger& logger = Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
-    const QString sLogPath(QDir(app.applicationDirPath()).filePath("log.txt"));
-
-    // 2. add two destinations
-    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(
-                                      sLogPath, EnableLogRotation, MaxSizeBytes(512), MaxOldLogCount(2)));
-    DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
-    logger.addDestination(debugDestination);
-    logger.addDestination(fileDestination);
-
-
-    // 3. start logging
-//    QLOG_INFO() << "Program started";
-//    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
-
-//    QLOG_TRACE() << "Here's a" << QString::fromUtf8("trace") << "message";
-//    QLOG_DEBUG() << "Here's a" << static_cast<int>(QsLogging::DebugLevel) << "message";
-//    QLOG_WARN()  << "Uh-oh!";
-//    qDebug() << "This message won't be picked up by the logger";
-//    QLOG_ERROR() << "An error has occurred";
-//    qWarning() << "Neither will this one";
-//    QLOG_FATAL() << "Fatal error!";
-
 
     app.setApplicationName("R.A.C.K.");
     app.setApplicationDisplayName("R.A.C.K - Radio Automation Construction Kit");
@@ -74,10 +45,22 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("rack-broadcast.org");
     app.setApplicationVersion(RACK_VERSION_STR);
 
+    // logging:
+    using namespace QsLogging;
+    Logger& logger = Logger::instance();
+    logger.setLoggingLevel(QsLogging::InfoLevel);
+    const QString logPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    QDir logDir;
+    logDir.mkpath(logPath);
+    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(logPath + "/rack.log", EnableLogRotation, MaxSizeBytes(1024*1000), MaxOldLogCount(4)));
+    DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
+    logger.addDestination(fileDestination);
+    logger.addDestination(debugDestination);
 
-    qDebug() << "R.A.C.K." << RACK_VERSION_STR;
-    qDebug() << "Built on" << RACK_BUILD_DATE_STR << "at" << RACK_BUILD_TIME_STR;
 
+    QLOG_INFO() << "start R.A.C.K., Version" << RACK_VERSION_STR;
+    QLOG_INFO() << "Built on" << RACK_BUILD_DATE_STR << "at" << RACK_BUILD_TIME_STR;
+    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
 
 
     //connect to database:
@@ -93,24 +76,24 @@ int main(int argc, char *argv[])
 //                              qApp->tr("Unable to establish a database connection.\n"
 //                                       "Click Cancel to exit."), QMessageBox::Cancel);
 //        return 1;
-        qDebug() << "no database connection";
-        qDebug() << db.lastError();
+        QLOG_ERROR() << "no database connection";
+        QLOG_ERROR() << db.lastError();
+    }
+    else
+    {
+        QLOG_INFO() << "database connected";
     }
 
-    QStringList driverList;
-    driverList = QSqlDatabase::drivers();
-    foreach (QString driver, driverList) {
-        qDebug() << driver;
-    }
-
+//    QStringList driverList;
+//    driverList = QSqlDatabase::drivers();
+//    foreach (QString driver, driverList) {
+//        qDebug() << driver;
+//    }
 
 
     RackWindow mainWindow;
-
     mainWindow.resize(800, 600);
 //  mainWindow.setWindowState(Qt::WindowMaximized);
-
     mainWindow.show();
-
     return app.exec();
 }
