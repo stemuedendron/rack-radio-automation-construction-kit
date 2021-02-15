@@ -31,8 +31,12 @@
 RackdClient::RackdClient(QObject *parent)
     : QObject(parent),
       m_socket(new RackdClientSocket(this)),
-      m_meterSocket(new QUdpSocket(this))
+      m_meterSocket(new QUdpSocket(this)),
+      m_requestDS(new QDataStream(&m_request, QIODevice::WriteOnly))
 {
+
+    m_requestDS->setVersion(QDataStream::Qt_4_9);
+    *m_requestDS << quint32(0);
 
     for (quint16 i = 30000; i < 30100; i++)
     {
@@ -52,6 +56,11 @@ RackdClient::RackdClient(QObject *parent)
     connect(m_socket, SIGNAL(newBlock(RackdClientSocket*, QByteArray)), this, SLOT(handleResponse(RackdClientSocket*, QByteArray)));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleError(QAbstractSocket::SocketError)));
 
+}
+
+RackdClient::~RackdClient()
+{
+    delete m_requestDS;
 }
 
 
@@ -78,121 +87,91 @@ void RackdClient::handleError(QAbstractSocket::SocketError socketError)
 }
 
 
-void RackdClient::sendRequest()
-{
-    if (m_socket->state() == QAbstractSocket::ConnectedState)
-    {
-        //qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
 
-        m_socket->write(m_request);
-    }
-    m_request.clear();
-}
+
+
+
 
 
 //rackd protocoll implementation, requests:
 
 void RackdClient::passWord(const QString &password)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("PW") << password;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("PW") << password;
     sendRequest();
 }
 
 void RackdClient::dropConnection()
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("DC");
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("DC");
     sendRequest();
 }
 
 void RackdClient::loadStream(quint8 device, const QString &uri)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("LS") << device << uri;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("LS") << device << uri;
     sendRequest();
 }
 
 void RackdClient::unloadStream(quint32 handle)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("US") << handle;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("US") << handle;
     sendRequest();
 }
 
 void RackdClient::positionPlay(quint32 handle, quint32 pos)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("PP") << handle << pos;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("PP") << handle << pos;
     sendRequest();
 }
 
 void RackdClient::play(quint32 handle)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("PY") << handle;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("PY") << handle;
     sendRequest();
 }
 
 void RackdClient::stop(quint32 handle)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("SP") << handle;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("SP") << handle;
     sendRequest();
 }
 
-
-
 void RackdClient::meterEnable(bool ok)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    ok ? out << quint32(0) << QString("ME") << m_meterSocket->localPort() : out << quint32(0) << QString("ME") << quint16(0);
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    ok ? *m_requestDS << QString("ME") << m_meterSocket->localPort() : *m_requestDS << QString("ME") << quint16(0);
     sendRequest();
 }
 
 void RackdClient::waveForm(quint32 handle)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("WF") << handle;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("WF") << handle;
     sendRequest();
 }
 
 void RackdClient::waveForm1(quint32 handle)
 {
-    QDataStream out(&m_request, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_9);
-    out << quint32(0) << QString("WL") << handle;
-    out.device()->seek(0);
-    out << quint32(m_request.size() - sizeof(quint32));
+    *m_requestDS << QString("WL") << handle;
     sendRequest();
 }
+
+
+void RackdClient::sendRequest()
+{
+    m_requestDS->device()->seek(0);
+    *m_requestDS << quint32(m_request.size() - sizeof(quint32));
+    if (m_socket->state() == QAbstractSocket::ConnectedState)
+    {
+        //qDebug() << "send request block:" << m_request.toHex() << "size (Bytes):" << m_request.size();
+        m_socket->write(m_request);
+    }
+    m_request.clear();
+}
+
+
+
+
+
 
 
 
@@ -203,6 +182,9 @@ void RackdClient::waveForm1(quint32 handle)
 
 void RackdClient::handleResponse(RackdClientSocket *client, const QByteArray &responseBlock)
 {
+
+    //qDebug() << "received response block:" << responseBlock.toHex() << "size (Bytes):" << responseBlock.size();
+
     Q_UNUSED(client);
     QDataStream response(responseBlock);
     response.setVersion(QDataStream::Qt_4_9);
@@ -382,11 +364,14 @@ void RackdClient::handleDatagram()
             quint8 device;
             quint32 handle;
             quint32 pos;
-            response >> device >> handle >> pos;
+            quint16 leftLevel;
+            quint16 rightLevel;
+
+            response >> device >> handle >> pos >> leftLevel >> rightLevel;
 
             //qDebug() << "meter position:" << device << handle << pos;
 
-            emit position(device, handle, pos);
+            emit position(device, handle, pos, leftLevel, rightLevel);
         }
 
     }

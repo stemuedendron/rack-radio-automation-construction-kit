@@ -151,7 +151,9 @@ private slots:
 private:
 
     //protocol handling:
-    void sendResponse(RackdClientSocket *client, const QByteArray &response);
+    void sendResponse(RackdClientSocket *client);
+    QByteArray m_response;
+    QDataStream *m_responseDS;
 
     quint16 m_maxConnections;
 

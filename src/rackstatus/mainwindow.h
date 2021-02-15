@@ -47,7 +47,7 @@ private slots:
     void connected();
     void disconnected();
     void timer();
-    void position(quint8 device, quint32 handle, quint32 position);
+    void position(quint8 device, quint32 handle, quint32 position, quint16 leftLevel, quint16 rightLevel);
 
 
 private:

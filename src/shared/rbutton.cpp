@@ -52,7 +52,7 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
     //cause device[0] runs out of index, means device 0 is not valid, check rplayer and bass!!!!!!!
 
 
-    m_device = devices[0].engineIndex;
+    m_device = devices[6].engineIndex;
 
     if (!RPlayer::init(m_device)) qWarning("Can't initialize device %d", m_device);
 
@@ -70,7 +70,7 @@ RButton::RButton(ButtonKind bk, QWidget *parent)
     ////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
 
-    QFile file("../../src/resources/audio/main.ogg");
+    QFile file("main.ogg");
     QString filename = file.fileName();
     qDebug() << filename;
 

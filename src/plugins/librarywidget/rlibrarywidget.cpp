@@ -39,21 +39,29 @@ RLibraryWidget::RLibraryWidget(ICore *api, QWidget *parent) :
         m_model = m_core->modelList().at(2);
     }
 
-    m_folderButtonView->setModel(m_model);
+    //proxy model for searching:
+    QSortFilterProxyModel *proxy = new QSortFilterProxyModel(this);
+    proxy->setSourceModel(m_model);
+    proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxy->setFilterKeyColumn(-1);
 
-    QFileSystemModel *model = qobject_cast<QFileSystemModel *>(m_model);
-    if (model)
-    {
-        m_folderButtonView->setRootIndex(model->index(model->rootPath()));
-    }
+    m_folderButtonView->setModel(proxy);
 
-    QObject::connect(m_folderButtonView, SIGNAL(clicked(QModelIndex)), this, SLOT(listClicked(QModelIndex)));
+//    QFileSystemModel *model = qobject_cast<QFileSystemModel *>(m_model);
+//    if (model)
+//    {
+//        m_folderButtonView->setRootIndex(model->index(model->rootPath()));
+//    }
+
+//    QObject::connect(m_folderButtonView, SIGNAL(clicked(QModelIndex)), this, SLOT(listClicked(QModelIndex)));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(3);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(m_folderButtonView);
     setLayout(layout);
+
+    connect(m_folderButtonView, SIGNAL(textChanged(QString)), proxy, SLOT(setFilterFixedString(QString)));
 
 }
 

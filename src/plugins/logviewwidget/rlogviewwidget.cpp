@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013, Steffen Müller.
+    Copyright (C) 2014, Steffen Müller.
     All rights reserved.
 
     This file is part of r.a.c.k. radio automation construction kit
@@ -21,22 +21,31 @@
 */
 
 #include "icore.h"
-#include "rwikipedia.h"
-#include <QtWebEngineWidgets>
+#include "rlogviewwidget.h"
+#include "rtail.h"
 
-RWikipedia::RWikipedia(ICore *api, QWidget *parent)
-    : QWidget(parent),
-      m_core(api)
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QStandardPaths>
+
+RLogViewWidget::RLogViewWidget(ICore *api, QWidget *parent) :
+    QWidget(parent),
+    m_core(api)
 {
 
-    QWebEngineView *webView = new QWebEngineView;
-    //make sure we use application wide NetworkAccessManager:
-    //webView->page()->setNetworkAccessManager(m_core->networkAccessManager());
-    webView->load(QUrl("http://de.m.wikipedia.org/"));
-    //webView->setZoomFactor(0.8);
+    QTextEdit *logViewer = new QTextEdit;
+    logViewer->setObjectName("rackLogViewerTextEdit");
+    logViewer->setReadOnly(true);
+
+    const QString logPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    RTail *tail = new RTail(logPath + "/rack.log", this);
+    tail->connect(tail, SIGNAL(logString(QString)), logViewer, SLOT(append(QString)));
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(webView);
+    layout->setSpacing(3);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(logViewer);
     setLayout(layout);
 
+    m_core->logInfo("Log Viewer Plugin loaded");
 }

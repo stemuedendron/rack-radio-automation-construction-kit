@@ -56,7 +56,7 @@ protected slots:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void rowsInserted(const QModelIndex &parent, int start, int end);
     void rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
-    void rowsRemoved(const QModelIndex&, int, int);
+    void rowsRemoved(const QModelIndex&, int start, int end);
     void layoutChanged();
 
     void setButtonData();
@@ -69,6 +69,7 @@ protected slots:
 signals:
 
     void clicked(const QModelIndex &index);
+    void textChanged(const QString &text);
 
 protected:
 
@@ -90,6 +91,7 @@ private:
     int m_currentPage;
 
     RLibraryButton *createOneButton();
+    bool rowsVisible(int start, int end);
 
 };
 

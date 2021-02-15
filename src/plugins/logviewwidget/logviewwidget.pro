@@ -20,20 +20,22 @@
 #    Author: Steffen Müller
 #
 
-TEMPLATE    = subdirs
-CONFIG     += ordered
-SUBDIRS     = app \
-              rackd \
-              plugins/digitalclock \
-              plugins/radioclock \
-              plugins/hotkeywidget \
-              plugins/librarywidget \
-              plugins/wikipedia \
-              plugins/webbrowser \
-              plugins/logviewwidget \
-              rackdtest \
-              rackstatus \
-              tests/rplayertest \
-              tests/colordialog
+include(../../libs/extensionsystem/plugins.pri)
 
+QT += widgets
+TEMPLATE = lib
+CONFIG += plugin
+
+
+TARGET = $$qtLibraryTarget(logviewwidgetplugin)
+
+HEADERS += \
+    rlogviewwidget.h \
+    rlogviewwidgetplugin.h \
+    rtail.h
+
+SOURCES += \
+    rlogviewwidget.cpp \
+    rlogviewwidgetplugin.cpp \
+    rtail.cpp
 

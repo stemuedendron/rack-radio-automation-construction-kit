@@ -30,7 +30,7 @@ rack colors gradients 1-9 via colordialog buttons properties
 
 */
 
-/* Icons for plugin widgets follow the rule: classname + ToolButton */
+/* Icons for plugin widgets follows the rule: classname + ToolButton */
 
 /* this is a fallback if no image is provided and MUST be before real images: */
 #rackPluginHostToolBar > QToolButton {
@@ -894,6 +894,11 @@ QPushButton:pressed {
     font-size: 10px;
 }
 
+#rackLibraryViewSearchField {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 /*End Library Widget*/
 
 
@@ -1017,3 +1022,17 @@ RButton[playerState="3"] {
     border-color: red;
     qproperty-positionClockColor: rgba(255,0,0,100);
 }
+
+
+/* LogView Widget */
+
+#rackLogViewerTextEdit {
+    background-color: #000000;
+    border: none;
+    color: #CCCCCC;
+    font-size: 12px;
+}
+
+/* End LogView Widget */
+
+

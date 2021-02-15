@@ -75,6 +75,10 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
     headerLayout->addWidget(b1,       0, 2, 2, 1);
     headerLayout->addWidget(b2,       0, 3, 2, 1);
 
+    //search field
+    QLineEdit *ed = new QLineEdit;
+    ed->setObjectName("rackLibraryViewSearchField");
+
     //footer
     m_footer->setObjectName("rackWidgetFooter");
 
@@ -102,6 +106,7 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
     layout->setSpacing(3);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(m_header);
+    layout->addWidget(ed);
     layout->addWidget(m_buttons);
     layout->addWidget(m_footer);
     setLayout(layout);
@@ -109,6 +114,7 @@ RLibraryFolderButtonView::RLibraryFolderButtonView(ICore *api, QWidget *parent) 
     QObject::connect(b0, SIGNAL(clicked()), this, SLOT(oneLevelUp()));
     QObject::connect(b1, SIGNAL(clicked()), this, SLOT(previousPage()));
     QObject::connect(b2, SIGNAL(clicked()), this, SLOT(nextPage()));
+    QObject::connect(ed, SIGNAL(textChanged(QString)), this, SIGNAL(textChanged(QString)));
 
 }
 
@@ -344,7 +350,7 @@ QAbstractItemModel *RLibraryFolderButtonView::model() const
 void RLibraryFolderButtonView::setRootIndex(const QModelIndex &index)
 {
     if (index.isValid() && index.model() != m_model) {
-        qWarning("QAbstractItemView::setRootIndex failed : index must be from the currently set model");
+        qWarning("QAbstractItemView::setRootIndex failed : index must be from the current model");
         return;
     }
     m_root = index;
@@ -372,26 +378,25 @@ void RLibraryFolderButtonView::dataChanged(const QModelIndex &topLeft, const QMo
 void RLibraryFolderButtonView::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     qDebug() << "model: rowsInserted";
-    setButtonData();
+    if (rowsVisible(start, end)) setButtonData();
 }
 
 void RLibraryFolderButtonView::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
-    qDebug() << "model: rowsAboutToBeRemoved";
-    setButtonData();
+//    qDebug() << "model: rowsAboutToBeRemoved";
+//    setButtonData();
 }
 
-void RLibraryFolderButtonView::rowsRemoved(const QModelIndex &, int, int)
+void RLibraryFolderButtonView::rowsRemoved(const QModelIndex &, int start, int end)
 {
     qDebug() << "model: rowsRemoved";
-    setButtonData();
+    if (rowsVisible(start, end)) setButtonData();
 }
 
 void RLibraryFolderButtonView::reset()
 {
     qDebug() << "model: reset";
     qDebug() << "we have:" << m_model->rowCount();
-
     setButtonData();
 }
 
@@ -399,4 +404,11 @@ void RLibraryFolderButtonView::layoutChanged()
 {
     qDebug() << "model: layoutChanged";
     setButtonData();
+}
+
+bool RLibraryFolderButtonView::rowsVisible(int start, int end)
+{
+    int startVisible = m_currentPage * m_buttons->layout()->count();
+    int endVisible = startVisible + m_buttons->layout()->count() - 1;
+    return (start >= startVisible && start <= endVisible) || (end >= startVisible && end <= endVisible);
 }

@@ -31,3 +31,4 @@ HEADERS += \
     ../../libs/extensionsystem/iwidgetplugin.h
 
 DESTDIR  = ../../app/plugins
+

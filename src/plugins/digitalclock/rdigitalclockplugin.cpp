@@ -26,6 +26,8 @@
 QWidget *RDigitalClockPlugin::createRWidget(ICore *api, QWidget *parent)
 {
 
+    api->logDebug("try to create digital clock widget");
+
     return new RDigitalClock(api, parent);
 
 }

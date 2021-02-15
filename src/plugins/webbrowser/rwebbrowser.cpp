@@ -23,31 +23,30 @@
 #include "icore.h"
 #include "rwebbrowser.h"
 #include <QtWidgets>
-#include <QtWebKitWidgets>
+#include <QtWebEngineWidgets>
 
 RWebBrowser::RWebBrowser(ICore *api, QWidget *parent)
     : QWidget(parent),
       m_core(api),
-      m_webView(new QWebView),
+      m_webView(new QWebEngineView),
       m_locationEdit(new QLineEdit),
       m_buttonLayout(new QVBoxLayout),
       m_progress(0)
 {
 
-    //make sure we use application wide NetworkAccessManager:
-    m_webView->page()->setNetworkAccessManager(m_core->networkAccessManager());
+
 
     //TODO: make this configurable via settings
-    m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    //m_webView->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
 
     m_locationEdit->setSizePolicy(QSizePolicy::Expanding, m_locationEdit->sizePolicy().verticalPolicy());
 
     QToolBar *toolBar = new QToolBar;
 
-    toolBar->addAction(m_webView->pageAction(QWebPage::Back));
-    toolBar->addAction(m_webView->pageAction(QWebPage::Forward));
-    toolBar->addAction(m_webView->pageAction(QWebPage::Reload));
-    toolBar->addAction(m_webView->pageAction(QWebPage::Stop));
+    toolBar->addAction(m_webView->pageAction(QWebEnginePage::Back));
+    toolBar->addAction(m_webView->pageAction(QWebEnginePage::Forward));
+    toolBar->addAction(m_webView->pageAction(QWebEnginePage::Reload));
+    toolBar->addAction(m_webView->pageAction(QWebEnginePage::Stop));
     toolBar->addWidget(m_locationEdit);
 
     QObject::connect(m_webView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
@@ -130,40 +129,40 @@ void RWebBrowser::finishLoading(bool)
 //    m_progress = 100;
     //    adjustTitle();
 
-    QWebFrame* frame = m_webView->page()->mainFrame();
-    if (frame!=NULL)
-    {
-        QWebElementCollection elements = frame->findAllElements("a");
-        foreach (QWebElement element, elements)
-        {
-            QStringList attributesList = element.attributeNames();
-            foreach (QString attributeName, attributesList)
-            {
-                if (attributeName != "href") break;
-                QRegExp rx(".*.mp1$|.*.mp2$|.*.mp3$|.*.mp4$|.*.mpg$|.*.mpa$|.*.wav$|.*.ogg$|.*.m3u$|.*.pls$|.*.xspf$");
-                rx.setCaseSensitivity(Qt::CaseInsensitive);
-                if (element.attribute(attributeName).contains(rx))
-                {
+//    QWebFrame* frame = m_webView->page()->mainFrame();
+//    if (frame!=NULL)
+//    {
+//        QWebElementCollection elements = frame->findAllElements("a");
+//        foreach (QWebElement element, elements)
+//        {
+//            QStringList attributesList = element.attributeNames();
+//            foreach (QString attributeName, attributesList)
+//            {
+//                if (attributeName != "href") break;
+//                QRegExp rx(".*.mp1$|.*.mp2$|.*.mp3$|.*.mp4$|.*.mpg$|.*.mpa$|.*.wav$|.*.ogg$|.*.m3u$|.*.pls$|.*.xspf$");
+//                rx.setCaseSensitivity(Qt::CaseInsensitive);
+//                if (element.attribute(attributeName).contains(rx))
+//                {
 
-                    QUrl baseUrl(m_webView->url());
-                    QUrl relativeUrl = QUrl::fromEncoded(element.attribute(attributeName).toUtf8(), QUrl::StrictMode);
-                    QString streamName = baseUrl.resolved(relativeUrl).toString();
+//                    QUrl baseUrl(m_webView->url());
+//                    QUrl relativeUrl = QUrl::fromEncoded(element.attribute(attributeName).toUtf8(), QUrl::StrictMode);
+//                    QString streamName = baseUrl.resolved(relativeUrl).toString();
 
-                    qDebug() << streamName;
+//                    qDebug() << streamName;
 
-                    //test button
+//                    //test button
 
-                    QPushButton *testButton = new QPushButton(streamName);
-                    m_buttonLayout->addWidget(testButton);
+//                    QPushButton *testButton = new QPushButton(streamName);
+//                    m_buttonLayout->addWidget(testButton);
 
-                    //
+//                    //
 
 
-                }
-            }
-        }
+//                }
+//            }
+//        }
 
-    }
+//    }
 }
 
 void RWebBrowser::setZoom(int z)

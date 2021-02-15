@@ -48,11 +48,14 @@ int main(int argc, char *argv[])
     // logging:
     using namespace QsLogging;
     Logger& logger = Logger::instance();
-    logger.setLoggingLevel(QsLogging::InfoLevel);
+
+    //TODO: set standard loglevel from user settings:
+    logger.setLoggingLevel(QsLogging::TraceLevel);
+
     const QString logPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     QDir logDir;
     logDir.mkpath(logPath);
-    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(logPath + "/rack.log", EnableLogRotation, MaxSizeBytes(1024*1000), MaxOldLogCount(4)));
+    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(logPath + "/rack.log", EnableLogRotation, MaxSizeBytes(1024*1000), MaxOldLogCount(10)));
     DestinationPtr debugDestination(DestinationFactory::MakeDebugOutputDestination());
     logger.addDestination(fileDestination);
     logger.addDestination(debugDestination);
@@ -64,6 +67,14 @@ int main(int argc, char *argv[])
 
 
     //connect to database:
+    QLOG_INFO() << "available database drivers:";
+    QStringList driverList;
+    driverList = QSqlDatabase::drivers();
+    foreach (QString driver, driverList) {
+        QLOG_INFO() << qPrintable(driver);
+    }
+
+
     //TODO: settings from config
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName("localhost");
@@ -83,13 +94,6 @@ int main(int argc, char *argv[])
     {
         QLOG_INFO() << "database connected";
     }
-
-//    QStringList driverList;
-//    driverList = QSqlDatabase::drivers();
-//    foreach (QString driver, driverList) {
-//        qDebug() << driver;
-//    }
-
 
     RackWindow mainWindow;
     mainWindow.resize(800, 600);

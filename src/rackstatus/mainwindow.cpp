@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_rackdClient, SIGNAL(connected()), this, SLOT(connected()));
     connect(m_rackdClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
+    connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32,quint16,quint16)), this, SLOT(position(quint8,quint32,quint32,quint16,quint16)));
 
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timer()));
     m_timer->start(1000);
@@ -68,7 +68,7 @@ void MainWindow::timer()
 }
 
 
-void MainWindow::position(quint8 device, quint32 handle, quint32 position)
+void MainWindow::position(quint8 device, quint32 handle, quint32 position, quint16 leftLevel, quint16 rightLevel)
 {
     m_log->append(QString::number(device) + ":" + QString::number(handle) + ":" + QString::number(position));
 

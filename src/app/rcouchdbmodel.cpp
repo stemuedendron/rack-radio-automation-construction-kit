@@ -38,11 +38,11 @@ RCouchDBModel::RCouchDBModel(QNetworkAccessManager *nam, QUrl url, QObject *pare
     request.setUrl(url);
 
     QNetworkReply *reply = m_nam->get(request);
-    connect(reply, SIGNAL(finished()), this, SLOT(populateFinished()));
+    connect(reply, SIGNAL(finished()), this, SLOT(populateModel()));
 
 }
 
-void RCouchDBModel::populateFinished()
+void RCouchDBModel::populateModel()
 {
 
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -61,6 +61,7 @@ void RCouchDBModel::populateFinished()
             {
                 QJsonObject row = rows[i].toObject();
                 QJsonObject key = row["key"].toObject();
+
 
                 setItem(i, 0 , new QStandardItem(QString(key["_id"].toString())));
                 setItem(i, 1 , new QStandardItem(QString(key["artist"].toString())));

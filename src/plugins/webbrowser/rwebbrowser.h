@@ -27,7 +27,7 @@
 
 class ICore;
 class QVBoxLayout;
-class QWebView;
+class QWebEngineView;
 class QLineEdit;
 
 class RWebBrowser : public QWidget
@@ -51,7 +51,7 @@ protected slots:
 private:
 
     ICore* m_core;
-    QWebView *m_webView;
+    QWebEngineView *m_webView;
     QLineEdit *m_locationEdit;
     QVBoxLayout *m_buttonLayout;
     int m_progress;

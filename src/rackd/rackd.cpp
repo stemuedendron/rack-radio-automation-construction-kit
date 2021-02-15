@@ -211,9 +211,10 @@ void waveformThread1::run()
         quint32 unit = qRound(float(info.chans * info.freq) / 200);
         float buf[unit];
         QList<QPair<float, float> > samples;
-        while (BASS_ChannelIsActive(decoder) == BASS_ACTIVE_PLAYING)
+        while (true)
         {
             DWORD written = BASS_ChannelGetData(decoder, buf, (unit * sizeof(float)) | BASS_DATA_FLOAT);
+            if (written == (DWORD)-1) break;
             float min = 0;
             float max = 0;
             for (quint16 i = 0; i < written / (info.chans * sizeof(float)); i++)
@@ -269,6 +270,7 @@ void SigHandler(int signum)
 
 Rackd::Rackd(QObject *parent)
     : QTcpServer(parent),
+      m_responseDS(new QDataStream(&m_response, QIODevice::WriteOnly)),
       m_maxConnections(32),
       m_meterSocket(new QUdpSocket(this)),
       m_lastBassError(0)
@@ -278,6 +280,10 @@ Rackd::Rackd(QObject *parent)
     signal(SIGHUP,SigHandler);
     signal(SIGINT,SigHandler);
     signal(SIGTERM,SigHandler);
+
+    //prepare response block:
+    m_responseDS->setVersion(QDataStream::Qt_4_9);
+    *m_responseDS << quint32(0);
 
     //start listen:
     if (!listen(QHostAddress::Any, 1234))
@@ -400,14 +406,10 @@ void Rackd::handleError(QAbstractSocket::SocketError)
 void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 {
 
+    //qDebug() << "received request block:" << request.toHex() << "size (Bytes):" << request.size();
+
     QDataStream requestDS(request);
     requestDS.setVersion(QDataStream::Qt_4_9);
-
-    //prepare response block:
-    QByteArray response;
-    QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_4_9);
-    responseDS << quint32(0);
 
     QString command;
     requestDS >> command;
@@ -420,13 +422,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         requestDS >> pw;
         bool ok = (pw == "pass"); //TODO: read from settings
         client->setAuth(ok);
-        responseDS << command << ok;
+        *m_responseDS << command << ok;
 
         qDebug() << "client" <<  client->peerAddress().toString()  << client->peerPort() << "authenticated:" << client->isAuth();
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -444,10 +444,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
         qDebug() << "ERROR: authentication required!";
 
-        responseDS << QString("ER") << command << QString("request need authentication");
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        *m_responseDS << QString("ER") << command << QString("request need authentication");
+        sendResponse(client);
         return;
     }
 
@@ -492,17 +490,15 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
             (t > 0) ? time = quint32(t) : time = 0;
 
-            responseDS << command << device << uri << quint32(handle) << time << true;
+            *m_responseDS << command << device << uri << quint32(handle) << time << true;
         }
         else
         {
             qDebug() << "ERROR: load stream failed:" << uri << BASS_ErrorGetCode();
-            responseDS << command << device << uri << quint32(handle) << quint32(0) << false;
+            *m_responseDS << command << device << uri << quint32(handle) << quint32(0) << false;
         }
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -511,7 +507,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         quint32 handle;
         requestDS >> handle;
         bool ok = BASS_StreamFree(handle);
-        responseDS << command << handle << ok;
+        *m_responseDS << command << handle << ok;
 
         qDebug() << "unload stream:" << handle << ok << BASS_ErrorGetCode();
 
@@ -528,9 +524,7 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         qDebug() << "active streams:";
         foreach (RStreamData streamData, m_streams) qDebug() << streamData.handle << streamData.client << streamData.device;
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -542,13 +536,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         requestDS >> handle >> position;
 
         bool ok = BASS_ChannelSetPosition(handle, BASS_ChannelSeconds2Bytes(handle, position / double(1000)), BASS_POS_BYTE);
-        responseDS << command << handle << position << ok;
+        *m_responseDS << command << handle << position << ok;
 
         qDebug() << "seek:" << handle << position << ok << BASS_ErrorGetCode();
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -560,13 +552,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         //bool pitch;
         requestDS >> handle;
         bool ok = BASS_ChannelPlay(handle, false);
-        responseDS << command << handle << ok;
+        *m_responseDS << command << handle << ok;
 
         qDebug() << "play:" << handle << ok << BASS_ErrorGetCode();
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -578,13 +568,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         requestDS >> handle;
         //bool ok = BASS_ChannelPause(handle);
         bool ok = BASS_ChannelStop(handle);
-        responseDS << command << handle << ok;
+        *m_responseDS << command << handle << ok;
 
         qDebug() << "stop:" << handle << ok << BASS_ErrorGetCode();
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -655,13 +643,11 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
         quint16 port;
         requestDS >> port;
         client->setClientMeterPort(port);
-        responseDS << command << port << true;
+        *m_responseDS << command << port << true;
 
         qDebug() << "meter enable:" << client << port;
 
-        responseDS.device()->seek(0);
-        responseDS << quint32(response.size() - sizeof(quint32));
-        sendResponse(client, response);
+        sendResponse(client);
         return;
     }
 
@@ -672,10 +658,8 @@ void Rackd::handleRequest(RackdClientSocket *client, const QByteArray &request)
 
 
     qDebug() << "ERROR: unknown request" << command;
-    responseDS << QString("ER") << command << QString("unknown request");
-    responseDS.device()->seek(0);
-    responseDS << quint32(response.size() - sizeof(quint32));
-    sendResponse(client, response);
+    *m_responseDS << QString("ER") << command << QString("unknown request");
+    sendResponse(client);
 
 }
 
@@ -693,13 +677,8 @@ void Rackd::loadStreamFinished(RackdClientSocket *client, quint8 device, const Q
     }
     RStreamData streamData = {handle, client, device, 0};
     m_streams.append(streamData);
-    QByteArray response;
-    QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_4_9);
-    responseDS << quint32(0) << QString("LS") << device << uri << handle << time << ok;
-    responseDS.device()->seek(0);
-    responseDS << quint32(response.size() - sizeof(quint32));
-    sendResponse(client, response);
+    *m_responseDS << QString("LS") << device << uri << handle << time << ok;
+    sendResponse(client);
 }
 
 
@@ -712,15 +691,10 @@ void Rackd::waveformFinished(RackdClientSocket *client, quint32 handle, QImage w
         qDebug() << "client that requested waveform is disconnected";
         return;
     }
-    QByteArray response;
-    QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_4_9);
-    responseDS << quint32(0) << QString("WF") << handle << waveform << ok;
-    responseDS.device()->seek(0);
-    responseDS << quint32(response.size() - sizeof(quint32));
-    sendResponse(client, response);
+    *m_responseDS << QString("WF") << handle << waveform << ok;
+    sendResponse(client);
 
-    qDebug() << "block size:" << response.size();
+    qDebug() << "block size:" << m_response.size();
 }
 
 
@@ -733,26 +707,24 @@ void Rackd::waveformFinished1(RackdClientSocket *client, quint32 handle, RImageL
         qDebug() << "client that requested waveform1 is disconnected";
         return;
     }
-    QByteArray response;
-    QDataStream responseDS(&response, QIODevice::WriteOnly);
-    responseDS.setVersion(QDataStream::Qt_4_9);
-    responseDS << quint32(0) << QString("WL") << handle << waveforms << ok;
-    responseDS.device()->seek(0);
-    responseDS << quint32(response.size() - sizeof(quint32));
-    sendResponse(client, response);
+    *m_responseDS << QString("WL") << handle << waveforms << ok;
+    sendResponse(client);
 
-    qDebug() << "block size:" << response.size();
+    qDebug() << "block size:" << m_response.size();
 }
 
 
 
-void Rackd::sendResponse(RackdClientSocket *client, const QByteArray &response)
+void Rackd::sendResponse(RackdClientSocket *client)
 {
+    m_responseDS->device()->seek(0);
+    *m_responseDS << quint32(m_response.size() - sizeof(quint32));
     if (client->state() == QAbstractSocket::ConnectedState)
     {
-        //qDebug() << "send response block:" << response.toHex() << "size (Bytes):" << response.size();
-        client->write(response);
+        //qDebug() << "send response block:" << m_response.toHex() << "size (Bytes):" << m_response.size();
+        client->write(m_response);
     }
+    m_response.clear();
 }
 
 
@@ -767,7 +739,27 @@ void Rackd::timerEvent(QTimerEvent *)
         out.setVersion(QDataStream::Qt_4_9);
         qint64 pos = qint64(BASS_ChannelBytes2Seconds(m_streams.at(i).handle, BASS_ChannelGetPosition(m_streams.at(i).handle, BASS_POS_BYTE)) * 1000);
         (pos > 0) ? m_streams[i].position = quint32(pos) : m_streams[i].position = 0;
-        out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position;
+
+        quint16 leftLevel = 0;
+        quint16 rightLevel = 0;
+        if (BASS_ChannelIsActive(m_streams.at(i).handle) == BASS_ACTIVE_PLAYING)
+        {
+            DWORD level = BASS_ChannelGetLevel(m_streams.at(i).handle);
+            if (level > 0)
+            {
+                leftLevel = LOWORD(level);
+                rightLevel = HIWORD(level);
+            }
+        }
+
+
+        out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position << leftLevel << rightLevel;
+
+        //out << QString("MP") << m_streams.at(i).device << m_streams.at(i).handle << m_streams.at(i).position;
+
+
+
+
 
         //qDebug() << data.client << data.handle << data.position;
 
@@ -828,6 +820,7 @@ void Rackd::doCleanUp()
 Rackd::~Rackd()
 {
     qDebug() << "destructor called. Goodbye from rack daemon!";
+    delete m_responseDS;
 }
 
 

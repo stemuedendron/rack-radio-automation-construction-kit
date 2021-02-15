@@ -26,12 +26,16 @@ QT       += network
 HEADERS += \
     mainwindow.h \
     ../shared/rackdclient.h \
-    ../shared/rackdclientsocket.h
+    ../shared/rackdclientsocket.h \
+    rpeakmeter.h \
+    rmeterbar.h
 
 SOURCES += \
     mainwindow.cpp \
     main.cpp \
     ../shared/rackdclient.cpp \
-    ../shared/rackdclientsocket.cpp
+    ../shared/rackdclientsocket.cpp \
+    rpeakmeter.cpp \
+    rmeterbar.cpp
 
 INCLUDEPATH += ../shared

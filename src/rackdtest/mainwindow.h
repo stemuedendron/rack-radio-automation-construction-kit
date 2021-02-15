@@ -24,13 +24,13 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QBasicTimer>
 
 class RackdClient;
-class QLineEdit;
 class QSpinBox;
 class QTextEdit;
-//class QSlider;
 class QLabel;
+class RPeakMeter;
 class QGraphicsScene;
 class QGraphicsView;
 class QFrame;
@@ -52,6 +52,8 @@ protected:
 
 private slots:
 
+    void togglePeakmeter();
+
     void connectToServer();
     void sendPass();
     void meterEnable(bool ok);
@@ -69,7 +71,7 @@ private slots:
     //slots for response signals:
     void passWordOK(bool ok);
     void streamLoaded(quint32 handle, quint32 time);
-    void position(quint8 device, quint32 handle, quint32 position);
+    void position(quint8 device, quint32 handle, quint32 position, quint16 leftLevel, quint16 rightLevel);
     void waveFormGenerated(quint32 handle, QImage waveform);
 
     void waveFormGenerated1(quint32 handle, QList<QImage> waveforms);
@@ -79,18 +81,18 @@ private slots:
 private:
 
     RackdClient *m_rackdClient;
-    QLineEdit *m_le;
     QSpinBox *m_sb;
     QTextEdit *m_log;
-    //QSlider *m_slider;
     QLabel *m_labelTime;
+
+    RPeakMeter *m_peakMeter;
+
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
     QFrame *m_playCursor;
 
     quint32 m_handle;
     quint32 m_time;
-
 
 };
 

@@ -41,6 +41,7 @@ class RackdClient : public QObject
 public:
 
     explicit RackdClient(QObject *parent = 0);
+    ~RackdClient();
 
 
 public slots:
@@ -93,7 +94,8 @@ signals:
 
 
     //udp meter status:
-    void position(quint8 device, quint32 handle, quint32 position);
+    void position(quint8 device, quint32 handle, quint32 position, quint16 leftLevel, quint16 rightLevel);
+
 
     void waveFormGenerated(quint32 handle, QImage waveform);
 
@@ -104,6 +106,7 @@ private:
     RackdClientSocket *m_socket;
     QUdpSocket *m_meterSocket;
     QByteArray m_request;
+    QDataStream *m_requestDS;
     void sendRequest();
 
 

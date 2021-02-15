@@ -20,34 +20,31 @@
     Author: Steffen Müller
 */
 
-#ifndef RCOUCHDBMODEL_H
-#define RCOUCHDBMODEL_H
+#ifndef RLOGVIEWWIDGETPLUGIN_H
+#define RLOGVIEWWIDGETPLUGIN_H
 
-#include <QStandardItemModel>
+#include "iwidgetplugin.h"
+#include <QObject>
 
-class QNetworkAccessManager;
 
-class RCouchDBModel : public QStandardItemModel
+class RLogViewWidgetPlugin : public QObject, IWidgetPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.rack.IWidgetPlugin/1.0")
+    Q_INTERFACES(IWidgetPlugin)
 
 public:
 
-    explicit RCouchDBModel(QNetworkAccessManager *nam, QUrl url, QObject *parent = 0);
+    QWidget *createRWidget(ICore *api, QWidget *parent = 0);
 
-signals:
-
-public slots:
-
-private slots:
-
-    void populateModel();
-    void couchDBChanged();
-
-private:
-
-    QNetworkAccessManager *m_nam;
+    QString name() const { return "Log Viewer"; }
+    QString description() const { return tr("This is a simple log viewer."); }
+    QString version() const { return "0.0.1"; }
+    QString url() const { return "http://rack-radio-automation-construction-kit.googlecode.com/"; }
+    QString vendor() const { return "rack"; }
+    QString license() const { return "GNU GPLv3+"; }
+    QString copyright() const { return "Copyright (C) Steffen Müller"; }
 
 };
 
-#endif // RCOUCHDBMODEL_H
+#endif // RLOGVIEWWIDGETPLUGIN_H

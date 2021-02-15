@@ -42,6 +42,8 @@ public:
     QNetworkAccessManager *networkAccessManager() const;
     QList<QAbstractItemModel *> modelList() const;
 
+
+
 public slots:
 
     void setNormalState();
@@ -49,7 +51,14 @@ public slots:
     void toggleDeleteState();
     void togglePreviewState();
 
-    void getHello(const QString &);
+    void getHello(const QString &str);
+
+    void logTrace(const QString &str);
+    void logDebug(const QString &str);
+    void logInfo(const QString &str);
+    void logWarn(const QString &str);
+    void logError(const QString &str);
+    void logFatal(const QString &str);
 
 private:
 

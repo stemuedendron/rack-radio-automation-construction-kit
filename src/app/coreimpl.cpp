@@ -23,6 +23,7 @@
 #include "coreimpl.h"
 #include "rackwindow.h"
 #include "rcouchdbmodel.h"
+#include "QsLog.h"
 
 #include <QtWidgets>
 #include <QNetworkAccessManager>
@@ -58,7 +59,7 @@ CoreImpl::CoreImpl(RackWindow *mainwindow) :
     //couchdb
     //localhost:5984/rackdb/_design/library/_view/media
 
-    QUrl url("http://localhost:5984/dummy/_design/library/_view/media");
+    QUrl url("http://localhost:5984/rackdb/_design/library/_view/media");
 
     RCouchDBModel *couchDBModel = new RCouchDBModel(m_networkAccessManager, url, this);
     m_modelList.append(couchDBModel);
@@ -144,6 +145,36 @@ void CoreImpl::timerEvent(QTimerEvent *)
 void CoreImpl::getHello(const QString &str)
 {
     m_mainwindow->setWindowTitle(str);
+}
+
+void CoreImpl::logTrace(const QString &str)
+{
+    QLOG_TRACE() << qPrintable(str);
+}
+
+void CoreImpl::logDebug(const QString &str)
+{
+    QLOG_DEBUG() << qPrintable(str);
+}
+
+void CoreImpl::logInfo(const QString &str)
+{
+    QLOG_INFO() << qPrintable(str);
+}
+
+void CoreImpl::logWarn(const QString &str)
+{
+    QLOG_WARN() << qPrintable(str);
+}
+
+void CoreImpl::logError(const QString &str)
+{
+    QLOG_ERROR() << qPrintable(str);
+}
+
+void CoreImpl::logFatal(const QString &str)
+{
+    QLOG_FATAL() << qPrintable(str);
 }
 
 CoreImpl::~CoreImpl()

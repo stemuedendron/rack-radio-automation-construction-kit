@@ -53,8 +53,6 @@ public:
     //if we only want one item to be inserted just use a QModelIndex
     //QItemSelection currentItemSelection;
 
-
-
 public slots:
 
     //state slots:
@@ -64,6 +62,13 @@ public slots:
     virtual void togglePreviewState() = 0;
 
     virtual void getHello(const QString &) = 0;
+
+    virtual void logTrace(const QString &) = 0;
+    virtual void logDebug(const QString &) = 0;
+    virtual void logInfo(const QString &) = 0;
+    virtual void logWarn(const QString &) = 0;
+    virtual void logError(const QString &) = 0;
+    virtual void logFatal(const QString &) = 0;
 
 signals:
 

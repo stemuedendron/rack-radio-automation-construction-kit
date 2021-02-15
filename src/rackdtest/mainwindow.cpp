@@ -22,6 +22,7 @@
 
 #include "mainwindow.h"
 #include "rackdclient.h"
+#include "rpeakmeter.h"
 
 #include <QtWidgets>
 #include <QHostAddress>
@@ -33,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
     m_rackdClient = new RackdClient(this);
-    m_le = new QLineEdit;
     m_sb = new QSpinBox;
     QPushButton *bConn = new QPushButton("connect");
     QPushButton *bPW = new QPushButton("send password");
@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_labelTime = new QLabel("00:00:00.0");
     QFont f( "Ubuntu", 28, QFont::Bold);
     m_labelTime->setFont(f);
+
+    QPushButton *bTP = new QPushButton("toggle paekmeter");
+    m_peakMeter = new RPeakMeter;
 
     m_scene = new QGraphicsScene;
     m_scene->setBackgroundBrush(Qt::black);
@@ -87,9 +90,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(bUS, SIGNAL(clicked()), this, SLOT(unloadStream()));
     connect(bDC, SIGNAL(clicked()), this, SLOT(dropConnection()));
 
+    connect(bTP, SIGNAL(clicked()), this, SLOT(togglePeakmeter()));
 
     connect(m_view->horizontalScrollBar(), &QAbstractSlider::sliderMoved, this, &MainWindow::setPosition);
-
 
     connect(m_rackdClient, SIGNAL(passWordOK(bool)), this, SLOT(passWordOK(bool)));
     connect(m_rackdClient, SIGNAL(streamLoaded(quint32,quint32)), this, SLOT(streamLoaded(quint32,quint32)));
@@ -98,10 +101,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_rackdClient, SIGNAL(waveFormGenerated1(quint32,QList<QImage>)), this, SLOT(waveFormGenerated1(quint32,QList<QImage>)));
 
     connect(m_rackdClient, SIGNAL(streamUnloaded(quint32)), this, SLOT(streamUnloaded(quint32)));
-    connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32)), this, SLOT(position(quint8,quint32,quint32)));
+    connect(m_rackdClient, SIGNAL(position(quint8,quint32,quint32,quint16,quint16)), this, SLOT(position(quint8,quint32,quint32,quint16,quint16)));
 
     QVBoxLayout *l = new QVBoxLayout();
-    l->addWidget(m_le);
     l->addWidget(m_sb);
     l->addWidget(bConn);
     l->addWidget(bPW);
@@ -117,6 +119,10 @@ MainWindow::MainWindow(QWidget *parent) :
     l->addWidget(bDC);
     l->addWidget(m_log);
     l->addWidget(m_labelTime);
+
+    l->addWidget(bTP);
+    l->addWidget(m_peakMeter);
+
     l->addWidget(m_view);
 
     setLayout(l);
@@ -142,7 +148,9 @@ void MainWindow::meterEnable(bool ok)
 
 void MainWindow::loadStream()
 {
-    m_rackdClient->loadStream(quint8(m_sb->value()), m_le->text());
+    QString fileName = QFileDialog::getOpenFileName(this);
+    m_rackdClient->loadStream(quint8(m_sb->value()), fileName);
+    m_log->append("try to load stream: " + fileName);
 }
 
 void MainWindow::waveForm()
@@ -196,9 +204,10 @@ void MainWindow::streamLoaded(quint32 handle, quint32 time)
 {
     m_handle = handle;
     m_time = time;
+    m_log->append("load stream OK");
 }
 
-void MainWindow::position(quint8 device, quint32 handle, quint32 position)
+void MainWindow::position(quint8 device, quint32 handle, quint32 position, quint16 leftLevel, quint16 rightLevel)
 {
     Q_UNUSED(device);
     if (!(handle == m_handle)) return;
@@ -215,6 +224,10 @@ void MainWindow::position(quint8 device, quint32 handle, quint32 position)
 
     qreal scale = qreal(position) / m_time;
     m_view->horizontalScrollBar()->setValue(int(m_view->horizontalScrollBar()->maximum() * scale));
+
+    //level
+    m_peakMeter->setLeftLevel(leftLevel);
+    m_peakMeter->setRightLevel(rightLevel);
 
 }
 
@@ -235,6 +248,12 @@ void MainWindow::waveFormGenerated1(quint32 handle, QList<QImage> waveforms)
     for (int i = 0; i < waveforms.size(); ++i)
     {
         m_scene->addPixmap(QPixmap::fromImage(waveforms.at(i)));
+
+        //code to save waveform images:
+        //QString fn;
+        //fn = "/home/rf/Arbeitsfläche/waveform1/" + QString::number(i) + ".png";
+        //waveforms.at(i).save(fn);
+
     }
 
     QResizeEvent event(size(), size());
@@ -271,6 +290,12 @@ void MainWindow::resizeEvent(QResizeEvent *)
     }
 
     m_scene->setSceneRect(0, 0, waveformWidth + centerX * 2, waveformHeight);
+
+}
+
+void MainWindow::togglePeakmeter()
+{
+    m_peakMeter->orientation() == Qt::Horizontal ? m_peakMeter->setOrientation(Qt::Vertical) : m_peakMeter->setOrientation(Qt::Horizontal);
 }
 
 
